@@ -1,24 +1,42 @@
+/* poppins */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+/* voltaire */
+@import url('https://fonts.googleapis.com/css2?family=Voltaire&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-/* app/globals.css */
-body {
+*{
   margin: 0;
-  font-family: Arial, sans-serif;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Montserrat", sans-serif;
 }
 
-.container {
-  max-width: 1200px;
+.title{
+  font-family: "Voltaire", sans-serif;
+}
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 25px; /* Width of the scrollbar */
+  height: 25px; /* Height of the horizontal scrollbar */
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: gray; /* Background of the scrollbar (track) */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: orange; /* Color of the scrollbar handle (thumb) */
+  border-radius: 10px; /* Rounded corners for the thumb */
+  border: 2px solid gray; /* Border around the thumb to create a gap effect */
+}
+
+/* Firefox Support */
+.custom-scrollbar {
+  scrollbar-width: thin; /* Make scrollbar thinner */
+  scrollbar-color: #fa8811 #FAEFD3; /* Thumb color and track color */
 }
