@@ -7,6 +7,7 @@ interface SubscribeProps {
   textColor?: string;
   justifyContent?: string;
   itemPosition?: string;
+  placeHolder?: string;
 }
 
 
@@ -33,6 +34,7 @@ export const Subscribe = () => {
 export const SubscribeInsigts: React.FC<SubscribeProps> = ({
   bgColor = "bg-primary-2",
   textColor = "text-secondary-1",
+  placeHolder = "Sign up your email",
 }) => {
 
   return (
@@ -45,7 +47,7 @@ export const SubscribeInsigts: React.FC<SubscribeProps> = ({
             <input
               className={`w-full h-10 p-4 pl-12 border-b-2 border-secondary-1 outline-none ring-0 ${bgColor}`}
               type="text"
-              placeholder="Sign up your email"
+              placeholder={placeHolder}
             />
             <Icon
               className="text-secondary-1 absolute top-1/2 left-0 -translate-y-1/2"

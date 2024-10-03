@@ -18,7 +18,7 @@ export const EventHeroPage = () => {
             <HeroButton />
           </div> 
           <div className="w-full max-w-[90%] mx-auto">
-            <SubscribeInsigts textColor="text-secondary-1" bgColor="bg-transparent" />
+          <SubscribeInsigts textColor="text-secondary-1" bgColor="bg-transparent" placeHolder="Enter your email" />
           </div>
         </div>
       </div>
