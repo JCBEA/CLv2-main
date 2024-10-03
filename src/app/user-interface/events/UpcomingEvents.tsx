@@ -3,6 +3,7 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
+import { EventDetails } from "./EventDetails";
 
 
 // Helper to group events by date
@@ -188,45 +189,4 @@ const getColorClasses = (index: number) => {
 
 
 
-export const EventDetails = [
-  {
-    coverPhoto: "/images/events/cover.png",
-    title: "Mukna Expo Launch & Interactive Mural Unveiling",
-    location: "sawangan park",
-    date: "2024-10-12",
-    strTime: "8:00 AM",
-    endTime: "12:00 PM",
-  },
-  {
-    coverPhoto: "/images/events/cover.png",
-    title: "Mukna Expo Launch & Interactive Mural Unveiling",
-    location: "sawangan park",
-    date: "2024-10-01",
-    strTime: "8:00 AM",
-    endTime: "12:00 PM",
-  },
-  {
-    coverPhoto: "/images/events/cover.png",
-    title: "Mukna Expo Launch & Interactive Mural Unveiling",
-    location: "sawangan park",
-    date: "2024-10-01",
-    strTime: "8:00 AM",
-    endTime: "12:00 PM",
-  },
-  {
-    coverPhoto: "/images/events/cover.png",
-    title: "Mukna Expo Launch & Interactive Mural Unveiling",
-    location: "sawangan park",
-    date: "2024-10-12",
-    strTime: "8:00 AM",
-    endTime: "12:00 PM",
-  },
-  {
-    coverPhoto: "/images/events/cover.png",
-    title: "Mukna Expo Launch & Interactive Mural Unveiling",
-    location: "sawangan park",
-    date: "2024-10-12",
-    strTime: "8:00 AM",
-    endTime: "12:00 PM",
-  },
-];
+

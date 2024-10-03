@@ -1,9 +1,6 @@
 "use client";
 
 import { SubscribeInsigts } from "@/components/reusable-component/Subscribe";
-import { Icon } from "@iconify/react/dist/iconify.js";
-
-
 
 export const EventHeroPage = () => {
   return (
