@@ -94,7 +94,7 @@ export const Messages = () => {
               )}
               <div className="w-full h-full"></div>
               <div className="w-full h-fit p-4">
-                <div className="w-full flex gap-2 justify-between items-center text-primary-2 bg-shade-7 rounded-full px-4">
+                <div className="w-full flex gap-2 justify-between items-center text-primary-2 bg-shade-8 rounded-full px-4">
                   <input
                     className="w-full p-3 outline-none ring-0 placeholder:text-primary-2 bg-transparent"
                     type="text"

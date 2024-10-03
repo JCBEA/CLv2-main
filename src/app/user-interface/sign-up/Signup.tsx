@@ -2,13 +2,12 @@
 
 import { Logo } from "@/components/reusable-component/Logo";
 import { Icon } from "@iconify/react/dist/iconify.js";
-
 import { motion } from "framer-motion";
 import Link from "next/link";
 
 export const Signup = () => {
   return (
-    <div className="w-full min-h-dvh py-[20dvh] bg-[url('/images/signup/background.png')] bg-cover bg-no-repeat relative">
+    <div className="w-full min-h-dvh lg:py-[20dvh] py-[15dvh] bg-[url('/images/signup/background.jpg')] bg-cover bg-no-repeat relative">
       {/* Full height overlay covering the entire div */}
       <div className="absolute inset-0 w-full h-full bg-black/50"></div>
 
@@ -46,11 +45,12 @@ const AccountCreation = () => {
       </div>
 
       {/* Background divs (behind the main content) */}
-      <div className="w-full absolute -bottom-10 z-10 max-w-[90%] left-0 right-0  mx-auto h-32 rounded-2xl bg-shade-4"></div>
-      <div className="w-full absolute -bottom-20 z-0 max-w-[80%] left-0 right-0  mx-auto h-32 rounded-2xl bg-shade-5"></div>
+      <div className="w-full absolute -bottom-10 z-10 max-w-[90%] left-0 right-0  mx-auto h-32 rounded-2xl bg-shade-6"></div>
+      <div className="w-full absolute -bottom-20 z-0 max-w-[80%] left-0 right-0  mx-auto h-32 rounded-2xl bg-shade-7"></div>
     </div>
   );
 };
+  
 
 export const Form = () => {
   return (

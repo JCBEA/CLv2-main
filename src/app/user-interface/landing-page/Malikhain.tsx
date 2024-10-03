@@ -17,7 +17,7 @@ export const Malikhain = () => {
           dynamic future in the Philippines. Witness the power of creativity at
           the heart of economic progress with the Malikhaing Pinoy Program.
         </p>
-        <motion.button className="w-full md:max-w-sm max-w-xs py-3 font-medium rounded-lg bg-shade-3 text-2xl text-secondary-1 relative flex items-center justify-center"
+        <motion.button className="w-full md:max-w-sm max-w-xs py-3 font-medium rounded-lg bg-shade-4 text-2xl text-secondary-1 relative flex items-center justify-center"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}>
           Learn More

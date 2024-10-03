@@ -70,7 +70,7 @@ const ProfileDetails = () => {
 
 const OtherDetails = () => {
   return (
-    <div className="w-full h-fit py-12 bg-shade-6">
+    <div className="w-full h-fit py-12 bg-shade-8">
       <div className="w-full md:max-w-[80%] max-w-[90%] mx-auto flex flex-col gap-1.5">
         {userDetails.map((userDetail, index) => (
           <UserDetail key={index} userDetail={userDetail} />
@@ -120,11 +120,11 @@ const Button = () => {
 
 const ProfileButton = ({ open, setOpen }: ProfileButtonProps) => {
   return (
-    <div className="w-full h-fit flex bg-shade-6">
+    <div className="w-full h-fit flex bg-shade-8">
       <button
         onClick={() => setOpen(false)} // Set open to false to show Calendar
         className={`w-full py-4 font-bold text-lg uppercase flex justify-center items-center gap-2 ${
-          !open ? "bg-shade-1" : "bg-shade-6"
+          !open ? "bg-shade-1" : "bg-shade-8"
         } rounded-tr-lg overflow-hidden`}
       >
         <Icon icon="ph:calendar-dots-thin" width="35" height="35" />
@@ -133,7 +133,7 @@ const ProfileButton = ({ open, setOpen }: ProfileButtonProps) => {
       <button
         onClick={() => setOpen(true)} // Set open to true to show Messages
         className={`w-full py-4 font-bold text-lg uppercase flex justify-center items-center gap-2 ${
-          open ? "bg-shade-1" : "bg-shade-6"
+          open ? "bg-shade-1" : "bg-shade-8"
         } rounded-tl-lg`}
       >
         <Icon icon="arcticons:mail" width="35" height="35" />

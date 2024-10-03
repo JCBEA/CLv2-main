@@ -68,8 +68,8 @@ export const Header = ({
   }, [backgroundColor, textColor, buttonName, paddingLeftCustom, roundedCustom, HeaderProps.bgOpacity, HeaderProps.bgBlur]);
 
   return (
-    <div className={`w-full h-[10dvh] fixed top-0 z-[1000] lg:${paddingLeft}`}>
-      <div className={`w-full h-full lg:${rounded} ${bgColor} ${txtColor} ${bgOpacity} ${bgBlur}`}>
+    <div className={`w-full h-[10dvh] fixed top-0 z-[1000] ${paddingLeft}`}>
+      <div className={`w-full h-full ${rounded} ${bgColor} ${txtColor} ${bgOpacity} ${bgBlur}`}>
         <div className="w-full max-w-[95%] mx-auto h-full flex justify-between items-center">
           <div className="w-fit h-full py-2">
             <Logo width="auto" height="auto" color="text-secondary-2" />

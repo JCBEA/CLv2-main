@@ -1,6 +1,18 @@
-export const Transcribed = () => {
+"use client";
+
+interface TranscribedProps {
+  bgColor?: string;
+  textColor?: string;
+}
+
+export const Transcribed = (
+  { 
+    bgColor = "bg-primary-2", 
+    textColor = "text-secondary-1"
+   }
+  : TranscribedProps = {}) => {
   return (
-    <div className="w-full md:h-[35dvh] h-fit md:py-0 py-12 bg-primary-2 text-secondary-1">
+    <div className={`w-full md:h-[35dvh] h-fit md:py-0 py-12 ${bgColor} ${textColor}`}>
       <div className="w-full h-full flex md:flex-row flex-col md:justify-between justify-evenly  items-center max-w-[80%] mx-auto">
         <div className="md:w-full md:h-full h-fit flex flex-col gap-4 text-lg justify-center items-start uppercase font-semibold">
           <div className="w-fit flex flex-col gap-0.5 justify-center items-center">
