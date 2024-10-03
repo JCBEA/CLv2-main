@@ -4,6 +4,7 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 
+
 // Helper to group events by date
 const groupEventsByDate = (events: { date: string }[]) => {
   return events.reduce((acc: { [key: string]: any[] } = {}, event) => {
@@ -58,9 +59,12 @@ const EventGrid = () => {
   // Group events by date
   const groupedEvents = groupEventsByDate(EventDetails);
 
+  // Sort the dates in ascending order
+  const sortedDates = Object.keys(groupedEvents).sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+
   return (
     <div className="w-full h-fit flex flex-col gap-12 pt-12">
-      {Object.keys(groupedEvents).map((date, groupIndex) => (
+      {sortedDates.map((date, groupIndex) => (
         <div key={date}>
           {/* Date heading */}
           <h1 className="font-bold text-4xl uppercase pb-8 md:text-left text-center">
@@ -71,8 +75,8 @@ const EventGrid = () => {
           </h1>
           {/* Event grid */}
           <div className="w-full h-fit grid xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-12">
-            {groupedEvents[date].map((event, index) => (
-              <EventCard event={event} key={index} groupIndex={groupIndex} />
+            {groupedEvents[date].map((event) => (
+              <EventCard event={event} key={event.title} groupIndex={groupIndex} /> 
             ))}
           </div>
           <div className="w-full h-[1px] bg-primary-1 mt-12"></div>
@@ -82,9 +86,10 @@ const EventGrid = () => {
   );
 };
 
+
 // Add groupIndex as a prop to determine the color scheme
 const EventCard = ({ event, groupIndex }: any) => {
-  // Define dynamic colors based on groupIndex using modulo
+  // Get color classes based on the group index (date index)
   const colorClasses = getColorClasses(groupIndex);
 
   return (
@@ -125,6 +130,8 @@ const EventCard = ({ event, groupIndex }: any) => {
     </motion.div>
   );
 };
+
+
 
 const EventRegisterButton = ({ colorClasses }: any) => {
   return (
@@ -178,7 +185,34 @@ const getColorClasses = (index: number) => {
   }
 };
 
-const EventDetails = [
+
+
+
+export const EventDetails = [
+  {
+    coverPhoto: "/images/events/cover.png",
+    title: "Mukna Expo Launch & Interactive Mural Unveiling",
+    location: "sawangan park",
+    date: "2024-10-12",
+    strTime: "8:00 AM",
+    endTime: "12:00 PM",
+  },
+  {
+    coverPhoto: "/images/events/cover.png",
+    title: "Mukna Expo Launch & Interactive Mural Unveiling",
+    location: "sawangan park",
+    date: "2024-10-01",
+    strTime: "8:00 AM",
+    endTime: "12:00 PM",
+  },
+  {
+    coverPhoto: "/images/events/cover.png",
+    title: "Mukna Expo Launch & Interactive Mural Unveiling",
+    location: "sawangan park",
+    date: "2024-10-01",
+    strTime: "8:00 AM",
+    endTime: "12:00 PM",
+  },
   {
     coverPhoto: "/images/events/cover.png",
     title: "Mukna Expo Launch & Interactive Mural Unveiling",
@@ -192,54 +226,6 @@ const EventDetails = [
     title: "Mukna Expo Launch & Interactive Mural Unveiling",
     location: "sawangan park",
     date: "2024-10-12",
-    strTime: "8:00 AM",
-    endTime: "12:00 PM",
-  },
-  {
-    coverPhoto: "/images/events/cover.png",
-    title: "Mukna Expo Launch & Interactive Mural Unveiling",
-    location: "sawangan park",
-    date: "2024-10-12",
-    strTime: "8:00 AM",
-    endTime: "12:00 PM",
-  },
-  {
-    coverPhoto: "/images/events/cover.png",
-    title: "Mukna Expo Launch & Interactive Mural Unveiling",
-    location: "sawangan park",
-    date: "2024-10-12",
-    strTime: "8:00 AM",
-    endTime: "12:00 PM",
-  },
-  {
-    coverPhoto: "/images/events/cover.png",
-    title: "Mukna Expo Launch & Interactive Mural Unveiling",
-    location: "sawangan park",
-    date: "2024-10-14",
-    strTime: "8:00 AM",
-    endTime: "12:00 PM",
-  },
-  {
-    coverPhoto: "/images/events/cover.png",
-    title: "Mukna Expo Launch & Interactive Mural Unveiling",
-    location: "sawangan park",
-    date: "2024-10-14",
-    strTime: "8:00 AM",
-    endTime: "12:00 PM",
-  },
-  {
-    coverPhoto: "/images/events/cover.png",
-    title: "Mukna Expo Launch & Interactive Mural Unveiling",
-    location: "sawangan park",
-    date: "2024-10-15",
-    strTime: "8:00 AM",
-    endTime: "12:00 PM",
-  },
-  {
-    coverPhoto: "/images/events/cover.png",
-    title: "Mukna Expo Launch & Interactive Mural Unveiling",
-    location: "sawangan park",
-    date: "2024-10-17",
     strTime: "8:00 AM",
     endTime: "12:00 PM",
   },
