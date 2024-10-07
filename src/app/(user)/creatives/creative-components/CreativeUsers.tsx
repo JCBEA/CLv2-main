@@ -16,7 +16,7 @@ export const CreativeUsers = () => {
         <div className="w-full h-fit pb-[15dvh] ">
             <div className="w-full h-full flex flex-col md:max-w-[80%] max-w-[90%] mx-auto ">
                 <div className="w-full p-6">
-                    <h1 className="md:w-full w-fit mx-auto text-5xl font-semibold uppercase md:text-left text-center leading-tight">meet our creatives</h1>
+                    <h1 className="md:w-full w-fit mx-auto lg:text-5xl md:text-4xl text-2xl font-semibold uppercase md:text-left text-center leading-tight">meet our creatives</h1>
                 </div>
                 <div className="grid xl:grid-cols-3 lg:grid-cols-2 md:grid-cols-2 grid-cols-1 lg:gap-16 md:gap-8 lg:gap-y-24 md:gap-y-12 gap-y-8 p-6">
                     {CreativeLegazpiUsers.map((user, id) => (

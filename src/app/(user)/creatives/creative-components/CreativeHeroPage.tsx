@@ -40,9 +40,9 @@ export const CreativeHeroPage = () => {
             transition={pageTransition}
         >
             <div className="w-full lg:max-w-[70%] md:max-w-[80%] max-w-[90%] mx-auto">
-                <motion.div className="w-full flex md:flex-col flex-col-reverse gap-12" variants={staggerChildren}>
-                    <motion.div className="w-full flex md:flex-row flex-col gap-4 md:justify-between justify-center items-center" variants={childVariants}>
-                        <h1 className="md:w-full w-fit text-5xl font-semibold uppercase">Discover</h1>
+                <motion.div className="w-full flex md:flex-col flex-col md:gap-12 gap-6" variants={staggerChildren}>
+                    <motion.div className="w-full flex md:flex-row flex-col-reverse gap-4 md:justify-between justify-center items-center" variants={childVariants}>
+                        <h1 className="md:w-full w-fit md:block hidden text-5xl font-semibold uppercase">Discover</h1>
                         <div className="w-full flex md:justify-end md:items-end justify-center items-center">
                             <SearchInput />
                         </div>

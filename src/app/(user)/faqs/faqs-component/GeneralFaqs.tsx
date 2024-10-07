@@ -73,22 +73,25 @@ const AccordionItem = ({ item }: { item: { question: string; answer: string } })
                             exit="collapsed"
                             variants={{
                                 open: { opacity: 1, height: "auto" },
-                                collapsed: { opacity: 0, height: 0 },
+                                collapsed: { opacity: 0, height: 0, minHeight: 0 },
                             }}
                             transition={{
-                                duration: 0.3,
+                                duration: 0.4, // Lengthened the exit animation a bit
                                 ease: [0.04, 0.62, 0.23, 0.98],
                             }}
                         >
                             <motion.div
                                 variants={{
-                                    collapsed: { y: -10 },
-                                    open: { y: 0 },
+                                    collapsed: { y: -10, opacity: 0 },
+                                    open: { y: 0, opacity: 1 },
                                 }}
-                                transition={{ duration: 0.4 }}
+                                transition={{
+                                    duration: 0.3,
+                                    ease: "easeInOut", // Smooth out the inner content
+                                }}
                                 className="overflow-hidden"
                             >
-                                <p className='text-base font-medium'>{item.answer}</p>
+                                <p className="text-base font-medium">{item.answer}</p>
                             </motion.div>
                         </motion.div>
                     )}

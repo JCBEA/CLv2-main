@@ -1,13 +1,14 @@
 // src/app/user/profile/page.tsx
 "use client"; // Ensure this is the very first line
 
-import { UserProfile } from "@/app/user-interface/profile/UserProfile";
+
 import { Infinite } from "@/components/reusable-component/Infinite";
 import { Subscribe } from "@/components/reusable-component/Subscribe";
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation'; // Ensure you import from next/navigation
 import { decryptToken } from '@/services/authservice'; // Import the decryptToken function
 import { supabase } from '@/services/supabaseClient';
+import { UserProfile } from "./profile/UserProfile";
 
 export default function Profile() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
