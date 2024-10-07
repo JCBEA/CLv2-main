@@ -5,6 +5,7 @@ import { Logo } from "@/components/reusable-component/Logo";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { loginUser } from "@/services/authservice";
 
 export const Signin = () => {
@@ -47,8 +48,8 @@ const AccountCreation = () => {
       </div>
 
       {/* Background divs (behind the main content) */}
-      <div className="w-full absolute -bottom-10 z-10 max-w-[90%] left-0 right-0  mx-auto h-32 rounded-2xl bg-shade-6"></div>
-      <div className="w-full absolute -bottom-20 z-0 max-w-[80%] left-0 right-0  mx-auto h-32 rounded-2xl bg-shade-7"></div>
+      <div className="w-full absolute -bottom-10 z-10 max-w-[90%] left-0 right-0 mx-auto h-32 rounded-2xl bg-shade-6"></div>
+      <div className="w-full absolute -bottom-20 z-0 max-w-[80%] left-0 right-0 mx-auto h-32 rounded-2xl bg-shade-7"></div>
     </div>
   );
 };
@@ -58,6 +59,7 @@ export const Form = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const router = useRouter(); // Initialize useRouter
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,7 +70,8 @@ export const Form = () => {
       // Call login service with username and password
       const user = await loginUser(username, password);
       console.log("Logged in user:", user);
-      // Handle successful login (e.g., redirect to dashboard or show success message)
+      // Redirect to profile page after successful login
+      router.push("/profile"); // Navigate to the profile page
     } catch (err) {
       setError("Invalid username or password");
     } finally {
@@ -78,7 +81,7 @@ export const Form = () => {
 
   return (
     <form className="w-full h-full flex flex-col gap-6" onSubmit={handleSubmit}>
-      {/* username */}
+      {/* Username */}
       <div className="w-full lg:max-w-sm relative">
         <input
           className="w-full h-10 border-b-2 p-4 pl-12 border-secondary-2 outline-none ring-0"
@@ -87,7 +90,6 @@ export const Form = () => {
           value={username}
           onChange={(e) => setUsername(e.target.value)} // Capture username input
         />
-
         <Icon
           className="text-secondary-2 absolute top-1/2 left-0 -translate-y-1/2"
           icon="mdi:user-outline"
@@ -96,7 +98,7 @@ export const Form = () => {
         />
       </div>
 
-      {/* password */}
+      {/* Password */}
       <div className="w-full lg:max-w-sm relative">
         <input
           className="w-full h-10 border-b-2 p-4 pl-12 border-secondary-2 outline-none ring-0"

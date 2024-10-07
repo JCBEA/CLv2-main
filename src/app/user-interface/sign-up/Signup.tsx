@@ -4,7 +4,9 @@ import { Logo } from "@/components/reusable-component/Logo";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { motion } from "framer-motion";
 import Link from "next/link";
-
+import { useState } from "react"; // Import useState
+import { signupUser } from "@/services/authservice";
+import { useRouter } from "next/navigation";
 export const Signup = () => {
   return (
     <div className="w-full min-h-dvh lg:py-[20dvh] py-[15dvh] bg-[url('/images/signup/background.jpg')] bg-cover bg-no-repeat relative">
@@ -45,24 +47,52 @@ const AccountCreation = () => {
       </div>
 
       {/* Background divs (behind the main content) */}
-      <div className="w-full absolute -bottom-10 z-10 max-w-[90%] left-0 right-0  mx-auto h-32 rounded-2xl bg-shade-6"></div>
-      <div className="w-full absolute -bottom-20 z-0 max-w-[80%] left-0 right-0  mx-auto h-32 rounded-2xl bg-shade-7"></div>
+      <div className="w-full absolute -bottom-10 z-10 max-w-[90%] left-0 right-0 mx-auto h-32 rounded-2xl bg-shade-6"></div>
+      <div className="w-full absolute -bottom-20 z-0 max-w-[80%] left-0 right-0 mx-auto h-32 rounded-2xl bg-shade-7"></div>
     </div>
   );
 };
-  
 
 export const Form = () => {
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const router = useRouter();
+  
+  const handleSignup = async (e: React.FormEvent) => {
+    e.preventDefault();
+  
+    try {
+      await signupUser(username, email, password);
+      setSuccess("Signup successful!");
+      setTimeout(() => {
+        router.push("/signin");
+      }, 2000);
+      setError("");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("An unknown error occurred.");
+      }
+      setSuccess("");
+    }
+  };
+  
   return (
-    <form className="w-full h-full flex flex-col gap-6">
+    <form className="w-full h-full flex flex-col gap-6" onSubmit={handleSignup}>
       {/* username */}
-      <div className="w-full lg:max-w-sm relative ">
+      <div className="w-full lg:max-w-sm relative">
         <input
           className="w-full h-10 border-b-2 p-4 pl-12 border-secondary-2 outline-none ring-0"
           type="text"
           placeholder="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)} 
+          required 
         />
-
         <Icon
           className="text-secondary-2 absolute top-1/2 left-0 -translate-y-1/2"
           icon="mdi:user-outline"
@@ -70,12 +100,16 @@ export const Form = () => {
           height="35"
         />
       </div>
+      
       {/* email address */}
       <div className="w-full lg:max-w-sm relative">
         <input
           className="w-full h-10 border-b-2 p-4 pl-12 border-secondary-2 outline-none ring-0"
-          type="text"
+          type="email"
           placeholder="Email address"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required 
         />
         <Icon
           className="text-secondary-2 absolute top-1/2 left-0 -translate-y-1/2"
@@ -84,12 +118,16 @@ export const Form = () => {
           height="35"
         />
       </div>
+      
       {/* password */}
       <div className="w-full lg:max-w-sm relative">
         <input
           className="w-full h-10 border-b-2 p-4 pl-12 border-secondary-2 outline-none ring-0"
-          type="text"
+          type="password"
           placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
         />
         <Icon
           className="text-secondary-2 absolute top-1/2 left-0 -translate-y-1/2"
@@ -98,20 +136,7 @@ export const Form = () => {
           height="35"
         />
       </div>
-      {/* birthdate selector */}
-      <div className="w-full lg:max-w-sm relative">
-        <input
-          className="w-full h-10 border-b-2 p-4 pl-12 border-secondary-2 outline-none ring-0"
-          type="text"
-          placeholder="Birthdate"
-        />
-        <Icon
-          className="text-secondary-2 absolute top-1/2 left-0 -translate-y-1/2"
-          icon="akar-icons:calendar"
-          width="35"
-          height="35"
-        />
-      </div>
+      
       <div className="w-full lg:max-w-sm pt-4">
         <motion.button
           className="border-2 border-secondary-2 w-full py-3 text-lg font-semibold uppercase"
@@ -122,6 +147,10 @@ export const Form = () => {
           Create account
         </motion.button>
       </div>
+      
+      {error && <p className="text-red-500">{error}</p>} 
+      {success && <p className="text-green-500">{success}</p>}
+      
       <div className="w-full flex flex-col justify-center items-center">
         <p>Already have an account?</p>
         <Link href={"/signin"} className="uppercase font-medium cursor-pointer">Login</Link>
