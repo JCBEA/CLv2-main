@@ -2,7 +2,8 @@
 export const loginUser = async (email: string, password: string) => {
     // Simulate an API call to authenticate the user
     if (email === 'test@example.com' && password === 'password') {
-      return { id: '1', name: 'John Doe', email };
+      const user = { id: '1', name: 'John Doe', email };
+      console.log("Login successful:", user); // Log successful login
     } else {
       throw new Error('Invalid email or password');
     }

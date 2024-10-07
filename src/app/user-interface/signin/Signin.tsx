@@ -1,9 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import { Logo } from "@/components/reusable-component/Logo";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { loginUser } from "@/services/authservice";
 
 export const Signin = () => {
   return (
@@ -31,7 +33,7 @@ const AccountCreation = () => {
           <img
             className="w-fit h-full rounded-xl"
             src="images/signup/study.png"
-            alt=""
+            alt="Study"
           />
         </div>
         <div className="w-full h-full flex flex-col gap-12 justify-center items-center p-10">
@@ -52,14 +54,38 @@ const AccountCreation = () => {
 };
 
 export const Form = () => {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    try {
+      // Call login service with username and password
+      const user = await loginUser(username, password);
+      console.log("Logged in user:", user);
+      // Handle successful login (e.g., redirect to dashboard or show success message)
+    } catch (err) {
+      setError("Invalid username or password");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <form className="w-full h-full flex flex-col gap-6">
+    <form className="w-full h-full flex flex-col gap-6" onSubmit={handleSubmit}>
       {/* username */}
-      <div className="w-full lg:max-w-sm relative ">
+      <div className="w-full lg:max-w-sm relative">
         <input
           className="w-full h-10 border-b-2 p-4 pl-12 border-secondary-2 outline-none ring-0"
           type="text"
           placeholder="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)} // Capture username input
         />
 
         <Icon
@@ -74,8 +100,10 @@ export const Form = () => {
       <div className="w-full lg:max-w-sm relative">
         <input
           className="w-full h-10 border-b-2 p-4 pl-12 border-secondary-2 outline-none ring-0"
-          type="text"
+          type="password" // Changed to password type
           placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)} // Capture password input
         />
         <Icon
           className="text-secondary-2 absolute top-1/2 left-0 -translate-y-1/2"
@@ -85,19 +113,24 @@ export const Form = () => {
         />
       </div>
 
+      {error && <p className="text-red-500">{error}</p>}
+
       <div className="w-full lg:max-w-sm pt-4">
         <motion.button
           className="border-2 border-secondary-2 w-full py-3 text-lg font-semibold uppercase"
           type="submit"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
+          disabled={loading} // Disable button while loading
         >
-          Log in
+          {loading ? "Logging in..." : "Log in"} {/* Show loading state */}
         </motion.button>
       </div>
       <div className="w-full flex flex-col justify-center items-center">
-        <p>Already have an account?</p>
-        <Link href={"/signup"} className="uppercase font-medium cursor-pointer">Sign up</Link>
+        <p>Don't have an account?</p>
+        <Link href={"/signup"} className="uppercase font-medium cursor-pointer">
+          Sign up
+        </Link>
       </div>
     </form>
   );
