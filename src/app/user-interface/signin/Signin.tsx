@@ -67,17 +67,21 @@ export const Form = () => {
     setLoading(true);
 
     try {
-      // Call login service with username and password
-      const user = await loginUser(username, password);
-      console.log("Logged in user:", user);
-      // Redirect to profile page after successful login
-      router.push("/profile"); // Navigate to the profile page
+        const user = await loginUser(username, password);
+        console.log("Logged in user:", user);
+        if (user) {
+            // Store the token in local storage or cookies
+            localStorage.setItem("token", user.token); // Example: Store JWT in localStorage
+            router.push("/profile");
+        }
     } catch (err) {
-      setError("Invalid username or password");
+        console.error(err);
+        setError("Invalid username or password");
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
-  };
+};
+
 
   return (
     <form className="w-full h-full flex flex-col gap-6" onSubmit={handleSubmit}>
