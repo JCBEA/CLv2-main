@@ -59,15 +59,37 @@ export const Form = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [creativeField, setCreativeField] = useState("");
+  const [address, setAddress] = useState("");
+  const [mobileNo, setMobileNo] = useState("");
+  const [bio, setBio] = useState("");
+  const [instagram, setInstagram] = useState("");
+  const [facebook, setFacebook] = useState("");
+  const [twitter, setTwitter] = useState("");
+  const [portfolioLink, setPortfolioLink] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const router = useRouter();
-  
+
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-  
+
     try {
-      await signupUser(username, email, password);
+      await signupUser(
+        username,
+        email,
+        password,
+        firstName,
+        creativeField,
+        address,
+        mobileNo,
+        bio,
+        instagram,
+        facebook,
+        twitter,
+        portfolioLink
+      );
       setSuccess("Signup successful!");
       setTimeout(() => {
         router.push("/signin");
@@ -82,18 +104,18 @@ export const Form = () => {
       setSuccess("");
     }
   };
-  
+
   return (
     <form className="w-full h-full flex flex-col gap-6" onSubmit={handleSignup}>
-      {/* username */}
+      {/* Username */}
       <div className="w-full lg:max-w-sm relative">
         <input
           className="w-full h-10 border-b-2 p-4 pl-12 border-secondary-2 outline-none ring-0"
           type="text"
           placeholder="Username"
           value={username}
-          onChange={(e) => setUsername(e.target.value)} 
-          required 
+          onChange={(e) => setUsername(e.target.value)}
+          required
         />
         <Icon
           className="text-secondary-2 absolute top-1/2 left-0 -translate-y-1/2"
@@ -102,8 +124,8 @@ export const Form = () => {
           height="35"
         />
       </div>
-      
-      {/* email address */}
+
+      {/* Email */}
       <div className="w-full lg:max-w-sm relative">
         <input
           className="w-full h-10 border-b-2 p-4 pl-12 border-secondary-2 outline-none ring-0"
@@ -111,7 +133,7 @@ export const Form = () => {
           placeholder="Email address"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          required 
+          required
         />
         <Icon
           className="text-secondary-2 absolute top-1/2 left-0 -translate-y-1/2"
@@ -120,8 +142,8 @@ export const Form = () => {
           height="35"
         />
       </div>
-      
-      {/* password */}
+
+      {/* Password */}
       <div className="w-full lg:max-w-sm relative">
         <input
           className="w-full h-10 border-b-2 p-4 pl-12 border-secondary-2 outline-none ring-0"
@@ -138,25 +160,176 @@ export const Form = () => {
           height="35"
         />
       </div>
-      
-      <div className="w-full lg:max-w-sm pt-4">
-        <motion.button
-          className="border-2 border-secondary-2 w-full py-3 text-lg font-semibold uppercase"
-          type="submit"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          Create account
-        </motion.button>
+
+      {/* First Name */}
+      <div className="w-full lg:max-w-sm relative">
+        <input
+          className="w-full h-10 border-b-2 p-4 pl-12 border-secondary-2 outline-none ring-0"
+          type="text"
+          placeholder="First Name"
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value)}
+          required
+        />
+        <Icon
+          className="text-secondary-2 absolute top-1/2 left-0 -translate-y-1/2"
+          icon="mdi:account-outline"
+          width="35"
+          height="35"
+        />
       </div>
-      
-      {error && <p className="text-red-500">{error}</p>} 
-      {success && <p className="text-green-500">{success}</p>}
-      
-      <div className="w-full flex flex-col justify-center items-center">
-        <p>Already have an account?</p>
-        <Link href={"/signin"} className="uppercase font-medium cursor-pointer">Login</Link>
+
+      {/* Creative Field */}
+      <div className="w-full lg:max-w-sm relative">
+        <input
+          className="w-full h-10 border-b-2 p-4 pl-12 border-secondary-2 outline-none ring-0"
+          type="text"
+          placeholder="Creative Field"
+          value={creativeField}
+          onChange={(e) => setCreativeField(e.target.value)}
+          required
+        />
+        <Icon
+          className="text-secondary-2 absolute top-1/2 left-0 -translate-y-1/2"
+          icon="mdi:palette-outline"
+          width="35"
+          height="35"
+        />
       </div>
+
+      {/* Address */}
+      <div className="w-full lg:max-w-sm relative">
+        <input
+          className="w-full h-10 border-b-2 p-4 pl-12 border-secondary-2 outline-none ring-0"
+          type="text"
+          placeholder="Address"
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
+          required
+        />
+        <Icon
+          className="text-secondary-2 absolute top-1/2 left-0 -translate-y-1/2"
+          icon="mdi:home-outline"
+          width="35"
+          height="35"
+        />
+      </div>
+
+      {/* Mobile No */}
+      <div className="w-full lg:max-w-sm relative">
+        <input
+          className="w-full h-10 border-b-2 p-4 pl-12 border-secondary-2 outline-none ring-0"
+          type="number"
+          placeholder="Mobile No"
+          value={mobileNo}
+          onChange={(e) => setMobileNo(e.target.value)}
+          required
+        />
+        <Icon
+          className="text-secondary-2 absolute top-1/2 left-0 -translate-y-1/2"
+          icon="mdi:phone-outline"
+          width="35"
+          height="35"
+        />
+      </div>
+
+      {/* Bio */}
+      <div className="w-full lg:max-w-sm relative">
+        <textarea
+          className="w-full h-20 border-b-2 p-4 pl-12 border-secondary-2 outline-none ring-0"
+          placeholder="Bio"
+          value={bio}
+          onChange={(e) => setBio(e.target.value)}
+          required
+        />
+        <Icon
+          className="text-secondary-2 absolute top-1/2 left-0 -translate-y-1/2"
+          icon="mdi:book-outline"
+          width="35"
+          height="35"
+        />
+      </div>
+
+      {/* Instagram */}
+      <div className="w-full lg:max-w-sm relative">
+        <input
+          className="w-full h-10 border-b-2 p-4 pl-12 border-secondary-2 outline-none ring-0"
+          type="text"
+          placeholder="Instagram"
+          value={instagram}
+          onChange={(e) => setInstagram(e.target.value)}
+        />
+        <Icon
+          className="text-secondary-2 absolute top-1/2 left-0 -translate-y-1/2"
+          icon="mdi:instagram"
+          width="35"
+          height="35"
+        />
+      </div>
+
+      {/* Facebook */}
+      <div className="w-full lg:max-w-sm relative">
+        <input
+          className="w-full h-10 border-b-2 p-4 pl-12 border-secondary-2 outline-none ring-0"
+          type="text"
+          placeholder="Facebook"
+          value={facebook}
+          onChange={(e) => setFacebook(e.target.value)}
+        />
+        <Icon
+          className="text-secondary-2 absolute top-1/2 left-0 -translate-y-1/2"
+          icon="mdi:facebook"
+          width="35"
+          height="35"
+        />
+      </div>
+
+      {/* Twitter */}
+      <div className="w-full lg:max-w-sm relative">
+        <input
+          className="w-full h-10 border-b-2 p-4 pl-12 border-secondary-2 outline-none ring-0"
+          type="text"
+          placeholder="Twitter"
+          value={twitter}
+          onChange={(e) => setTwitter(e.target.value)}
+        />
+        <Icon
+          className="text-secondary-2 absolute top-1/2 left-0 -translate-y-1/2"
+          icon="mdi:twitter"
+          width="35"
+          height="35"
+        />
+      </div>
+
+      {/* Portfolio Link */}
+      <div className="w-full lg:max-w-sm relative">
+        <input
+          className="w-full h-10 border-b-2 p-4 pl-12 border-secondary-2 outline-none ring-0"
+          type="text"
+          placeholder="Portfolio Link"
+          value={portfolioLink}
+          onChange={(e) => setPortfolioLink(e.target.value)}
+        />
+        <Icon
+          className="text-secondary-2 absolute top-1/2 left-0 -translate-y-1/2"
+          icon="mdi:link-variant"
+          width="35"
+          height="35"
+        />
+      </div>
+
+      {/* Error or Success Message */}
+      {error && <div className="text-red-500">{error}</div>}
+      {success && <div className="text-green-500">{success}</div>}
+
+      {/* Submit Button */}
+      <button
+  className="bg-primary text-white w-full lg:max-w-sm h-10 rounded-lg z-50"
+  type="submit"
+>
+  Sign Up
+</button>
+
     </form>
   );
 };
