@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from "framer-motion";
 import { CreativeArray } from "./CreativeArray";
 import { Icon } from '@iconify/react/dist/iconify.js';
+import Link from 'next/link';
 
 interface CardProps {
     title: string;
@@ -11,6 +12,7 @@ interface CardProps {
     right: string;
     left: string;
     translate: string;
+    link: string;
 }
 
 export const CreativeCarousel = () => {
@@ -27,7 +29,7 @@ export const CreativeCarousel = () => {
                 setCardsPerPage(4);
             } else if (window.innerWidth >= 768) { // sm screens
                 setCardsPerPage(3);
-            }else if (window.innerWidth >= 640) { // sm screens
+            } else if (window.innerWidth >= 640) { // sm screens
                 setCardsPerPage(2);
             } else { // xs screens
                 setCardsPerPage(1);
@@ -52,7 +54,7 @@ export const CreativeCarousel = () => {
     return (
         <div className="w-full md:h-[45dvh] h-[40dvh] relative">
             <div className="w-full md:max-w-[90%] h-full flex justify-center items-center  overflow-hidden mx-auto">
-                <div className="w-full lg:h-[11rem] h-[10rem]"> 
+                <div className="w-full lg:h-[11rem] h-[10rem]">
                     <motion.div
                         className="flex h-full md:px-2 md:gap-1"
                         initial={false}
@@ -79,11 +81,12 @@ export const CreativeCarousel = () => {
                                     right={item.right}
                                     left={item.left}
                                     translate={item.translate}
+                                    link={item.link!}
                                 />
                             </div>
                         ))}
                     </motion.div>
-                </div>  
+                </div>
             </div>
             <button
                 onClick={prev}
@@ -105,7 +108,7 @@ export const CreativeCarousel = () => {
 
 
 // card details
-const CreativeCards: React.FC<CardProps> = ({ title, src, right, left, translate }) => {
+const CreativeCards: React.FC<CardProps> = ({ title, src, right, left, translate, link }) => {
     return (
         <div className="w-full h-full  ">
             <motion.div whileHover={{ scale: 1.05 }} className="w-full h-full max-w-60 mx-auto bg-primary-1 overflow-visible relative rounded-3xl shadow-customShadow">
@@ -116,22 +119,27 @@ const CreativeCards: React.FC<CardProps> = ({ title, src, right, left, translate
                         alt={title}
                     />
                 </div>
-                <CreativeButton title={title} />
+                <CreativeButton title={title} link={link} />
             </motion.div>
         </div>
     );
 };
 
 // Button
-export const CreativeButton: React.FC<{ title: string }> = ({ title }) => {
+export const CreativeButton: React.FC<{ title: string, link: string }> = ({ title, link }) => {
+    if (!link) return null; // Return null if `link` is undefined
+
     return (
-        <motion.button 
-        whileTap={{ scale: 0.95 }}
-        whileHover={{ scale: 1.05 }}
-        className="absolute z-50 -bottom-5 -left-5 flex flex-col justify-center items-center rounded-full text-secondary-1 bg-quaternary-1 w-56 lg:h-14 md:h-12 h-10">
-            <span className="uppercase text-xs font-semibold text-center w-full max-w-48">
-                {title}
-            </span>
-        </motion.button>
+        <Link href={link}>
+            <motion.button
+                whileTap={{ scale: 0.95 }}
+                whileHover={{ scale: 1.05 }}
+                className="absolute z-50 -bottom-5 -left-5 flex flex-col justify-center items-center rounded-full text-secondary-1 bg-quaternary-1 w-56 lg:h-14 md:h-12 h-10"
+            >
+                <span className="uppercase text-xs font-semibold text-center w-full max-w-48">
+                    {title}
+                </span>
+            </motion.button>
+        </Link>
     );
-}
+};

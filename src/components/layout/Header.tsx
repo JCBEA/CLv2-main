@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Logo } from "../reusable-component/Logo";
 import { Icon } from "@iconify/react";
 import { useState, useEffect } from "react";
+import Link from "next/link";
 
 interface MenuItemProps {
   name: string;
@@ -13,10 +14,12 @@ interface HeaderProps {
   backgroundColor?: string;
   textColor?: string;
   buttonName?: string;
+  linkName?: string;
   roundedCustom?: string;
   paddingLeftCustom?: string;
   bgOpacity?: string;
   bgBlur?: string;
+  menuItems: MenuItemProps[]; // Adding dynamic menu items as a prop
 }
 
 const MenuItem = ({ name, link }: MenuItemProps) => {
@@ -44,13 +47,16 @@ export const Header = ({
   backgroundColor = "bg-primary-1", // Default background color
   textColor = "text-primary-2", // Default text color
   buttonName = "Join Mukna", // Default button name
+  linkName = "events",
   paddingLeftCustom = "pl-14",
   roundedCustom = "rounded-bl-3xl",
+  menuItems, // Dynamic menu items passed here
   ...HeaderProps
 }: HeaderProps) => {
   const [bgColor, setBgColor] = useState(backgroundColor);
   const [txtColor, setTxtColor] = useState(textColor);
   const [btnName, setBtnName] = useState(buttonName);
+  const [nameLink, setLinkName] = useState(linkName);
   const [paddingLeft, setPadding] = useState(paddingLeftCustom);
   const [rounded, setRounded] = useState(roundedCustom);
   const [bgOpacity, setBgOpacity] = useState(HeaderProps.bgOpacity);
@@ -90,18 +96,6 @@ export const Header = ({
     setBgBlur(HeaderProps.bgBlur);
   }, [backgroundColor, textColor, buttonName, paddingLeftCustom, roundedCustom, HeaderProps.bgOpacity, HeaderProps.bgBlur]);
 
-
-  // Optional: You can dynamically update the colors or name here if needed (e.g., from an API or user preference).
-  useEffect(() => {
-    setBgColor(backgroundColor);
-    setTxtColor(textColor);
-    setBtnName(buttonName);
-    setPadding(paddingLeftCustom);
-    setRounded(roundedCustom);
-    setBgOpacity(HeaderProps.bgOpacity);
-    setBgBlur(HeaderProps.bgBlur);
-  }, [backgroundColor, textColor, buttonName, paddingLeftCustom, roundedCustom, HeaderProps.bgOpacity, HeaderProps.bgBlur]);
-
   return (
     <div className={`w-full h-[10dvh] fixed top-0 z-[1000] ${paddingLeft}`}>
       <motion.div
@@ -115,16 +109,18 @@ export const Header = ({
             <Logo width="auto" height="auto" color="text-secondary-2" />
           </div>
           <div className="w-fit lg:flex justify-center items-center lg:gap-14 hidden">
-            {headerMenu.map((item, index) => (
+            {menuItems.map((item, index) => (
               <MenuItem key={index} {...item} />
             ))}
-            <motion.button
-              className="uppercase w-44 py-1.5 font-semibold rounded-full bg-shade-2"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              {btnName}
-            </motion.button>
+            <Link href={nameLink}>
+              <motion.button
+                className="uppercase w-44 py-1.5 font-semibold rounded-full bg-shade-2"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                {btnName}
+              </motion.button>
+            </Link>
           </div>
           <Icon
             className="lg:hidden block text-secondary-2"
@@ -138,9 +134,14 @@ export const Header = ({
   );
 };
 
-const headerMenu = [
-  { name: "Directory", link: "/" },
-  { name: "Gallery", link: "/about" },
-  { name: "FAQ", link: "/faqs" },
-  { name: "Log In", link: "/signin" },
-];
+// Example usage with dynamic menu items
+
+// const dynamicMenuItems = [
+//   { name: "Home", link: "/" },
+//   { name: "Services", link: "/services" },
+//   { name: "Blog", link: "/blog" },
+//   { name: "Contact", link: "/contact" },
+// ];
+
+// In a parent component
+// <Header menuItems={dynamicMenuItems} />

@@ -1,3 +1,5 @@
+import { Icon } from "@iconify/react/dist/iconify.js";
+
 export const Footer = () => {
   return (
     <div className="w-full md:h-[25dvh] h-[15dvh] bg-primary-1 ">
@@ -6,19 +8,18 @@ export const Footer = () => {
           <p>All Rights Reserved.</p>
           <p>visit our social media accounts</p>
         </div>
-        <div className="w-full h-fit flex md:gap-6 gap-4">
-          {svgIcons.map((src, index) => (
-            <img
-              key={index}
-              src={src}
-              alt={`social media icon ${index + 1}`}
-              className="w-8 h-8"
-            />
-          ))}
-        </div>
+        <div className="w-full h-fit flex justify-start items-ce md:gap-4 gap-4 text-primary-2">
+        {iconNify.map((src, index) => (
+          <Icon className="cursor-pointer" key={index} icon={src} width="35" height="35" />
+        ))}
+      </div>
       </div>
     </div>
-  );
+  )
 };
 
-const svgIcons = ["/SVG/mail.svg", "/SVG/fb.svg", "/SVG/insta.svg"];
+// uncomment nalang if trip yung may color na icons
+const iconNify = ["devicon:facebook", "skill-icons:instagram", "skill-icons:gmail-light"];
+
+// uncomment nalang if trip yung walang color na icons
+// const iconNify = ["iconoir:facebook-tag", "ph:instagram-logo-light", "fluent:mail-28-regular"];

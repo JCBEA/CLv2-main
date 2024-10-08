@@ -10,8 +10,10 @@ export default function MainLayout({
     <html lang="en">
       <body>
         <Header
+          menuItems={dynamicMenuItems}
           roundedCustom="lg:rounded-bl-3xl"
           paddingLeftCustom="lg:pl-14"
+          buttonName="Join Mukna"
         />
         {children}
         <Footer />
@@ -19,3 +21,10 @@ export default function MainLayout({
     </html>
   );
 }
+
+const dynamicMenuItems = [
+  { name: "directory", link: "/creative-dashboard" },
+  { name: "gallery", link: "/gallery" },
+  { name: "faqs", link: "/faqs" },
+  { name: "Log in", link: "/signin" },
+];
