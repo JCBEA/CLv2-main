@@ -1,17 +1,32 @@
-// src/hoc/withAuth.tsx
+// src/services/hoc/withAuth.tsx
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation'; // Ensure you import from next/navigation
-import { decryptToken } from '@/services/authservice'; // Import the decryptToken function
+import { useRouter } from 'next/navigation'; 
+import { decryptToken } from '@/services/authservice'; 
 import { supabase } from '@/services/supabaseClient';
 
-const withAuth = (WrappedComponent: React.ComponentType) => {
+// Define the UserDetail interface again here or import it
+interface UserDetail {
+    id: string;
+    first_name: string;
+    creative_field: string;
+    address: string;
+    mobileNo: string;
+    bio: string;
+    instagram: string;
+    facebook: string;
+    twitter: string;
+    portfolioLink: string;
+}
+
+const withAuth = (WrappedComponent: React.ComponentType<{ userDetail: UserDetail | null }>) => {
     return function AuthComponent() {
         const [isAuthenticated, setIsAuthenticated] = useState(false);
         const [loading, setLoading] = useState(true);
+        const [userDetail, setUserDetail] = useState<UserDetail | null>(null); // Use the defined UserDetail type
         const router = useRouter();
 
         useEffect(() => {
-            const token = localStorage.getItem('token'); // Get the token from local storage
+            const token = localStorage.getItem('token'); 
 
             const checkAuthentication = async () => {
                 if (!token) {
@@ -21,30 +36,29 @@ const withAuth = (WrappedComponent: React.ComponentType) => {
                 }
 
                 try {
-                    const payload = await decryptToken(token); // Use the decryptToken function
+                    const payload = await decryptToken(token); 
                     console.log("Decrypted Payload:", payload);
 
-                    // Check if the user exists in the database using the decrypted ID and username
                     const { data, error } = await supabase
-                        .from("users")
-                        .select("id, username")
-                        .eq("id", payload.id)
-                        .eq("username", payload.username)
+                        .from("userDetails")
+                        .select("*")
+                        .eq("detailsid", payload.id)
                         .single();
 
                     if (error || !data) {
-                        console.log("User not found in the database. Redirecting to login.");
+                        console.log("User details not found. Redirecting to login.");
                         router.push('/signup');
                         return;
                     }
 
-                    console.log("Authenticated user:", payload);
-                    setIsAuthenticated(true); // User is authenticated
+                    console.log("Fetched user details:", data);
+                    setUserDetail(data); 
+                    setIsAuthenticated(true); 
                 } catch (error) {
-                    console.error("Token verification failed:", error);
-                    router.push('/signup'); // Redirect to login if verification fails
+                    console.error("Token verification or data fetching failed:", error);
+                    router.push('/signup');
                 } finally {
-                    setLoading(false); // Set loading to false after checking
+                    setLoading(false); 
                 }
             };
 
@@ -52,14 +66,14 @@ const withAuth = (WrappedComponent: React.ComponentType) => {
         }, [router]);
 
         if (loading) {
-            return <div>Loading...</div>; // Show a loading state
+            return <div>Loading...</div>; 
         }
 
         if (!isAuthenticated) {
-            return null; // Optionally return a loading spinner or a placeholder
+            return null;
         }
 
-        return <WrappedComponent />; // Render the wrapped component once authenticated
+        return <WrappedComponent userDetail={userDetail} />; // Pass userDetail as a prop
     };
 };
 

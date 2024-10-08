@@ -6,10 +6,15 @@ import { Calendar } from "./Calendar";
 import { Messages } from "./Messages";
 
 interface UserDetail {
-  location: string;
-  contactNo: string;
-  aboutMe: string;
-  category: string;
+  first_name: string;
+  creative_field:string;
+  address:string;
+  mobileNo:string;
+  bio:string;
+  instagram:string;
+  facebook:string;
+  twitter:string;
+  portfolioLink:string;
 }
 
 interface ProfileButtonProps {
@@ -56,7 +61,7 @@ const ProfileDetails = () => {
       </div>
       <div className="h-full w-full flex lg:flex-row flex-col lg:justify-start justify-center lg:gap-12 gap-4 items-center lg:mt-4 lg:pb-0 pb-4">
         {/* Dynamically setting the name here */}
-        <h1 className="text-3xl font-bold">{userDetail.name}</h1>
+        <h1 className="text-3xl font-bold">{userDetail.first_name}</h1>
         <div className="flex flex-row justify-row items-center gap-4">
           <Icon icon="circum:instagram" width="35" height="35" />
           <Icon icon="uit:facebook-f" width="35" height="35" />
@@ -87,21 +92,41 @@ const UserDetail = ({ userDetail }: { userDetail: UserDetail }) => {
   return (
     <>
       <small className="font-bold text-primary-2 opacity-80 capitalize">
-        Location
+        Name
       </small>
-      <p className="text-primary-2 font-bold">{userDetail.location}</p>
+      <p className="text-primary-2 font-bold">{userDetail.first_name}</p>
       <small className="font-bold text-primary-2 opacity-80 capitalize">
-        Contact number
+        Creative Field
       </small>
-      <p className="text-primary-2 font-bold">{userDetail.contactNo}</p>
+      <p className="text-primary-2 font-bold">{userDetail.creative_field}</p>
       <small className="font-bold text-primary-2 opacity-80 capitalize">
-        About me
+        Address
       </small>
-      <p className="text-primary-2 font-bold">{userDetail.aboutMe}</p>
+      <p className="text-primary-2 font-bold">{userDetail.address}</p>
       <small className="font-bold text-primary-2 opacity-80 capitalize">
-        category
+        Mobile Number
       </small>
-      <p className="text-primary-2 font-bold">{userDetail.category}</p>
+      <p className="text-primary-2 font-bold">{userDetail.mobileNo}</p>
+      <small className="font-bold text-primary-2 opacity-80 capitalize">
+        bio
+      </small>
+      <p className="text-primary-2 font-bold">{userDetail.bio}</p>
+      <small className="font-bold text-primary-2 opacity-80 capitalize">
+        Instagram
+      </small>
+      <p className="text-primary-2 font-bold">{userDetail.instagram}</p>
+      <small className="font-bold text-primary-2 opacity-80 capitalize">
+        Facebook
+      </small>
+      <p className="text-primary-2 font-bold">{userDetail.facebook}</p>
+      <small className="font-bold text-primary-2 opacity-80 capitalize">
+        Twitter
+      </small>
+      <p className="text-primary-2 font-bold">{userDetail.twitter}</p>
+      <small className="font-bold text-primary-2 opacity-80 capitalize">
+        Portfolio Link
+      </small>
+      <p className="text-primary-2 font-bold">{userDetail.portfolioLink}</p>
     </>
   );
 };
@@ -143,14 +168,20 @@ const ProfileButton = ({ open, setOpen }: ProfileButtonProps) => {
   );
 };
 
+
+
+
+
 const userDetails = [
   {
-    name: "SEAN PALACAY",
-    age: 23, //dapat i store su bday tapos calculate nalang para makuwa su age
-    location: "Tabaco City, Albay ",
-    contactNo: "+639123456789",
-    aboutMe:
-      "Am from Legazpi City a Bikolano Visual Artist,born on September 21,1958 years old now ,a widow with 2 kids I lost my wife last November 7 2019 presently residing at #365 Purple 5 Gogon Legazpi City they fondly called me BENNY as AKA...I belong to Artist Group BROTSA.",
-    category: "Visual Arts ",
+   first_name: "John",
+   creative_field: "Art",
+   address: "123 Main St",
+   mobileNo: "09090909",
+   bio: "I am John, a creative person.",
+   instagram: "@john",
+   facebook: "@john",
+   twitter: "@john",
+   portfolioLink: "https://example.com/john",
   },
 ];

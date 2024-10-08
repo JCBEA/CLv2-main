@@ -127,7 +127,49 @@ export const signupUser = async (
 };
 
 
+
+
+export const getUserDetailsFromToken = async () => {
+  try {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      throw new Error("No token found in local storage");
+    }
+
+    const payload = await verifyJWT(token);
+    const userId = payload.id;
+
+    const { data, error } = await supabase
+      .from('userDetails')
+      .select('*')
+      .eq('detailsid', userId)
+      .single();
+
+    if (error || !data) {
+      throw new Error(error ? error.message : "Failed to fetch user details");
+    }
+
+    return data;
+  } catch (error) {
+    // Cast the error to 'Error' to safely access the 'message' property
+    if (error instanceof Error) {
+      console.error("Failed to retrieve user details:", error.message);
+    } else {
+      console.error("An unknown error occurred:", error);
+    }
+
+    throw new Error("Failed to retrieve user details");
+  }
+};
+
+
+
+
+
 export const logoutUser = async () => {
   // Simulate an API call to log out the user
   return true;
 };
+
+
+
