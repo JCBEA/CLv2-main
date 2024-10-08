@@ -44,13 +44,6 @@ export const Step1 = ({ formData, handleChange, nextStep }: any) => {
       />
 
       {/* Next Button */}
-      <button
-        type="button"
-        onClick={nextStep}
-        className="bg-secondary-2 text-white px-4 py-2 rounded mt-4"
-      >
-        Next
-      </button>
     </div>
   );
 };
