@@ -1,8 +1,9 @@
 import { Infinite } from "@/components/reusable-component/Infinite";
-import { CreativeCarousel } from "./creative-components/CreativeCarousel";
-import { CreativeHeroPage } from "./creative-components/CreativeHeroPage";
 import { Subscribe } from "@/components/reusable-component/Subscribe";
+import { CreativeCarousel } from "./creative-components/CreativeCarousel";
+import CreativeHeroPage from "./creative-components/CreativeHeroPage";
 import { CreativeUsers } from "./creative-components/CreativeUsers";
+
 
 
 export default function CreativeDirectoryPage() {

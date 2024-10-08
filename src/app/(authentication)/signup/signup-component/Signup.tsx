@@ -54,6 +54,7 @@ const AccountCreation = () => {
   );
 };
 
+
 export const Form = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -322,12 +323,34 @@ export const Form = () => {
       {success && <div className="text-green-500">{success}</div>}
 
       {/* Submit Button */}
-      <button
-        className="bg-primary text-white w-full lg:max-w-sm h-10 rounded-lg z-50"
-        type="submit"
-      >
-        Sign Up
-      </button>
+
+      <SubmitButton />
+      <GotoLogin />
     </form>
   );
 };
+
+const SubmitButton = () => {
+  return (
+    <div className="w-full lg:max-w-sm pt-4">
+      <motion.button
+        className="border-2 border-secondary-2 w-full py-3 text-lg font-semibold uppercase"
+        type="submit"
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+      >
+        Create account
+      </motion.button>
+    </div>
+  )
+}
+
+
+const GotoLogin = () => {
+  return (
+    <div className="w-full flex flex-col justify-center items-center">
+      <p>Already have an account?</p>
+      <Link href={"/signin"} className="uppercase font-medium cursor-pointer">Login</Link>
+    </div>
+  )
+}
