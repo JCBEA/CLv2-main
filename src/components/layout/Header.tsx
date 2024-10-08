@@ -2,9 +2,10 @@
 import { motion } from "framer-motion";
 import { Logo } from "../reusable-component/Logo";
 import { Icon } from "@iconify/react";
-import { useState, useEffect } from "react";
-import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
+import gsap from "gsap";
 
+// Define Props Interfaces
 interface MenuItemProps {
   name: string;
   link: string;
@@ -14,21 +15,20 @@ interface HeaderProps {
   backgroundColor?: string;
   textColor?: string;
   buttonName?: string;
-  linkName?: string;
   roundedCustom?: string;
   paddingLeftCustom?: string;
-  bgOpacity?: string;
-  bgBlur?: string;
-  menuItems: MenuItemProps[]; // Adding dynamic menu items as a prop
 }
 
+// MenuItem Component
 const MenuItem = ({ name, link }: MenuItemProps) => {
   return (
     <motion.a
       href={link}
       className="text-base uppercase font-semibold whitespace-nowrap relative"
-      whileHover="hover"
-      initial="initial"
+      whileHover={{ scale: 1.1, color: "#fff" }}
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, ease: "easeOut" }} // Reduced duration for faster effect
     >
       {name}
       <motion.div
@@ -43,30 +43,27 @@ const MenuItem = ({ name, link }: MenuItemProps) => {
   );
 };
 
+// Header Component
 export const Header = ({
-  backgroundColor = "bg-primary-1", // Default background color
-  textColor = "text-primary-2", // Default text color
-  buttonName = "Join Mukna", // Default button name
-  linkName = "events",
+  backgroundColor = "bg-primary-1",
+  textColor = "text-primary-2",
+  buttonName = "Join Mukna",
   paddingLeftCustom = "pl-14",
   roundedCustom = "rounded-bl-3xl",
-  menuItems, // Dynamic menu items passed here
-  ...HeaderProps
 }: HeaderProps) => {
   const [bgColor, setBgColor] = useState(backgroundColor);
   const [txtColor, setTxtColor] = useState(textColor);
   const [btnName, setBtnName] = useState(buttonName);
-  const [nameLink, setLinkName] = useState(linkName);
   const [paddingLeft, setPadding] = useState(paddingLeftCustom);
   const [rounded, setRounded] = useState(roundedCustom);
-  const [bgOpacity, setBgOpacity] = useState(HeaderProps.bgOpacity);
-  const [bgBlur, setBgBlur] = useState(HeaderProps.bgBlur);
   const [showHeader, setShowHeader] = useState(true); // State to control header visibility
   const [lastScrollY, setLastScrollY] = useState(0);
-
+  const [isScrolled, setIsScrolled] = useState(false);
+  const headerRef = useRef(null);
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
+      
 
       if (currentScrollY > lastScrollY && currentScrollY > 100) {
         // Hide header when scrolling down
@@ -92,56 +89,111 @@ export const Header = ({
     setBtnName(buttonName);
     setPadding(paddingLeftCustom);
     setRounded(roundedCustom);
-    setBgOpacity(HeaderProps.bgOpacity);
-    setBgBlur(HeaderProps.bgBlur);
-  }, [backgroundColor, textColor, buttonName, paddingLeftCustom, roundedCustom, HeaderProps.bgOpacity, HeaderProps.bgBlur]);
+  }, [backgroundColor, textColor, buttonName, paddingLeftCustom, roundedCustom,]);
 
+
+  useEffect(() => {
+    // GSAP Animation for Header on Load
+    if (headerRef.current) {
+      gsap.fromTo(
+        headerRef.current,
+        { y: -100, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 1.2,
+          ease: "power3.out",
+        }
+      );
+    }
+
+    // Scroll listener to change header background when scrolling
+    const handleScroll = () => {
+      if (window.scrollY > 50) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
+ 
   return (
     <div className={`w-full h-[10dvh] fixed top-0 z-[1000] ${paddingLeft}`}>
       <motion.div
+        ref={headerRef}
         whileHover={{ backgroundColor: "#FFD094", }}
         transition={{ duration: 0.5, ease: "easeInOut", delay: 0.2 }}
         initial={{ y: 0 }}
         animate={{ y: showHeader ? 0 : "-100%" }} // Animate header visibility
-        className={`w-full h-full ${rounded} ${bgColor} ${txtColor} ${bgOpacity} ${bgBlur}`}>
+        className={`w-full h-full ${rounded} ${bgColor} ${txtColor}`}>
         <div className="w-full max-w-[95%] mx-auto h-full flex justify-between items-center">
-          <div className="w-fit h-full py-2">
+          {/* Logo Section */}
+          <motion.div
+            className="w-fit h-full py-2"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5, duration: 1 }}
+          >
             <Logo width="auto" height="auto" color="text-secondary-2" />
-          </div>
-          <div className="w-fit lg:flex justify-center items-center lg:gap-14 hidden">
-            {menuItems.map((item, index) => (
+          </motion.div>
+
+          {/* Menu Section */}
+          <motion.div
+            className="w-fit lg:flex justify-center items-center lg:gap-14 hidden"
+            initial="hidden"
+            animate="visible"
+            variants={{
+              hidden: { opacity: 0, y: -20 },
+              visible: {
+                opacity: 1,
+                y: 0,
+                transition: {
+                  staggerChildren: 0.1,
+                  delayChildren: 0.3,
+                },
+              },
+            }}
+          >
+            {headerMenu.map((item, index) => (
               <MenuItem key={index} {...item} />
             ))}
-            <Link href={nameLink}>
-              <motion.button
-                className="uppercase w-44 py-1.5 font-semibold rounded-full bg-shade-2"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                {btnName}
-              </motion.button>
-            </Link>
-          </div>
-          <Icon
+            <motion.button
+              className="uppercase w-44 py-1.5 font-semibold rounded-full bg-shade-2"
+              whileHover={{ scale: 1.1, backgroundColor: "#ff6f61" }}
+              whileTap={{ scale: 0.95 }}
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1, duration: 0.2, ease: "easeOut" }} // Reduced delay and duration for faster effect
+            >
+              {buttonName}
+            </motion.button>
+          </motion.div>
+
+          {/* Mobile Menu Icon */}
+          <motion.div
             className="lg:hidden block text-secondary-2"
-            icon="eva:menu-fill"
-            width="35"
-            height="35"
-          />
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.8, duration: 0.8, ease: "easeOut" }}
+          >
+            <Icon icon="eva:menu-fill" width="35" height="35" />
+          </motion.div>
         </div>
       </motion.div>
     </div>
   );
 };
 
-// Example usage with dynamic menu items
-
-// const dynamicMenuItems = [
-//   { name: "Home", link: "/" },
-//   { name: "Services", link: "/services" },
-//   { name: "Blog", link: "/blog" },
-//   { name: "Contact", link: "/contact" },
-// ];
-
-// In a parent component
-// <Header menuItems={dynamicMenuItems} />
+// Menu Data
+const headerMenu = [
+  { name: "Directory", link: "/" },
+  { name: "Gallery", link: "/about" },
+  { name: "FAQ", link: "/faqs" },
+  { name: "Log In", link: "/signin" },
+];
