@@ -5,16 +5,20 @@ import React, { useState } from "react";
 import { Calendar } from "./Calendar";
 import { Messages } from "./Messages";
 
-interface UserDetail {
+export interface UserDetail {
   first_name: string;
-  creative_field:string;
-  address:string;
-  mobileNo:string;
-  bio:string;
-  instagram:string;
-  facebook:string;
-  twitter:string;
-  portfolioLink:string;
+  creative_field: string;
+  address: string;
+  mobileNo: string;
+  bio: string;
+  instagram: string;
+  facebook: string;
+  twitter: string;
+  portfolioLink: string;
+}
+
+interface UserProfileProps {
+  userDetail: UserDetail; // Expecting the userDetail as a prop
 }
 
 interface ProfileButtonProps {
@@ -22,7 +26,7 @@ interface ProfileButtonProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export const UserProfile = () => {
+export const UserProfile: React.FC<UserProfileProps> = ({ userDetail }) => {
   const [open, setOpen] = useState(false); // State to control Calendar and Messages
 
   return (
@@ -34,15 +38,19 @@ export const UserProfile = () => {
           </h1>
           <div className="w-full h-full mt-28">
             <div className="w-full h-fit bg-primary-3 rounded-xl shadow-lg relative">
-              <ProfileDetails />
-              <OtherDetails />
+              <ProfileDetails userDetail={userDetail} />
+              <OtherDetails userDetail={userDetail} />
               <ProfileButton open={open} setOpen={setOpen} />
 
               {/* Conditional rendering based on the open state */}
               {open ? <Messages /> : <Calendar />}
 
-              {/* pedi na digdi magkaan na onclick edit */}
-              <Icon className="absolute top-2 right-2 cursor-pointer" icon="material-symbols-light:edit-square-outline" width="35" height="35" />
+              <Icon
+                className="absolute top-2 right-2 cursor-pointer"
+                icon="material-symbols-light:edit-square-outline"
+                width="35"
+                height="35"
+              />
             </div>
           </div>
         </div>
@@ -51,16 +59,13 @@ export const UserProfile = () => {
   );
 };
 
-const ProfileDetails = () => {
-  const userDetail = userDetails[0]; // Assuming there’s one user for now
-  
+const ProfileDetails: React.FC<{ userDetail: UserDetail }> = ({ userDetail }) => {
   return (
     <div className="w-full md:max-w-[80%] mx-auto flex lg:flex-row flex-col justify-start lg:items-start items-center gap-8 lg:h-36 h-fit text-secondary-1">
       <div className=" -mt-20">
         <div className="w-48 h-48 bg-gray-400 rounded-full aspect-square"></div>
       </div>
       <div className="h-full w-full flex lg:flex-row flex-col lg:justify-start justify-center lg:gap-12 gap-4 items-center lg:mt-4 lg:pb-0 pb-4">
-        {/* Dynamically setting the name here */}
         <h1 className="text-3xl font-bold">{userDetail.first_name}</h1>
         <div className="flex flex-row justify-row items-center gap-4">
           <Icon icon="circum:instagram" width="35" height="35" />
@@ -72,14 +77,11 @@ const ProfileDetails = () => {
   );
 };
 
-
-const OtherDetails = () => {
+const OtherDetails: React.FC<{ userDetail: UserDetail }> = ({ userDetail }) => {
   return (
     <div className="w-full h-fit py-12 bg-shade-8">
       <div className="w-full md:max-w-[80%] max-w-[90%] mx-auto flex flex-col gap-1.5">
-        {userDetails.map((userDetail, index) => (
-          <UserDetail key={index} userDetail={userDetail} />
-        ))}
+        <UserDetailDisplay userDetail={userDetail} /> {/* Use the renamed component */}
         <div className="pt-8 w-full flex justify-center items-center">
           <Button />
         </div>
@@ -88,7 +90,7 @@ const OtherDetails = () => {
   );
 };
 
-const UserDetail = ({ userDetail }: { userDetail: UserDetail }) => {
+const UserDetailDisplay = ({ userDetail }: { userDetail: UserDetail }) => {
   return (
     <>
       <small className="font-bold text-primary-2 opacity-80 capitalize">
@@ -108,7 +110,7 @@ const UserDetail = ({ userDetail }: { userDetail: UserDetail }) => {
       </small>
       <p className="text-primary-2 font-bold">{userDetail.mobileNo}</p>
       <small className="font-bold text-primary-2 opacity-80 capitalize">
-        bio
+        Bio
       </small>
       <p className="text-primary-2 font-bold">{userDetail.bio}</p>
       <small className="font-bold text-primary-2 opacity-80 capitalize">
@@ -131,6 +133,7 @@ const UserDetail = ({ userDetail }: { userDetail: UserDetail }) => {
   );
 };
 
+
 const Button = () => {
   return (
     <motion.button
@@ -138,16 +141,16 @@ const Button = () => {
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
     >
-      add you work
+      Add Your Work
     </motion.button>
   );
 };
 
-const ProfileButton = ({ open, setOpen }: ProfileButtonProps) => {
+const ProfileButton: React.FC<ProfileButtonProps> = ({ open, setOpen }) => {
   return (
     <div className="w-full h-fit flex bg-shade-8">
       <button
-        onClick={() => setOpen(false)} // Set open to false to show Calendar
+        onClick={() => setOpen(false)}
         className={`w-full py-4 font-bold text-lg uppercase flex justify-center items-center gap-2 ${
           !open ? "bg-shade-1" : "bg-shade-8"
         } rounded-tr-lg overflow-hidden`}
@@ -156,7 +159,7 @@ const ProfileButton = ({ open, setOpen }: ProfileButtonProps) => {
         Schedule
       </button>
       <button
-        onClick={() => setOpen(true)} // Set open to true to show Messages
+        onClick={() => setOpen(true)}
         className={`w-full py-4 font-bold text-lg uppercase flex justify-center items-center gap-2 ${
           open ? "bg-shade-1" : "bg-shade-8"
         } rounded-tl-lg`}
@@ -167,21 +170,3 @@ const ProfileButton = ({ open, setOpen }: ProfileButtonProps) => {
     </div>
   );
 };
-
-
-
-
-
-const userDetails = [
-  {
-   first_name: "John",
-   creative_field: "Art",
-   address: "123 Main St",
-   mobileNo: "09090909",
-   bio: "I am John, a creative person.",
-   instagram: "@john",
-   facebook: "@john",
-   twitter: "@john",
-   portfolioLink: "https://example.com/john",
-  },
-];
