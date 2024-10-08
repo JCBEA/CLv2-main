@@ -53,7 +53,6 @@ const AccountCreation = () => {
     </div>
   );
 };
-  
 
 export const Form = () => {
   const [username, setUsername] = useState("");
@@ -324,12 +323,11 @@ export const Form = () => {
 
       {/* Submit Button */}
       <button
-  className="bg-primary text-white w-full lg:max-w-sm h-10 rounded-lg z-50"
-  type="submit"
->
-  Sign Up
-</button>
-
+        className="bg-primary text-white w-full lg:max-w-sm h-10 rounded-lg z-50"
+        type="submit"
+      >
+        Sign Up
+      </button>
     </form>
   );
 };
