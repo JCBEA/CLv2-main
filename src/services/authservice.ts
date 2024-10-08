@@ -55,24 +55,77 @@ export const decryptToken = async (token: string) => {
   }
 };
 
-export const signupUser = async (username: string, email: string, password: string) => {
+export const signupUser = async (
+  username: string,
+  email: string,
+  password: string,
+  firstName: string,
+  creativeField: string,
+  address: string,
+  mobileNo: string,
+  bio: string,
+  instagram: string,
+  facebook: string,
+  twitter: string,
+  portfolioLink: string
+) => {
   console.log("Attempting signup with:", { username, email });
 
   // Hash the password before storing it
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  const { error } = await supabase
+  // Insert the new user into the 'users' table
+  const { data: userData, error: userError } = await supabase
     .from("users")
-    .insert([{ username, email, password: hashedPassword }]);
+    .insert([{ username, email, password: hashedPassword }])
+    .select("id, username")
+    .single();
 
-  if (error) {
-    console.log("Signup failed:", error.message);
+  if (userError || !userData) {
+    console.log("Signup failed:", userError ? userError.message : "Unknown error");
     throw new Error("Signup failed, please try again.");
   }
 
-  console.log("Signup successful:", { username });
-  return { username };
+  console.log("User created in 'users' table:", { id: userData.id, username: userData.username });
+
+  // Insert additional details into the 'userDetails' table
+  const { error: detailsError } = await supabase
+    .from("userDetails")
+    .insert([{
+      detailsid: userData.id, // Use the ID from the 'users' table as a foreign key
+      first_name: firstName,
+      creative_field: creativeField,
+      address: address,
+      mobileNo: mobileNo,
+      bio: bio,
+      instagram: instagram,
+      facebook: facebook,
+      twitter: twitter,
+      portfolioLink: portfolioLink
+    }]);
+
+  if (detailsError) {
+    console.log("Failed to insert user details:", detailsError.message);
+    throw new Error("Signup failed, could not insert user details.");
+  }
+
+  console.log("User details added to 'userDetails' table");
+
+  // Create a JWT for the new user
+  const token = await createJWT({ id: userData.id, username: userData.username });
+  console.log("JWT created for new user:", token);
+
+  // Decrypt and log the token payload
+  try {
+    const decryptedPayload = await verifyJWT(token);
+    console.log("Decrypted Payload after Signup:", decryptedPayload);
+  } catch (error) {
+    console.error("Failed to decrypt token:", error);
+  }
+
+  return { id: userData.id, username: userData.username, token };
 };
+
 
 export const logoutUser = async () => {
   // Simulate an API call to log out the user

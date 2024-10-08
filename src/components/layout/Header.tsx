@@ -35,9 +35,13 @@ const MenuItem = ({ name, link }: MenuItemProps) => {
         className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-2"
         variants={{
           initial: { width: "0%" },
-          hover: { width: "100%" },
+          hover: { width: "110%" },
         }}
+<<<<<<< HEAD
         transition={{ duration: 0.2, ease: "easeInOut", delay: 0 }} // Faster underline effect
+=======
+        transition={{ duration: 0.5, ease: "easeInOut" }}
+>>>>>>> 9d52fc3d9c8bec83b434b885c187c988e53b140a
       />
     </motion.a>
   );
@@ -51,8 +55,53 @@ export const Header = ({
   paddingLeftCustom = "pl-14",
   roundedCustom = "rounded-bl-3xl",
 }: HeaderProps) => {
+<<<<<<< HEAD
   const headerRef = useRef<HTMLDivElement | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
+=======
+  const [bgColor, setBgColor] = useState(backgroundColor);
+  const [txtColor, setTxtColor] = useState(textColor);
+  const [btnName, setBtnName] = useState(buttonName);
+  const [paddingLeft, setPadding] = useState(paddingLeftCustom);
+  const [rounded, setRounded] = useState(roundedCustom);
+  const [bgOpacity, setBgOpacity] = useState(HeaderProps.bgOpacity);
+  const [bgBlur, setBgBlur] = useState(HeaderProps.bgBlur);
+  const [showHeader, setShowHeader] = useState(true); // State to control header visibility
+  const [lastScrollY, setLastScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        // Hide header when scrolling down
+        setShowHeader(false);
+      } else {
+        // Show header when scrolling up
+        setShowHeader(true);
+      }
+
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [lastScrollY]);
+
+  useEffect(() => {
+    setBgColor(backgroundColor);
+    setTxtColor(textColor);
+    setBtnName(buttonName);
+    setPadding(paddingLeftCustom);
+    setRounded(roundedCustom);
+    setBgOpacity(HeaderProps.bgOpacity);
+    setBgBlur(HeaderProps.bgBlur);
+  }, [backgroundColor, textColor, buttonName, paddingLeftCustom, roundedCustom, HeaderProps.bgOpacity, HeaderProps.bgBlur]);
+
+>>>>>>> 9d52fc3d9c8bec83b434b885c187c988e53b140a
 
   useEffect(() => {
     // GSAP Animation for Header on Load
@@ -86,6 +135,7 @@ export const Header = ({
 
  
   return (
+<<<<<<< HEAD
     <div
       ref={headerRef}
       className={`w-full h-[10dvh] fixed top-0 z-[1000] ${paddingLeftCustom} transition-colors duration-500`}
@@ -100,6 +150,15 @@ export const Header = ({
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 1.0, ease: "easeOut" }}
       >
+=======
+    <div className={`w-full h-[10dvh] fixed top-0 z-[1000] ${paddingLeft}`}>
+      <motion.div
+        whileHover={{ backgroundColor: "#FFD094", }}
+        transition={{ duration: 0.5, ease: "easeInOut", delay: 0.2 }}
+        initial={{ y: 0 }}
+        animate={{ y: showHeader ? 0 : "-100%" }} // Animate header visibility
+        className={`w-full h-full ${rounded} ${bgColor} ${txtColor} ${bgOpacity} ${bgBlur}`}>
+>>>>>>> 9d52fc3d9c8bec83b434b885c187c988e53b140a
         <div className="w-full max-w-[95%] mx-auto h-full flex justify-between items-center">
           {/* Logo Section */}
           <motion.div
@@ -162,6 +221,6 @@ export const Header = ({
 const headerMenu = [
   { name: "Directory", link: "/" },
   { name: "Gallery", link: "/about" },
-  { name: "FAQ", link: "/contact" },
+  { name: "FAQ", link: "/faqs" },
   { name: "Log In", link: "/signin" },
 ];
