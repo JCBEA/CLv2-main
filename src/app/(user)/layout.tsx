@@ -27,8 +27,6 @@ export default function DashboardLayout({ children }: LayoutProps) {
           linkName="profile"
           paddingLeftCustom="pl-0"
           roundedCustom="rounded-bl-none"
-          bgBlur="backdrop-blur-lg"
-          bgOpacity="bg-opacity-20"
         />
         {children}
         <Footer />

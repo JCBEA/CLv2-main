@@ -11,6 +11,7 @@ export default function MainLayout({
       <body>
         <Header
           menuItems={dynamicMenuItems}
+          linkName="/events"
           roundedCustom="lg:rounded-bl-3xl"
           paddingLeftCustom="lg:pl-14"
           buttonName="Join Mukna"
