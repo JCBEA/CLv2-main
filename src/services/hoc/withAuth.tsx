@@ -18,7 +18,7 @@ interface UserDetail {
     portfolioLink: string;
 }
 
-const withAuth = (WrappedComponent: React.ComponentType<{ userDetail: UserDetail | null }>) => {
+const withAuth = (WrappedComponent: React.ComponentType<{ userDetail: UserDetail | null; editUserDetails: (updatedData: Partial<UserDetail>) => Promise<void>; }>) => {
     return function AuthComponent() {
         const [isAuthenticated, setIsAuthenticated] = useState(false);
         const [loading, setLoading] = useState(true);
@@ -65,6 +65,38 @@ const withAuth = (WrappedComponent: React.ComponentType<{ userDetail: UserDetail
             checkAuthentication();
         }, [router]);
 
+        const editUserDetails = async (updatedData: Partial<UserDetail>) => {
+            if (!userDetail) return;
+
+            try {
+                const { error } = await supabase
+                    .from("userDetails")
+                    .update(updatedData)
+                    .eq("detailsid", userDetail.id);
+
+                if (error) {
+                    console.error("Error updating user details:", error);
+                    throw new Error("Failed to update user details");
+                }
+
+                // Optionally fetch updated user details again to get the latest state
+                const { data, error: fetchError } = await supabase
+                    .from("userDetails")
+                    .select("*")
+                    .eq("detailsid", userDetail.id)
+                    .single();
+
+                if (fetchError || !data) {
+                    console.error("Error fetching updated user details:", fetchError);
+                    throw new Error("Failed to fetch updated user details");
+                }
+
+                setUserDetail(data); // Update state with new user details
+            } catch (error) {
+                console.error("Edit user details failed:", error);
+            }
+        };
+
         if (loading) {
             return <div>Loading...</div>; 
         }
@@ -73,7 +105,7 @@ const withAuth = (WrappedComponent: React.ComponentType<{ userDetail: UserDetail
             return null;
         }
 
-        return <WrappedComponent userDetail={userDetail} />; // Pass userDetail as a prop
+        return <WrappedComponent userDetail={userDetail} editUserDetails={editUserDetails} />; // Pass userDetail and editUserDetails as props
     };
 };
 

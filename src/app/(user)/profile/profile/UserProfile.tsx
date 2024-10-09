@@ -1,11 +1,14 @@
 "use client";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { motion } from "framer-motion";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Calendar } from "./Calendar";
 import { Messages } from "./Messages";
-
+import { jwtVerify } from 'jose';
+import Loader from "./loader";
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret';
 export interface UserDetail {
+  id: string; // Assuming there's an id for user identification
   first_name: string;
   creative_field: string;
   address: string;
@@ -33,9 +36,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ userDetail }) => {
     <div className="min-h-dvh w-full text-primary-2">
       <div className="w-full xl:max-w-[65%] lg:max-w-[80%] max-w-[90%] lg:px-8 mx-auto h-fit py-[12dvh]">
         <div className="w-full h-full flex flex-col">
-          <h1 className="uppercase font-semibold text-3xl lg:block hidden">
-            Creative profile
-          </h1>
+          <h1 className="uppercase font-semibold text-3xl lg:block hidden">Creative profile</h1>
           <div className="w-full h-full mt-28">
             <div className="w-full h-fit bg-primary-3 rounded-xl shadow-lg relative">
               <ProfileDetails userDetail={userDetail} />
@@ -45,12 +46,6 @@ export const UserProfile: React.FC<UserProfileProps> = ({ userDetail }) => {
               {/* Conditional rendering based on the open state */}
               {open ? <Messages /> : <Calendar />}
 
-              <Icon
-                className="absolute top-2 right-2 cursor-pointer"
-                icon="material-symbols-light:edit-square-outline"
-                width="35"
-                height="35"
-              />
             </div>
           </div>
         </div>
@@ -62,11 +57,11 @@ export const UserProfile: React.FC<UserProfileProps> = ({ userDetail }) => {
 const ProfileDetails: React.FC<{ userDetail: UserDetail }> = ({ userDetail }) => {
   return (
     <div className="w-full md:max-w-[80%] mx-auto flex lg:flex-row flex-col justify-start lg:items-start items-center gap-8 lg:h-36 h-fit text-secondary-1">
-      <div className=" -mt-20">
+      <div className="-mt-20">
         <div className="w-48 h-48 bg-gray-400 rounded-full aspect-square"></div>
       </div>
       <div className="h-full w-full flex lg:flex-row flex-col lg:justify-start justify-center lg:gap-12 gap-4 items-center lg:mt-4 lg:pb-0 pb-4">
-        <h1 className="text-3xl font-bold">{userDetail.first_name}</h1>
+        <h1 className="text-3xl font-bold">{userDetail.first_name},</h1>
         <div className="flex flex-row justify-row items-center gap-4">
           <Icon icon="circum:instagram" width="35" height="35" />
           <Icon icon="uit:facebook-f" width="35" height="35" />
@@ -81,7 +76,7 @@ const OtherDetails: React.FC<{ userDetail: UserDetail }> = ({ userDetail }) => {
   return (
     <div className="w-full h-fit py-12 bg-shade-8">
       <div className="w-full md:max-w-[80%] max-w-[90%] mx-auto flex flex-col gap-1.5">
-        <UserDetailDisplay userDetail={userDetail} /> {/* Use the renamed component */}
+        <UserDetailDisplay userDetail={userDetail} /> {/* Use the updated component */}
         <div className="pt-8 w-full flex justify-center items-center">
           <Button />
         </div>
@@ -91,44 +86,133 @@ const OtherDetails: React.FC<{ userDetail: UserDetail }> = ({ userDetail }) => {
 };
 
 const UserDetailDisplay = ({ userDetail }: { userDetail: UserDetail }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState<UserDetail>(userDetail);
+
+  // Update form data when userDetail changes
+  useEffect(() => {
+    setFormData(userDetail);
+  }, [userDetail]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSave = async () => {
+    const token = localStorage.getItem("token");
+
+    // Check if the token exists
+    if (!token) {
+      console.error("No token found, user may not be logged in.");
+      return; // Optionally handle unauthorized state here
+    }
+
+    try {
+      // Verify the token and handle it appropriately
+      const { payload } = await jwtVerify(token, new TextEncoder().encode(JWT_SECRET));
+      
+      // Log the payload for debugging
+      console.log("Retrieved token payload:", payload.id);
+
+      const response = await fetch("/api/creatives", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${payload.id}`,
+        },
+        body: JSON.stringify({
+          detailsid: payload.id,
+          userDetails: formData,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json(); // Get the error message
+        console.error("Error response:", errorData);
+        throw new Error(errorData.message);
+      }
+
+      // Handle success
+      console.log("User details updated successfully");
+      setIsEditing(false); // Exit edit mode
+    } catch (error) {
+      console.error("Error updating user details:", error);
+    }
+};
+
+
   return (
     <>
-      <small className="font-bold text-primary-2 opacity-80 capitalize">
-        Name
-      </small>
-      <p className="text-primary-2 font-bold">{userDetail.first_name}</p>
-      <small className="font-bold text-primary-2 opacity-80 capitalize">
-        Creative Field
-      </small>
-      <p className="text-primary-2 font-bold">{userDetail.creative_field}</p>
-      <small className="font-bold text-primary-2 opacity-80 capitalize">
-        Address
-      </small>
-      <p className="text-primary-2 font-bold">{userDetail.address}</p>
-      <small className="font-bold text-primary-2 opacity-80 capitalize">
-        Mobile Number
-      </small>
-      <p className="text-primary-2 font-bold">{userDetail.mobileNo}</p>
-      <small className="font-bold text-primary-2 opacity-80 capitalize">
-        Bio
-      </small>
-      <p className="text-primary-2 font-bold">{userDetail.bio}</p>
-      <small className="font-bold text-primary-2 opacity-80 capitalize">
-        Instagram
-      </small>
-      <p className="text-primary-2 font-bold">{userDetail.instagram}</p>
-      <small className="font-bold text-primary-2 opacity-80 capitalize">
-        Facebook
-      </small>
-      <p className="text-primary-2 font-bold">{userDetail.facebook}</p>
-      <small className="font-bold text-primary-2 opacity-80 capitalize">
-        Twitter
-      </small>
-      <p className="text-primary-2 font-bold">{userDetail.twitter}</p>
-      <small className="font-bold text-primary-2 opacity-80 capitalize">
-        Portfolio Link
-      </small>
-      <p className="text-primary-2 font-bold">{userDetail.portfolioLink}</p>
+      {isEditing ? (
+        <div>
+          {/* Input fields for editing user details */}
+          <div>
+            <small className="font-bold text-primary-2 opacity-80 capitalize">Location</small>
+            <input
+              type="text"
+              name="address"
+              value={formData.address}
+              onChange={handleInputChange}
+              className="text-primary-2 font-bold"
+            />
+          </div>
+          <div>
+            <small className="font-bold text-primary-2 opacity-80 capitalize">Contact Number</small>
+            <input
+              type="text"
+              name="mobileNo"
+              value={formData.mobileNo}
+              onChange={handleInputChange}
+              className="text-primary-2 font-bold"
+            />
+          </div>
+          <div>
+            <small className="font-bold text-primary-2 opacity-80 capitalize">About me</small>
+            <textarea
+              name="bio"
+              value={formData.bio}
+              onChange={handleInputChange}
+              className="text-primary-2 font-bold"
+            />
+          </div>
+          <div>
+            <small className="font-bold text-primary-2 opacity-80 capitalize">Creative Field</small>
+            <input
+              type="text"
+              name="creative_field"
+              value={formData.creative_field}
+              onChange={handleInputChange}
+              className="text-primary-2 font-bold"
+            />
+          </div>
+          <button onClick={handleSave} className="bg-shade-1 text-secondary-1 uppercase py-2 px-4 rounded-lg font-semibold">
+            Save Changes
+          </button>
+          <button onClick={() => setIsEditing(false)} className="ml-2 bg-red-500 text-white py-2 px-4 rounded-lg font-semibold">
+            Cancel
+          </button>
+        </div>
+      ) : (
+        <div>
+          {/* Display user details */}
+          <small className="font-bold text-primary-2 opacity-80 capitalize">Location</small>
+          <p className="text-primary-2 font-bold">{formData.address}</p>
+          <small className="font-bold text-primary-2 opacity-80 capitalize">Contact Number</small>
+          <p className="text-primary-2 font-bold">{formData.mobileNo}</p>
+          <small className="font-bold text-primary-2 opacity-80 capitalize">About me</small>
+          <p className="text-primary-2 font-bold">{formData.bio}</p>
+          <small className="font-bold text-primary-2 opacity-80 capitalize">Creative Field</small>
+          <p className="text-primary-2 font-bold">{formData.creative_field}</p>
+          <Icon
+                className="absolute top-2 right-2 cursor-pointer"
+                icon="material-symbols-light:edit-square-outline"
+                width="35"
+                height="35"
+                onClick={() => setIsEditing(true)}
+              />
+        </div>
+      )}
     </>
   );
 };
@@ -151,20 +235,18 @@ const ProfileButton: React.FC<ProfileButtonProps> = ({ open, setOpen }) => {
     <div className="w-full h-fit flex bg-shade-8">
       <button
         onClick={() => setOpen(false)}
-        className={`w-full py-4 font-bold text-lg uppercase flex justify-center items-center gap-2 ${
-          !open ? "bg-shade-1" : "bg-shade-8"
-        } rounded-tr-lg overflow-hidden`}
+        className={`w-full py-4 font-bold text-lg uppercase flex justify-center items-center gap-2 ${!open ? "bg-shade-1" : "bg-shade-8"
+          } rounded-tr-lg overflow-hidden`}
       >
         <Icon icon="ph:calendar-dots-thin" width="35" height="35" />
         Schedule
       </button>
       <button
         onClick={() => setOpen(true)}
-        className={`w-full py-4 font-bold text-lg uppercase flex justify-center items-center gap-2 ${
-          open ? "bg-shade-1" : "bg-shade-8"
-        } rounded-tl-lg`}
+        className={`w-full py-4 font-bold text-lg uppercase flex justify-center items-center gap-2 ${open ? "bg-shade-1" : "bg-shade-8"
+          } rounded-tl-lg overflow-hidden`}
       >
-        <Icon icon="arcticons:mail" width="35" height="35" />
+        <Icon icon="ph:message-circle-dots" width="35" height="35" />
         Messages
       </button>
     </div>
