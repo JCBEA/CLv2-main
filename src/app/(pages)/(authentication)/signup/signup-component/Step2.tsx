@@ -3,7 +3,7 @@ import { Input, Select, TextArea } from "./Signup";
 
 export const Step2 = ({ formData, handleChange, nextStep, prevStep }: any) => {
   return (
-    <div className="w-full h-full flex flex-col gap-4">
+    <div className="w-full h-full flex flex-col gap-4 text-primary-2">
       <h2 className="font-bold text-xl">Step 2: Personal Details</h2>
 
       {/* Creative Field Dropdown */}
