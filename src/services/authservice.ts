@@ -3,7 +3,6 @@ import { supabase } from '@/services/supabaseClient';
 import bcrypt from 'bcryptjs';
 import { createJWT, verifyJWT } from './jwt'; // Import createJWT and verifyJWT
 import { NextResponse } from 'next/server';
-
 export const loginUser = async (username: string, password: string) => {
   console.log("Attempting login with:", { username, password });
 
@@ -164,11 +163,10 @@ export const getUserDetailsFromToken = async () => {
 
 
 
-
-
 export const logoutUser = async () => {
-  // Simulate an API call to log out the user
-  return true;
+  return( 
+    localStorage.clear()
+  );
 };
 
 

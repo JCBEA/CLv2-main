@@ -5,7 +5,8 @@ import React, { useEffect, useState } from "react";
 import { Calendar } from "./Calendar";
 import { Messages } from "./Messages";
 import { jwtVerify } from 'jose';
-import Loader from "./loader";
+import { logoutUser } from "@/services/authservice";
+import { useRouter } from 'next/navigation';
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret';
 export interface UserDetail {
   id: string; // Assuming there's an id for user identification
@@ -55,6 +56,16 @@ export const UserProfile: React.FC<UserProfileProps> = ({ userDetail }) => {
 };
 
 const ProfileDetails: React.FC<{ userDetail: UserDetail }> = ({ userDetail }) => {
+  const router = useRouter();
+  const clickLogout = async () => {
+    try {
+      await logoutUser(); // Assuming this is a function that logs out the user
+      router.push('/'); // Redirect to home after logout
+    } catch (error) {
+      console.error('Logout failed', error);
+    }
+    
+  }
   return (
     <div className="w-full md:max-w-[80%] mx-auto flex lg:flex-row flex-col justify-start lg:items-start items-center gap-8 lg:h-36 h-fit text-secondary-1">
       <div className="-mt-20">
@@ -67,6 +78,7 @@ const ProfileDetails: React.FC<{ userDetail: UserDetail }> = ({ userDetail }) =>
           <Icon icon="uit:facebook-f" width="35" height="35" />
           <Icon icon="fluent:mail-28-regular" width="35" height="35" />
         </div>
+        <button onClick={clickLogout} >Logout</button>
       </div>
     </div>
   );
@@ -211,6 +223,7 @@ const UserDetailDisplay = ({ userDetail }: { userDetail: UserDetail }) => {
                 height="35"
                 onClick={() => setIsEditing(true)}
               />
+            {/* Temporary logout btn */}
         </div>
       )}
     </>
