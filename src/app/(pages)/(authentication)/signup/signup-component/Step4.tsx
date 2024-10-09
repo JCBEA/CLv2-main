@@ -1,6 +1,6 @@
 export const Step4 = ({ formData, handleSubmit, prevStep, handleCancel }: any) => {
     return (
-      <div className="w-full h-full flex flex-col gap-6">
+      <div className="w-full h-full flex flex-col gap-4">
         <h2 className="font-bold text-xl mb-4">Step 4: Review</h2>
   
         {/* Review Information */}
@@ -12,7 +12,7 @@ export const Step4 = ({ formData, handleSubmit, prevStep, handleCancel }: any) =
             <span className="font-semibold">Email: </span>{formData.email}
           </p>
           <p className="mb-2">
-            <span className="font-semibold">Name: </span>{formData.firstName} {formData.lastName}
+            <span className="font-semibold">Name: </span>{formData.name}
           </p>
           {/* Add additional fields for review */}
           <p className="mb-2">
@@ -27,7 +27,7 @@ export const Step4 = ({ formData, handleSubmit, prevStep, handleCancel }: any) =
         </div>
   
         {/* Navigation Buttons */}
-        <div className="flex justify-between mt-6">
+        {/* <div className="flex justify-between mt-6">
           <button
             onClick={prevStep}
             className="bg-gray-300 text-black px-4 py-2 rounded"
@@ -46,7 +46,7 @@ export const Step4 = ({ formData, handleSubmit, prevStep, handleCancel }: any) =
           >
             Submit
           </button>
-        </div>
+        </div> */}
       </div>
     );
   };

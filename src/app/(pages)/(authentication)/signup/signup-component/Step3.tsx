@@ -2,7 +2,7 @@ import { Input } from "./Signup";
 
 export const Step3 = ({ formData, handleChange, nextStep, prevStep }: any) => {
   return (
-    <div className="w-full h-full flex flex-col gap-6">
+    <div className="w-full h-full flex flex-col gap-4">
       <h2 className="font-bold text-xl">Step 3: Social Media</h2>
 
       {/* Instagram Input */}

@@ -35,6 +35,15 @@ interface InputProps {
   icon: string;
   type?: string;
 }
+interface SelectProps {
+  name: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  placeholder: string;
+  icon: string;
+  options: Array<{ value: string; label: string }>;
+}
+
 
 export const Signup = () => {
   return (
@@ -61,7 +70,7 @@ const AccountCreation = () => {
             alt=""
           />
         </div>
-        <div className="w-full h-full flex flex-col gap-4 justify-center items-center sm:p-10 p-6">
+        <div className="w-full h-full flex flex-col gap-4 justify-center items-center sm:p-10 p-4">
           <div className="w-64 h-fit">
             <Logo color="text-secondary-2" width={"auto"} height={"auto"} />
           </div>
@@ -101,7 +110,8 @@ const MultiStepForm = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const nextStep = () => {
+  const nextStep = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault(); // Prevent form submission on "Next" button click
     if (isStepValid()) {
       setStep((prev) => Math.min(prev + 1, 4));
       setError("");
@@ -131,12 +141,12 @@ const MultiStepForm = () => {
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    // Ensure this only happens on the final step
+    // Ensure this only happens on the final step (step 4)
     if (step !== 4) {
-      e.preventDefault(); // Prevent default if not on the last step
-      return; // Exit if it's not the last step
+      e.preventDefault(); // Prevent submission if not on the last step
+      return;
     }
-    
+  
     e.preventDefault(); // Prevent the default form submission
     try {
       await signupUser(
@@ -196,7 +206,7 @@ const MultiStepForm = () => {
   };
 
   return (
-    <form className="w-full h-full flex flex-col gap-6" onSubmit={handleSubmit}>
+    <form className="w-full h-full flex flex-col gap-2" onSubmit={handleSubmit}>
       <AnimatePresence mode="wait">
         <motion.div
           key={step}
@@ -246,7 +256,7 @@ const MultiStepForm = () => {
         )}
       </div>
 
-      <div className="w-full flex flex-col justify-center items-center mt-4">
+      <div className="w-full flex flex-col justify-center items-center mt-2">
         <p>Already have an account?</p>
         <Link href="/signin" className="uppercase font-medium cursor-pointer">
           Login
@@ -280,7 +290,7 @@ export const Input: React.FC<InputProps> = ({ name, value, onChange, placeholder
 export const TextArea: React.FC<InputProps> = ({ name, value, onChange, placeholder, icon }) => (
   <div className="w-full lg:max-w-sm relative">
     <textarea
-      className="w-full h-20 border-b-2 p-4 pl-12 border-secondary-2 outline-none ring-0"
+      className="w-full h-16 border-b-2 p-4 pl-12 border-secondary-2 outline-none ring-0 resize-none"
       name={name}
       value={value}
       onChange={onChange}
@@ -292,6 +302,36 @@ export const TextArea: React.FC<InputProps> = ({ name, value, onChange, placehol
       icon={icon}
       width="35"
       height="35"
+    />
+  </div>
+);
+
+
+export const Select: React.FC<SelectProps> = ({ name, value, onChange, placeholder, icon, options }) => (
+  <div className="relative w-full lg:max-w-sm">
+    <select
+      name={name}
+      value={value}
+      onChange={onChange}
+      className="w-full p-4 pl-12 pr-10 border-b-2 border-black outline-none ring-0 appearance-none bg-transparent"
+      required
+    >
+      <option value="" disabled>{placeholder}</option>
+      {options.map((option) => (
+        <option key={option.value} value={option.value}>{option.label}</option>
+      ))}
+    </select>
+    <Icon
+      className="text-secondary-2 absolute top-1/2 left-0 -translate-y-1/2"
+      icon={icon}
+      width="35"
+      height="35"
+    />
+    <Icon
+      icon={"mdi:chevron-down"}
+      className="absolute top-1/2 right-3 -translate-y-1/2 text-black pointer-events-none"
+      width="20"
+      height="20"
     />
   </div>
 );

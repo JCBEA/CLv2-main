@@ -1,19 +1,31 @@
-import { Input } from "./Signup";
-
+import { Icon } from "@iconify/react/dist/iconify.js";
+import { Input, Select, TextArea } from "./Signup";
 
 export const Step2 = ({ formData, handleChange, nextStep, prevStep }: any) => {
   return (
-    <div className="w-full h-full flex flex-col gap-6">
+    <div className="w-full h-full flex flex-col gap-4">
       <h2 className="font-bold text-xl">Step 2: Personal Details</h2>
 
-      {/* Creative Field Input */}
-      <Input
+      {/* Creative Field Dropdown */}
+      <Select
         name="creativeField"
         value={formData.creativeField}
         onChange={handleChange}
-        placeholder="Creative Field"
-        icon="mdi:palette" // Use an appropriate icon for the creative field
+        placeholder="Select your creative field"
+        icon="mdi:palette"
+        options={[
+          { value: "Photographer", label: "Photographer" },
+          { value: "Animator", label: "Animator" },
+          { value: "Fashion designer", label: "Fashion designer" },
+          { value: "Illustrator", label: "Illustrator" },
+          { value: "Interior Designer", label: "Interior Designer" },
+          { value: "Web Designer", label: "Web Designer" },
+          { value: "Art Teacher", label: "Art Teacher" },
+          { value: "Curator", label: "Curator" },
+          { value: "Industrial designer", label: "Industrial designer" },
+        ]}
       />
+
 
       {/* Address Input */}
       <Input
@@ -35,13 +47,13 @@ export const Step2 = ({ formData, handleChange, nextStep, prevStep }: any) => {
       />
 
       {/* Bio Textarea */}
-      <textarea 
+      <TextArea
         name="bio"
         value={formData.bio}
         onChange={handleChange}
         placeholder="Bio"
-        className="border border-gray-300 rounded-md p-2" // Apply styles to the textarea
-      ></textarea>
+        icon="mdi:note-outline"
+      ></TextArea>
     </div>
   );
 };
