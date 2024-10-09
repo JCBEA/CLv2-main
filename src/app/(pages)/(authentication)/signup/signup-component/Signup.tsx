@@ -61,7 +61,7 @@ export const Signup = () => {
 
 const AccountCreation = () => {
   return (
-    <div className="w-full h-full relative border border-black">
+    <div className="w-full h-full relative">
       <div className="w-full h-full flex bg-secondary-1 rounded-2xl z-50 relative">
         <div className="w-full h-full sm:p-10 p-6 lg:block hidden">
           <img
@@ -70,8 +70,8 @@ const AccountCreation = () => {
             alt=""
           />
         </div>
-        <div className="w-full h-full flex flex-col gap-4 justify-center items-center sm:p-10 p-4">
-          <div className="w-64 h-fit">
+        <div className="w-full min-h-full lg:-ml-8 flex flex-col gap-4 justify-center items-center sm:p-10 p-4">
+          <div className="w-64 h-fit"> 
             <Logo color="text-secondary-2" width={"auto"} height={"auto"} />
           </div>
           <div className="w-full h-full flex justify-end items-end">
@@ -206,7 +206,7 @@ const MultiStepForm = () => {
   };
 
   return (
-    <form className="w-full h-full flex flex-col gap-2" onSubmit={handleSubmit}>
+    <form className="w-full h-full flex flex-col gap-2 overflow-hidden" onSubmit={handleSubmit}>
       <AnimatePresence mode="wait">
         <motion.div
           key={step}
@@ -222,13 +222,12 @@ const MultiStepForm = () => {
       {error && <div className="text-red-500 mt-2">{error}</div>}
       {success && <div className="text-green-500 mt-2">{success}</div>}
 
-      <div className="flex justify-between mt-4">
+      <div className="flex justify-center items-center gap-4 mt-4">
         {step > 1 && (
           <motion.button
             type="button"
             onClick={prevStep}
-            className="bg-gray-300 text-gray-700 px-4 py-2 rounded"
-            whileHover={{ scale: 1.05 }}
+            className="border-2 border-secondary-2 text-secondary-2 w-full py-2"
             whileTap={{ scale: 0.95 }}
           >
             Previous
@@ -238,8 +237,7 @@ const MultiStepForm = () => {
           <motion.button
             type="button"
             onClick={nextStep}
-            className="bg-secondary-2 text-white px-4 py-2 rounded ml-auto"
-            whileHover={{ scale: 1.05 }}
+            className="border-2 z-50 border-secondary-2 text-secondary-2 w-full py-2 ml-auto"
             whileTap={{ scale: 0.95 }}
           >
             Next
@@ -247,8 +245,7 @@ const MultiStepForm = () => {
         ) : (
           <motion.button
             type="submit"
-            className="bg-secondary-2 text-white px-4 py-2 rounded ml-auto"
-            whileHover={{ scale: 1.05 }}
+            className="w-full border-2 border-secondary-2 text-secondary-2 py-2 ml-auto"
             whileTap={{ scale: 0.95 }}
           >
             Submit
