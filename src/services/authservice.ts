@@ -162,6 +162,12 @@ export const getUserDetailsFromToken = async () => {
 };
 
 
+export const getSession = () =>{
+  return( 
+   localStorage.getItem("token")
+  );
+};
+
 
 export const logoutUser = async () => {
   return( 
