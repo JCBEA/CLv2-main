@@ -83,24 +83,24 @@ export const Messages = () => {
   const handleUserClick = async (userId: string, messageId: string) => {
     setLoading(true);
     setChatMessages([]);
-  
+
     try {
       // Get messages for the selected user
       const someoneMessage = messages.filter((msg) => msg.id === messageId);
       // Get messages for the current user
       const yourMessage = messages.filter((msg) => msg.id === userId);
-  
+
       // Combine both messages
       const combinedMessages = [...someoneMessage, ...yourMessage];
-  
+
       // Sort combined messages from past to latest based on created_at
-      const sortedMessages = combinedMessages.sort((a, b) => 
+      const sortedMessages = combinedMessages.sort((a, b) =>
         new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
       );
-  
+
       // Set the sorted messages to state
       setChatMessages(sortedMessages);
-  
+
       // Open chat window
       setIsChatOpen(true);
     } catch (err) {
@@ -110,7 +110,7 @@ export const Messages = () => {
       setLoading(false);
     }
   };
-  
+
 
   const filteredMessages = messages.filter((message) => message.id !== userId);
 
@@ -149,24 +149,24 @@ export const Messages = () => {
               ) : (
                 <div className="w-full flex flex-col gap-4">
                   {latestMessagesArray.map((message) => (
-  <div
-    key={`${message.id}-${message.created_at}`} // Ensure uniqueness
-    className="w-full flex items-center gap-2 cursor-pointer"
-    onClick={() => userId && handleUserClick(userId, message.id)} // Pass both IDs
-  >
-    <div className="w-full flex flex-col">
-      <div className="w-full flex justify-between items-center">
-        <p className="text-sm font-semibold">{message.first_name}</p>
-        <p className="text-xs font-semibold opacity-80">
-          {new Date(message.created_at).toLocaleString()} {/* Formatting the date */}
-        </p>
-      </div>
-      <p className={`text-base font-bold ${message.message.length > 10 ? "line-clamp-1" : ""}`}>
-        {message.message}
-      </p>
-    </div>
-  </div>
-))}
+                    <div
+                      key={`${message.id}-${message.created_at}`} // Ensure uniqueness
+                      className="w-full flex items-center gap-2 cursor-pointer"
+                      onClick={() => userId && handleUserClick(userId, message.id)} // Pass both IDs
+                    >
+                      <div className="w-full flex flex-col">
+                        <div className="w-full flex justify-between items-center">
+                          <p className="text-sm font-semibold">{message.first_name}</p>
+                          <p className="text-xs font-semibold opacity-80">
+                            {new Date(message.created_at).toLocaleString()} {/* Formatting the date */}
+                          </p>
+                        </div>
+                        <p className={`text-base font-bold ${message.message.length > 10 ? "line-clamp-1" : ""}`}>
+                          {message.message}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
 
                 </div>
               )}
@@ -185,23 +185,23 @@ export const Messages = () => {
                 </button>
               )}
 
-<div className="w-full h-full">
-{loading ? (
-  <p>Loading messages...</p> // Replace with a spinner component if you have one
-) : (
-  chatMessages.length > 0 ? (
-    chatMessages.map((msg) => (
-      <div key={msg.id} className="p-2">
-        <p><strong>{msg.first_name || 'Unknown'}:</strong> {msg.message}</p>
-        <p className="text-xs">{new Date(msg.created_at).toLocaleString()}</p>
-      </div>
-    ))
-  ) : (
-    <p>No messages to display.</p>
-  )
-)}
+              <div className="w-full h-full">
+                {loading ? (
+                  <p>Loading messages...</p> // Replace with a spinner component if you have one
+                ) : (
+                  chatMessages.length > 0 ? (
+                    chatMessages.map((msg) => (
+                      <div key={msg.id} className="p-2">
+                        <p><strong>{msg.first_name || 'Unknown'}:</strong> {msg.message}</p>
+                        <p className="text-xs">{new Date(msg.created_at).toLocaleString()}</p>
+                      </div>
+                    ))
+                  ) : (
+                    <p>No messages to display.</p>
+                  )
+                )}
 
-</div>
+              </div>
 
 
               <div className="w-full h-fit p-4">
