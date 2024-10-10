@@ -81,7 +81,9 @@ export const Messages = () => {
   }, []);
 
   const handleUserClick = async (userId: string, messageId: string) => {
-    setIsChatOpen(false);
+    setLoading(true);
+    setChatMessages([]);
+  
     try {
       // Get messages for the selected user
       const someoneMessage = messages.filter((msg) => msg.id === messageId);
