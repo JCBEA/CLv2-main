@@ -14,12 +14,12 @@ export const ServiceCreatives = () => {
     return (
         <div className="w-full h-fit relative">
             <div className="w-full h-full flex flex-col gap-[10dvh] justify-center items-center">
-                <h1 className="uppercase font-bold text-5xl">
+                <h1 className="uppercase font-bold lg:text-5xl text-4xl w-full max-w-full lg:max-w-[70%] lg:text-left text-center ">
                     top creatives
                 </h1>
                 <div className="w-full relative">
                     <div className="w-full max-w-[90%] mx-auto">
-                        <div className="w-full h-fit grid grid-cols-3 gap-8 p-4">
+                        <div className="w-full h-fit grid lg:grid-cols-3 grid-cols-1 gap-8 p-4">
                             {TopCreatives.map((user, id) => (
                                 <UserCards
                                     key={id}
@@ -30,7 +30,7 @@ export const ServiceCreatives = () => {
                             ))}
                         </div>
                     </div>
-                    <div className="w-full h-[70%] absolute top-1/2 -translate-y-1/2 right-0 flex justify-center items-center bg-shade-1">
+                    <div className="w-full lg:h-[70%] h-full absolute top-1/2 -translate-y-1/2 right-0 flex justify-center items-center bg-shade-1">
 
                     </div>
                 </div>

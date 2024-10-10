@@ -21,8 +21,8 @@ export const Services = () => {
     return (
         <div className="w-full h-fit pb-[15dvh]">
             <div className="w-full flex flex-col ">
-                <CreativeHeader />
-                <div className="w-full max-w-[90%] mx-auto grid grid-cols-3 gap-x-14 gap-y-14 py-[15dvh]">
+                {/* <CreativeHeader /> */}
+                <div className="w-full max-w-[90%] mx-auto grid lg:grid-cols-3 grid-cols-1 gap-x-14 gap-y-14 py-[15dvh]">
                     {/* cards here */}
                     {ServiceArray.map((user, id) => (
                         <CreativeCards
@@ -45,8 +45,6 @@ export const Services = () => {
     )
 }
 
-
-
 const calculateAge = (bDay: string | Date) => {
     const dateNow = new Date();
     const bDayDate = new Date(bDay);
@@ -66,31 +64,51 @@ const calculateAge = (bDay: string | Date) => {
     return age;
 };
 
-const CreativeCards: React.FC<ServiceArrayProps> = ({ name, bDay, description, imageSrc, imageBg, fbLink, instaLink, email, address, }) => {
-    const age = calculateAge(bDay);
+export const CreativeCards: React.FC<ServiceArrayProps> = ({
+    name,
+    bDay,
+    description,
+    imageSrc,
+    imageBg,
+    fbLink,
+    instaLink,
+    email,
+    address,
+}) => {
+    const age = calculateAge(bDay)
+
     return (
         <motion.div
             whileHover={{ scale: 1.02 }}
-            className="w-full border border-gray-400 rounded-xl p-4 bg-secondary-1 shadow-customShadow">
-            <div className="flex flex-col ">
-                <div className="w-full h-44 relative ">
-                    <div className="w-full h-44">
-                        <img className="w-full h-full object-cover" src={imageBg || "images/landing-page/eabab.png"} alt="" />
-                    </div>
+            className="w-full border border-gray-400 rounded-xl p-4 bg-secondary-1 shadow-customShadow"
+        >
+            <div className="flex flex-col h-full lg:gap-4">
+                <div className="w-full h-44 relative">
+                    <img
+                        className="w-full h-full object-cover"
+                        src={imageBg || "images/landing-page/eabab.png"}
+                        alt=""
+                    />
                 </div>
-                <div className="w-full h-full max-h-32 -mt-6 flex flex-row gap-2 justify-start items-center">
-                    <img className="h-32 w-32 z-50 bg-gray-600 rounded-full object-cover" src={imageSrc || "/images/creative-directory/boy.png"} alt="" />
-                    <div className="w-full flex flex-col justify-start items-start">
-                        <div className="w-full flex flex-row justify-between items-start mt-2">
-                            <h4 className="text-xl font-bold">{name}</h4>
+                <div className="w-full flex flex-col sm:flex-row gap-4 items-center sm:items-start">
+                    <img
+                        className="h-32 w-32 z-50 -mt-12 bg-gray-600 rounded-full object-cover"
+                        src={imageSrc || "/images/creative-directory/boy.png"}
+                        alt=""
+                    />
+                    <div className="w-full flex flex-col justify-start items-center sm:items-start">
+                        <div className="w-full flex flex-row lg:justify-between justify-center items-center sm:items-start mt-2 gap-2">
+                            <h4 className="text-xl font-bold text-center sm:text-left">{name}</h4>
                             <div className="flex gap-2">
                                 <motion.span whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                                     <Icon className="cursor-pointer text-red-400" icon="jam:heart" width="25" height="25" />
                                 </motion.span>
                             </div>
                         </div>
-                        <div className="w-full flex flex-row justify-between items-start">
-                            <p className={`text-xs font-semibold ${description.length > 20 ? "line-clamp-1" : ""}`}>{age}, {address}</p>
+                        <div className="w-full flex flex-col sm:flex-row justify-between items-center sm:items-start gap-2 sm:gap-0">
+                            <p className={`text-xs font-semibold text-center sm:text-left ${description.length > 20 ? "line-clamp-1" : ""}`}>
+                                {age}, {address}
+                            </p>
                             <span className="flex gap-0.5">
                                 {iconNifyNonColored.map((icon, id) => (
                                     <Icon key={id} className="cursor-pointer" icon={icon} width="25" height="25" />
@@ -98,11 +116,12 @@ const CreativeCards: React.FC<ServiceArrayProps> = ({ name, bDay, description, i
                             </span>
                         </div>
                     </div>
-
                 </div>
-                <div className="w-full min-h-32 max-h-fit flex flex-col  pt-4">
-                    <div className="w-full h-full max-w-[87%] mx-auto  flex flex-col gap-6 justify-center items-center">
-                        <p className={`text-center text-xs font-semibold ${description.length > 100 ? "line-clamp-6" : ""}`}>{description}</p>
+                <div className="w-full min-h-32 flex flex-col pt-4">
+                    <div className="w-full h-full max-w-[87%] mx-auto flex flex-col gap-6 justify-center items-center">
+                        <p className={`text-center text-xs font-semibold ${description.length > 100 ? "line-clamp-6" : ""}`}>
+                            {description}
+                        </p>
                         <CreativeButton />
                     </div>
                 </div>
@@ -111,34 +130,34 @@ const CreativeCards: React.FC<ServiceArrayProps> = ({ name, bDay, description, i
     )
 }
 
-const CreativeHeader = () => {
-    return (
-        <div className="w-full bg-white pt-[12dvh] pb-5 sticky top-0 z-[100]">
-            <div className="max-w-[80%] mx-auto flex flex-col gap-8 justify-center items-center">
-            <div className="w-full max-w-[70%] mx-auto relative">
-                <input className="placeholder:text-primary-2 text-lg font-medium rounded-full bg-quaternary-2 ring-none outline-none w-full py-3 px-14" type="text" placeholder="Search" />
-                <Icon className="absolute cursor-pointer top-1/2 -translate-y-1/2 right-4 text-primary-2" icon="tabler:send-2" width="25" height="25" />
-                <Icon className="absolute cursor-pointer top-1/2 -translate-y-1/2 left-4 text-primary-2" icon="f7:menu" width="25" height="25" />
-            </div>
-            <div className="w-full flex flex-row justify-center items-center gap-6  ">
-                <div className="w-fit h-fit bg-quaternary-2 rounded-full p-2">
-                    <Icon className=" text-primary-2 cursor-pointer " icon="line-md:heart-twotone" width="35" height="35" />
-                </div>
-                <div className="w-full ">
-                    <div className="placeholder:text-primary-2 text-xl font-bold rounded-full bg-quaternary-2 py-1.5 ring-none outline-none w-full px-8 flex justify-between items-center">
-                        {Alphabet.map((letter, index) => (
-                            <motion.span
-                                whileHover={{ scale: 1.5, color: "#1b7a8e" }}
-                                whileTap={{ scale: 0.9 }}
-                                className="cursor-pointer p-2" key={index}>{letter}</motion.span>
-                        ))}
-                    </div>
-                </div>
-            </div>
-            </div>
-        </div>
-    )
-}
+// const CreativeHeader = () => {
+//     return (
+//         <div className="w-full bg-white pt-[12dvh] pb-5 sticky top-0 z-[100]">
+//             <div className="max-w-[80%] mx-auto flex flex-col gap-8 justify-center items-center">
+//             <div className="w-full max-w-[70%] mx-auto relative">
+//                 <input className="placeholder:text-primary-2 text-lg font-medium rounded-full bg-quaternary-2 ring-none outline-none w-full py-3 px-14" type="text" placeholder="Search" />
+//                 <Icon className="absolute cursor-pointer top-1/2 -translate-y-1/2 right-4 text-primary-2" icon="tabler:send-2" width="25" height="25" />
+//                 <Icon className="absolute cursor-pointer top-1/2 -translate-y-1/2 left-4 text-primary-2" icon="f7:menu" width="25" height="25" />
+//             </div>
+//             <div className="w-full flex flex-row justify-center items-center gap-6  ">
+//                 <div className="w-fit h-fit bg-quaternary-2 rounded-full p-2">
+//                     <Icon className=" text-primary-2 cursor-pointer " icon="line-md:heart-twotone" width="35" height="35" />
+//                 </div>
+//                 <div className="w-full ">
+//                     <div className="placeholder:text-primary-2 text-xl font-bold rounded-full bg-quaternary-2 py-1.5 ring-none outline-none w-full px-8 flex justify-between items-center">
+//                         {Alphabet.map((letter, index) => (
+//                             <motion.span
+//                                 whileHover={{ scale: 1.5, color: "#1b7a8e" }}
+//                                 whileTap={{ scale: 0.9 }}
+//                                 className="cursor-pointer p-2" key={index}>{letter}</motion.span>
+//                         ))}
+//                     </div>
+//                 </div>
+//             </div>
+//             </div>
+//         </div>
+//     )
+// }
 
 const CreativeButton = () => {
     return (
