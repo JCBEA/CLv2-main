@@ -25,7 +25,7 @@ export default function MainLayout({
 
 const dynamicMenuItems = [
   { name: "directory", link: "/creative-dashboard" },
-  { name: "gallery", link: "/gallery" },
+  { name: "gallery", link: "/g-visitor" },
   { name: "faqs", link: "/faqs" },
   { name: "Log in", link: "/signin" },
 ];
