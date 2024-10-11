@@ -11,7 +11,7 @@ interface LayoutProps {
 const dynamicMenuItems = [
   { name: "Home", link: "/pofcon-landing-page" },
   { name: "Directory", link: "/creative-dashboard" },
-  { name: "Gallery", link: "/g-user" },
+  { name: "Gallery", link: "/g-visitor" },
   { name: "Faqs", link: "/faqs" },
 ];
 

@@ -53,7 +53,7 @@ export const CreativeCarousel = () => {
 
     return (
         <div className="w-full md:h-[45dvh] h-[40dvh] relative">
-            <div className="w-full md:max-w-[90%] h-full flex justify-center items-center  overflow-hidden mx-auto">
+            <div className="w-full md:max-w-[90%] h-full flex justify-center items-center overflow-hidden mx-auto">
                 <div className="w-full lg:h-[11rem] h-[10rem]">
                     <motion.div
                         className="flex h-full md:px-2 md:gap-1"
@@ -62,18 +62,21 @@ export const CreativeCarousel = () => {
                         transition={{ duration: 0.5 }}
                     >
                         {CreativeArray.map((item, id) => (
-                            <div
+                            <motion.div
                                 key={id}
                                 className={`flex-shrink-0 h-full ${cardsPerPage === 1
-                                    ? "w-full"
-                                    : cardsPerPage === 2
-                                        ? "w-1/2"
-                                        : cardsPerPage === 3
-                                            ? "w-1/3"
-                                            : cardsPerPage === 4
-                                                ? "w-1/4"
-                                                : "w-1/5" // For 5 items on lg and xl screens
+                                        ? "w-full"
+                                        : cardsPerPage === 2
+                                            ? "w-1/2"
+                                            : cardsPerPage === 3
+                                                ? "w-1/3"
+                                                : cardsPerPage === 4
+                                                    ? "w-1/4"
+                                                    : "w-1/5"
                                     } p-4`}
+                                initial={{ opacity: 0, y: 50 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 1, delay: id * 0.2 }}
                             >
                                 <CreativeCards
                                     title={item.title}
@@ -83,7 +86,7 @@ export const CreativeCarousel = () => {
                                     translate={item.translate}
                                     link={item.link!}
                                 />
-                            </div>
+                            </motion.div>
                         ))}
                     </motion.div>
                 </div>
