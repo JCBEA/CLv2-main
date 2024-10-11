@@ -67,6 +67,7 @@ export const Header = ({
       ]);
     } else {
       setMenuItems([
+        { name: "Directory", link: "/creative-dashboard" },
         { name: "Gallery", link: "/g-visitor" },
         { name: "FAQ", link: "/faqs" },
         { name: "Log In", link: "/signin" },
