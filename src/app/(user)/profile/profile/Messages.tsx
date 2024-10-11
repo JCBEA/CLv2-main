@@ -51,12 +51,14 @@ export const Messages = () => {
         try {
           const { payload } = await jwtVerify(token, new TextEncoder().encode(JWT_SECRET));
           const userIdFromToken = payload.id as string;
+          const userNameFromToken = payload.username as string;
           setUserId(userIdFromToken);
 
           const response = await fetch('/api/chat', {
             method: 'GET',
             headers: {
               'Authorization': userIdFromToken,
+              'Append': userNameFromToken
             },
           });
 
@@ -80,10 +82,11 @@ export const Messages = () => {
     fetchMessages();
   }, []);
 
+
+
   const handleUserClick = async (userId: string, messageId: string) => {
     setLoading(true);
-    setChatMessages([]);
-
+    setChatMessages([]); // Clear previous chat messages before loading new ones
     try {
       // Get messages for the selected user
       const someoneMessage = messages.filter((msg) => msg.id === messageId);
@@ -101,15 +104,16 @@ export const Messages = () => {
       // Set the sorted messages to state
       setChatMessages(sortedMessages);
 
-      // Open chat window
+      // Open chat window after setting messages
       setIsChatOpen(true);
     } catch (err) {
       console.error('Error fetching chat messages:', err);
     } finally {
-      // End loading state here to ensure it reflects correctly after loading messages
       setLoading(false);
     }
   };
+
+
 
 
   const filteredMessages = messages.filter((message) => message.id !== userId);
@@ -187,7 +191,7 @@ export const Messages = () => {
 
               <div className="w-full h-full">
                 {loading ? (
-                  <p>Loading messages...</p> // Replace with a spinner component if you have one
+                  <p>Loading messages...</p> // Replace with a spinner component if needed
                 ) : (
                   chatMessages.length > 0 ? (
                     chatMessages.map((msg) => (
@@ -200,7 +204,6 @@ export const Messages = () => {
                     <p>No messages to display.</p>
                   )
                 )}
-
               </div>
 
 
