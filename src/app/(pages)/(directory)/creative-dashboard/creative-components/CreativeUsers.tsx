@@ -1,7 +1,8 @@
 "use client";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { CreativeLegazpiUsers } from "./CreativeArray";
-import { motion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
+import { useRef } from "react";
 
 interface CreativeArrayProps {
     name: string,
@@ -50,8 +51,15 @@ const calculateAge = (bDay: string | Date) => {
 
 const UserCard = ({ name, bDay, description, imageSrc, imageBg }: CreativeArrayProps) => {
     const age = calculateAge(bDay);
+    const ref = useRef(null);
+    const isInView = useInView(ref, { once: true, amount: 0.2 });
+
     return (
         <motion.div
+            ref={ref}
+            initial={{ opacity: 0, y: 50 }}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
             whileHover={{ scale: 1.02 }}
             className="w-full border border-gray-400 rounded-xl p-4 bg-secondary-1 shadow-customShadow">
             <div className="flex flex-col ">

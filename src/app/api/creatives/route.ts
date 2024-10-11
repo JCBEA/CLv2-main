@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/services/supabaseClient'; // Adjust import as necessary
+import { supabase } from '@/services/supabaseClient';
 import { jwtVerify } from 'jose';
 
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret'; // Use a strong secret
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret';
 
 // GET method to retrieve a list of creatives
 export async function GET() {
@@ -19,7 +19,7 @@ export async function GET() {
 
 // PUT method to update user details based on token
 export async function PUT(req: Request) {
-  const authHeader = req.headers.get('Authorization')?.split(' ')[1];
+  const authHeader = req.headers.get('Authorization');
   if (!authHeader) {
       return NextResponse.json({ message: 'No token provided' }, { status: 401 });
   }

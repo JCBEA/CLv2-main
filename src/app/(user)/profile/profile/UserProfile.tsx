@@ -7,6 +7,8 @@ import { Messages } from "./Messages";
 import { jwtVerify } from 'jose';
 import { logoutUser } from "@/services/authservice";
 import { useRouter } from 'next/navigation';
+import { getSession } from "@/services/authservice";
+
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret';
 export interface UserDetail {
   id: string; // Assuming there's an id for user identification
@@ -112,14 +114,13 @@ const UserDetailDisplay = ({ userDetail }: { userDetail: UserDetail }) => {
   };
 
   const handleSave = async () => {
-    const token = localStorage.getItem("token");
+    const token = getSession();
 
     // Check if the token exists
     if (!token) {
       console.error("No token found, user may not be logged in.");
       return; // Optionally handle unauthorized state here
     }
-
     try {
       // Verify the token and handle it appropriately
       const { payload } = await jwtVerify(token, new TextEncoder().encode(JWT_SECRET));
@@ -131,7 +132,7 @@ const UserDetailDisplay = ({ userDetail }: { userDetail: UserDetail }) => {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${payload.id}`,
+          "Authorization": `${payload.id}`,
         },
         body: JSON.stringify({
           detailsid: payload.id,
