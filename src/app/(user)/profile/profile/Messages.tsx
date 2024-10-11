@@ -3,11 +3,12 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { getSession } from "@/services/authservice";
+import { getMessageId, getSession, getUserName } from "@/services/authservice";
 import { jwtVerify } from "jose";
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret';
 
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret';
+const messageId = getMessageId();
 interface Message {
   id: string;
   first_name: string;
@@ -30,6 +31,7 @@ export const Messages = () => {
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [newMessage, setNewMessage] = useState<string>(""); // State for new message input
 
   // Detect screen size
   useEffect(() => {
@@ -49,26 +51,26 @@ export const Messages = () => {
       const token = getSession();
       if (token) {
         try {
+          const messageId = getMessageId();
           const { payload } = await jwtVerify(token, new TextEncoder().encode(JWT_SECRET));
           const userIdFromToken = payload.id as string;
           const userNameFromToken = payload.username as string;
           setUserId(userIdFromToken);
-
+  
           const response = await fetch('/api/chat', {
             method: 'GET',
             headers: {
               'Authorization': userIdFromToken,
-              'Append': userNameFromToken
+              'Append': userNameFromToken,
             },
           });
-
+  
           if (!response.ok) {
             throw new Error('Failed to fetch messages');
           }
-
+  
           const data = await response.json();
           setMessages(data.messages || []);
-          setUserDetails(data.userDetails || []);
         } catch (err: any) {
           setError(err.message);
         } finally {
@@ -79,19 +81,99 @@ export const Messages = () => {
         setError('No session token found');
       }
     };
+  
     fetchMessages();
   }, []);
+  
+
+  // Function to handle sending a new message
+  const handleSendMessage = async () => {
+    const token = getSession();
+    if (!newMessage || !token) return; // Prevent sending empty messages
+    try {
+      // Verify JWT token to extract user details
+      const { payload } = await jwtVerify(token, new TextEncoder().encode(JWT_SECRET));
+      const userIdFromToken = payload.id as string;
+      const getUser = getUserName();
+      const messageId = getMessageId();
+      // Prepare the message data
+      const messageData = {
+        message: newMessage,
+        forId: messageId, // Assuming messageId is the recipient or thread ID
+        created_at: new Date().toISOString(),
+        first_name: getUser
+      };
+
+      // Send the message data to the server
+      const response = await fetch("/api/chat", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": userIdFromToken, // Passing user ID in the Authorization header
+        },
+        body: JSON.stringify(messageData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to send message");
+      }
+
+      // After successfully sending the message, update the chatMessages and reset input
+      const sentMessage = await response.json();
+      setChatMessages((prevMessages) => [...prevMessages, sentMessage]);
+      setNewMessage(""); // Clear the message input after sending
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
+  };
 
 
-
-  const handleUserClick = async (userId: string, messageId: string) => {
+  const handleUserClick = async (userId: string, messageId: string, msgFor:string) => {
+    localStorage.removeItem("user");
     setLoading(true);
     setChatMessages([]); // Clear previous chat messages before loading new ones
+    const token = getSession();
+    if (!token) return;
+    try{
+      const messageId = getMessageId();
+      const { payload } = await jwtVerify(token, new TextEncoder().encode(JWT_SECRET));
+      const userIdFromToken = payload.id as string;
+      const userNameFromToken = payload.username as string;
+      setUserId(userIdFromToken);
+
+      const response = await fetch('/api/chat', {
+        method: 'GET',
+        headers: {
+          'Authorization': userIdFromToken,
+          'Append': userNameFromToken,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch messages');
+      }
+
+      const data = await response.json();
+      setMessages(data.messages || []);
+      setUserDetails(data.userDetails || []);
+          // Store first_name from userDetails in localStorage
+          if (data.userDetails && Array.isArray(data.userDetails)) {
+            data.userDetails.forEach((userDetail: UserDetail) => {
+              const first_name = userDetail.first_name
+              localStorage.setItem("user", first_name);
+            });
+          }
+        }catch (err: any) {
+            setError(err.message);
+          }
     try {
+      localStorage.setItem("messageId", messageId);
+      const getMessageToken = getMessageId();
+      console.log("Token ID"+getMessageToken);
       // Get messages for the selected user
       const someoneMessage = messages.filter((msg) => msg.id === messageId);
       // Get messages for the current user
-      const yourMessage = messages.filter((msg) => msg.id === userId);
+      const yourMessage = messages.filter((msg) => (msg.id === userId && msg.for ==messageId));
 
       // Combine both messages
       const combinedMessages = [...someoneMessage, ...yourMessage];
@@ -103,18 +185,14 @@ export const Messages = () => {
 
       // Set the sorted messages to state
       setChatMessages(sortedMessages);
-
       // Open chat window after setting messages
       setIsChatOpen(true);
     } catch (err) {
-      console.error('Error fetching chat messages:', err);
+      console.error("Error fetching chat messages:", err);
     } finally {
       setLoading(false);
     }
   };
-
-
-
 
   const filteredMessages = messages.filter((message) => message.id !== userId);
 
@@ -156,7 +234,7 @@ export const Messages = () => {
                     <div
                       key={`${message.id}-${message.created_at}`} // Ensure uniqueness
                       className="w-full flex items-center gap-2 cursor-pointer"
-                      onClick={() => userId && handleUserClick(userId, message.id)} // Pass both IDs
+                      onClick={() => userId && handleUserClick(userId, message.id, message.for)} // Pass both IDs
                     >
                       <div className="w-full flex flex-col">
                         <div className="w-full flex justify-between items-center">
@@ -171,7 +249,6 @@ export const Messages = () => {
                       </div>
                     </div>
                   ))}
-
                 </div>
               )}
             </div>
@@ -206,27 +283,32 @@ export const Messages = () => {
                 )}
               </div>
 
-
+              {/* Message Input */}
               <div className="w-full h-fit p-4">
                 <div className="w-full flex gap-2 justify-between items-center text-primary-2 bg-shade-8 rounded-full px-4">
                   <input
                     className="w-full p-3 outline-none ring-0 placeholder:text-primary-2 bg-transparent"
                     type="text"
-                    placeholder="Start a new message"
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    placeholder="Type a message..."
                   />
-                  <motion.div
-                    className="w-fit h-fit"
-                    whileTap={{ scale: 0.9 }}
-                    whileHover={{ scale: 1.1 }}
+
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="text-primary-2 font-bold"
+                    onClick={handleSendMessage}
                   >
                     <Icon
+
                       className="rotate-[-36deg] cursor-pointer -mt-1"
                       type="submit"
                       icon="proicons:send"
                       width="35"
                       height="35"
                     />
-                  </motion.div>
+                  </motion.button>
                 </div>
               </div>
             </div>

@@ -168,10 +168,25 @@ export const getSession = () => {
   return null;
 };
 
+export const getMessageId = () => {
+  if (typeof window !== "undefined") {
+      return localStorage.getItem("messageId");
+  }
+  return null; // Return null or a default value if not in the browser
+};
+
+export const getUserName = () => {
+  if (typeof window !== "undefined") {
+      return localStorage.getItem("user");
+  }
+  return null; // Return null or a default value if not in the browser
+};
+
+
 export const logoutUser = () => {
   if (typeof window !== 'undefined') {
     localStorage.removeItem("token");
-    // You might want to clear other auth-related items as well
+    localStorage.removeItem("messageId");
     localStorage.removeItem("user");
   }
 };
