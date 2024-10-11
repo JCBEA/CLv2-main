@@ -1,10 +1,13 @@
 "use client";
+
 import { motion } from "framer-motion";
 import { Logo } from "../reusable-component/Logo";
 import { Icon } from "@iconify/react";
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
-import Link from "next/dist/client/link";
+import Link from "next/link";
+import { getSession, logoutUser } from "@/services/authservice";
+import { useRouter } from 'next/navigation';
 
 // Define Props Interfaces
 interface MenuItemProps {
@@ -19,7 +22,6 @@ interface HeaderProps {
   linkName: string;
   roundedCustom?: string;
   paddingLeftCustom?: string;
-  menuItems: MenuItemProps[];
 }
 
 // MenuItem Component
@@ -31,7 +33,7 @@ const MenuItem = ({ name, link }: MenuItemProps) => {
       whileHover={{ scale: 1.1 }}
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, ease: "easeOut" }} // Reduced duration for faster effect
+      transition={{ duration: 0.3, ease: "easeOut" }}
     >
       {name}
     </motion.a>
@@ -46,10 +48,31 @@ export const Header = ({
   paddingLeftCustom = "pl-14",
   roundedCustom = "rounded-bl-3xl",
   linkName = "",
-  menuItems,
 }: HeaderProps) => {
   const headerRef = useRef<HTMLDivElement | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [menuItems, setMenuItems] = useState<MenuItemProps[]>([]);
+  const router = useRouter();
+
+  const checkAuth = async () => {
+    const session = await getSession();
+    setIsLoggedIn(!!session);
+
+    if (session) {
+      setMenuItems([
+        { name: "Directory", link: "/creative-dashboard" },
+        { name: "Gallery", link: "/g-user" },
+        { name: "FAQ", link: "/faqs" },
+      ]);
+    } else {
+      setMenuItems([
+        { name: "Gallery", link: "/g-visitor" },
+        { name: "FAQ", link: "/faqs" },
+        { name: "Log In", link: "/signin" },
+      ]);
+    }
+  };
 
   useEffect(() => {
     // GSAP Animation for Header on Load
@@ -68,19 +91,24 @@ export const Header = ({
 
     // Scroll listener to change header background when scrolling
     const handleScroll = () => {
-      if (window.scrollY > 50) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
+      setIsScrolled(window.scrollY > 50);
     };
 
     window.addEventListener("scroll", handleScroll);
+
+    checkAuth();
+
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
+  const handleLogout = () => {
+    logoutUser();
+    setIsLoggedIn(false);
+    checkAuth(); // Update menu items
+    router.push('/signin');
+  };
 
   return (
     <div
@@ -88,10 +116,9 @@ export const Header = ({
       className={`w-full h-[10dvh] fixed top-0 z-[1000] ${paddingLeftCustom} transition-colors duration-500`}
     >
       <motion.div
-        className={`w-full h-full ${roundedCustom} ${textColor} ${isScrolled
-          ? "bg-primary-1/60 backdrop-blur-md"
-          : backgroundColor
-          }`}
+        className={`w-full h-full ${roundedCustom} ${textColor} ${
+          isScrolled ? "bg-primary-1/60 backdrop-blur-md" : backgroundColor
+        }`}
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 1.0, ease: "easeOut" }}
@@ -127,19 +154,32 @@ export const Header = ({
             {menuItems.map((item, index) => (
               <MenuItem key={index} {...item} />
             ))}
-            <Link
-              href={linkName}>
+            {isLoggedIn ? (
               <motion.button
+                onClick={handleLogout}
                 className="uppercase w-44 py-1.5 font-semibold rounded-full bg-shade-2"
                 whileHover={{ scale: 1.1, backgroundColor: "#403737", color: "#fff" }}
                 whileTap={{ scale: 0.95 }}
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, ease: "easeOut" }} // Reduced delay and duration for faster effect
+                transition={{ duration: 0.3, ease: "easeOut" }}
               >
-                {buttonName}
+                Logout
               </motion.button>
-            </Link>
+            ) : (
+              <Link href={linkName}>
+                <motion.button
+                  className="uppercase w-44 py-1.5 font-semibold rounded-full bg-shade-2"
+                  whileHover={{ scale: 1.1, backgroundColor: "#403737", color: "#fff" }}
+                  whileTap={{ scale: 0.95 }}
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
+                >
+                  {buttonName}
+                </motion.button>
+              </Link>
+            )}
           </motion.div>
 
           {/* Mobile Menu Icon */}
@@ -156,11 +196,3 @@ export const Header = ({
     </div>
   );
 };
-
-// Menu Data
-const headerMenu = [
-  { name: "Directory", link: "/" },
-  { name: "Gallery", link: "/about" },
-  { name: "FAQ", link: "/faqs" },
-  { name: "Log In", link: "/signin" },
-];

@@ -161,18 +161,19 @@ export const getUserDetailsFromToken = async () => {
   }
 };
 
-
-export const getSession = () =>{
-  return( 
-   localStorage.getItem("token")
-  );
+export const getSession = () => {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem("token");
+  }
+  return null;
 };
 
-
-export const logoutUser = async () => {
-  return( 
-    localStorage.clear()
-  );
+export const logoutUser = () => {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem("token");
+    // You might want to clear other auth-related items as well
+    localStorage.removeItem("user");
+  }
 };
 
 
