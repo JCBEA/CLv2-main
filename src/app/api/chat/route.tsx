@@ -4,15 +4,16 @@ import { supabase } from '@/services/supabaseClient';
 export async function GET(req: Request) {
   const userId = req.headers.get('Authorization');
   const username = req.headers.get('Append');
-  
-  if (!userId && !username) {
+
+  if (!userId || !username) {
     return NextResponse.json({ message: 'User ID is missing' }, { status: 401 });
   }
 
   try {
+    // Fetch messages related to the user
     const { data: messages, error: messagesError } = await supabase
       .from('messages')
-      .select('id, first_name, message, created_at')
+      .select('id, first_name, message, created_at, for')
       .or(`for.eq.${userId},id.eq.${userId}`);
 
     if (messagesError) {
@@ -20,35 +21,19 @@ export async function GET(req: Request) {
       return NextResponse.json({ message: 'Failed to fetch messages', error: messagesError.message }, { status: 500 });
     }
 
-    const messageIds = messages?.map(msg => msg.id) || [];
-
-    const { data: userDetailsByUserId, error: userDetailsByUserIdError } = await supabase
+    // Fetch user details where detailsid equals userId
+    const { data: userDetails, error: userDetailsError } = await supabase
       .from('userDetails')
       .select('*')
       .eq('detailsid', userId);
 
-    if (userDetailsByUserIdError) {
-      console.error('Supabase fetch error for userDetails by userId:', userDetailsByUserIdError);
-      return NextResponse.json({ message: 'Failed to fetch user details by userId', error: userDetailsByUserIdError.message }, { status: 500 });
+    if (userDetailsError) {
+      console.error('Supabase fetch error for userDetails:', userDetailsError);
+      return NextResponse.json({ message: 'Failed to fetch user details', error: userDetailsError.message }, { status: 500 });
     }
-
-    const { data: userDetailsByMessageIds, error: userDetailsByMessageIdsError } = await supabase
-      .from('userDetails')
-      .select('*')
-      .in('detailsid', messageIds);
-
-    if (userDetailsByMessageIdsError) {
-      console.error('Supabase fetch error for userDetails by messageIds:', userDetailsByMessageIdsError);
-      return NextResponse.json({ message: 'Failed to fetch user details by message IDs', error: userDetailsByMessageIdsError.message }, { status: 500 });
-    }
-
-    const combinedUserDetails = [
-      ...(userDetailsByUserId || []),
-      ...(userDetailsByMessageIds || []),
-    ];
 
     return NextResponse.json(
-      { messages: messages || [], userDetails: combinedUserDetails },
+      { messages: messages || [], userDetails: userDetails || [] },
       { status: 200 }
     );
   } catch (error: any) {
@@ -57,31 +42,33 @@ export async function GET(req: Request) {
   }
 }
 
-export async function PUT(req: Request) {
-  const userId = req.headers.get('Authorization');
-  const username = req.headers.get('Append');
 
-  if (!userId || !username) {
+export async function PUT(req: Request) {
+  const userId = req.headers.get('Authorization'); // User ID from the Authorization header
+
+  if (!userId) {
     return NextResponse.json({ message: 'User ID or Username is missing' }, { status: 400 });
   }
 
   try {
-    const body = await req.json(); // Extract the body from the request
-    const { message } = body; // Assuming the message is passed in the request body as { message: "some message" }
+    // Extract the body from the request
+    const body = await req.json();
+    const { message, forId, first_name } = body; // Assuming 'forId' is passed as recipient/thread ID
 
-    if (!message) {
-      return NextResponse.json({ message: 'Message is missing' }, { status: 400 });
+    if (!message || !forId) {
+      return NextResponse.json({ message: 'Message or recipient is missing' }, { status: 400 });
     }
 
-    // Insert the new message into the 'messages' table where id == userId and first_name == username
+    // Insert the new message into the 'messages' table
     const { data: insertData, error: insertError } = await supabase
       .from('messages')
-      .insert([
+      .insert([ 
         {
-          id: userId, // Ensure this matches the userId from headers
-          first_name: username, // Ensure this matches the username from headers
-          message, // The message to be inserted from the request body
-          created_at: new Date().toISOString() // Automatically generate the timestamp
+          id: userId,
+          first_name: first_name, 
+          message: message, 
+          for: forId,
+          created_at: new Date().toISOString(),
         }
       ]);
 
@@ -90,7 +77,7 @@ export async function PUT(req: Request) {
       return NextResponse.json({ message: 'Failed to insert message', error: insertError.message }, { status: 500 });
     }
 
-    return NextResponse.json({ message: 'Message inserted successfully', data: insertData }, { status: 200 });
+    return NextResponse.json({data: insertData }, { status: 200 });
   } catch (error: any) {
     console.error('Error inserting message:', error);
     return NextResponse.json({ message: 'Error inserting message', error: error.message }, { status: 500 });
