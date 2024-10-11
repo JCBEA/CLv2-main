@@ -13,8 +13,8 @@ export default function FaQsPage() {
             <GeneralFaqs />
             <StillHaveQue />
             <div className="w-full flex flex-col">
-                <Infinite />
-                <Subscribe />
+            <Infinite />
+            <Subscribe />
             </div>
         </main>
     );

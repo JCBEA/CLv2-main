@@ -1,29 +1,28 @@
-"use client";
+// src/context/AuthContext.tsx
+'use client'
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
-// User type definition
-interface User {
-  id: string;
+type User = {
   name: string;
-  email: string;
-}
+  // Add other user properties as needed
+};
 
-// Define the types for the AuthContext
-interface AuthContextType {
+type AuthContextType = {
   user: User | null;
-  login: (userData: User) => void;
+  login: (user: User) => void;
   logout: () => void;
-}
+};
 
-// Create the context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// AuthProvider to wrap around the entire app
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
+    // Check for existing user session on component mount
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       setUser(JSON.parse(storedUser));
@@ -38,6 +37,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
+    router.push('/signin'); // Redirect to signin page after logout
   };
 
   return (
@@ -47,11 +47,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-// Custom hook to use AuthContext
-export const useAuth = (): AuthContextType => {
+export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 };
