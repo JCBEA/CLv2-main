@@ -22,12 +22,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const router = useRouter();
 
   useEffect(() => {
-    // Check for existing user session on component mount
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        setUser(parsedUser);
+      } catch (error) {
+        console.error("Error parsing stored user data:", error);
+        // Optionally, remove the invalid data from localStorage
+        localStorage.removeItem('user');
+      }
     }
   }, []);
+  
 
   const login = (userData: User) => {
     setUser(userData);

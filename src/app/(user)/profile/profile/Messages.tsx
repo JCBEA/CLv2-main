@@ -6,9 +6,9 @@ import { motion } from "framer-motion";
 import { getMessageId, getSession, getUserName } from "@/services/authservice";
 import { jwtVerify } from "jose";
 
-
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret';
 const messageId = getMessageId();
+
 interface Message {
   id: string;
   first_name: string;
@@ -31,7 +31,7 @@ export const Messages = () => {
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [newMessage, setNewMessage] = useState<string>(""); // State for new message input
+  const [newMessage, setNewMessage] = useState<string>("");
 
   // Detect screen size
   useEffect(() => {
@@ -56,7 +56,7 @@ export const Messages = () => {
           const userIdFromToken = payload.id as string;
           const userNameFromToken = payload.username as string;
           setUserId(userIdFromToken);
-  
+
           const response = await fetch('/api/chat', {
             method: 'GET',
             headers: {
@@ -64,11 +64,11 @@ export const Messages = () => {
               'Append': userNameFromToken,
             },
           });
-  
+
           if (!response.ok) {
             throw new Error('Failed to fetch messages');
           }
-  
+
           const data = await response.json();
           setMessages(data.messages || []);
         } catch (err: any) {
@@ -81,35 +81,30 @@ export const Messages = () => {
         setError('No session token found');
       }
     };
-  
+
     fetchMessages();
   }, []);
-  
 
-  // Function to handle sending a new message
   const handleSendMessage = async () => {
     const token = getSession();
-    if (!newMessage || !token) return; // Prevent sending empty messages
+    if (!newMessage || !token) return;
     try {
-      // Verify JWT token to extract user details
       const { payload } = await jwtVerify(token, new TextEncoder().encode(JWT_SECRET));
       const userIdFromToken = payload.id as string;
       const getUser = getUserName();
       const messageId = getMessageId();
-      // Prepare the message data
       const messageData = {
         message: newMessage,
-        forId: messageId, // Assuming messageId is the recipient or thread ID
+        forId: messageId,
         created_at: new Date().toISOString(),
         first_name: getUser
       };
 
-      // Send the message data to the server
       const response = await fetch("/api/chat", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": userIdFromToken, // Passing user ID in the Authorization header
+          "Authorization": userIdFromToken,
         },
         body: JSON.stringify(messageData),
       });
@@ -118,10 +113,9 @@ export const Messages = () => {
         throw new Error("Failed to send message");
       }
 
-      // After successfully sending the message, update the chatMessages and reset input
       const sentMessage = await response.json();
       setChatMessages((prevMessages) => [...prevMessages, sentMessage]);
-      setNewMessage(""); // Clear the message input after sending
+      setNewMessage("");
     } catch (error) {
       console.error("Error sending message:", error);
     }
@@ -141,13 +135,13 @@ export const Messages = () => {
     };
   }, []);
 
-  const handleUserClick = async (userId: string, messageId: string, msgFor:string) => {
+  const handleUserClick = async (userId: string, messageId: string, msgFor: string) => {
     localStorage.removeItem("user");
     setLoading(true);
-    setChatMessages([]); // Clear previous chat messages before loading new ones
+    setChatMessages([]);
     const token = getSession();
     if (!token) return;
-    try{
+    try {
       const messageId = getMessageId();
       const { payload } = await jwtVerify(token, new TextEncoder().encode(JWT_SECRET));
       const userIdFromToken = payload.id as string;
@@ -169,36 +163,28 @@ export const Messages = () => {
       const data = await response.json();
       setMessages(data.messages || []);
       setUserDetails(data.userDetails || []);
-          // Store first_name from userDetails in localStorage
-          if (data.userDetails && Array.isArray(data.userDetails)) {
-            data.userDetails.forEach((userDetail: UserDetail) => {
-              const first_name = userDetail.first_name
-              localStorage.setItem("user", first_name);
-            });
-          }
-        }catch (err: any) {
-            setError(err.message);
-          }
+      if (data.userDetails && Array.isArray(data.userDetails)) {
+        data.userDetails.forEach((userDetail: UserDetail) => {
+          const first_name = userDetail.first_name
+          localStorage.setItem("user", first_name);
+        });
+      }
+    } catch (err: any) {
+      setError(err.message);
+    }
     try {
       localStorage.setItem("messageId", messageId);
       const getMessageToken = getMessageId();
-      console.log("Token ID"+getMessageToken);
-      // Get messages for the selected user
+      console.log("Token ID" + getMessageToken);
       const someoneMessage = messages.filter((msg) => msg.id === messageId);
-      // Get messages for the current user
-      const yourMessage = messages.filter((msg) => (msg.id === userId && msg.for ==messageId));
+      const yourMessage = messages.filter((msg) => (msg.id === userId && msg.for == messageId));
 
-      // Combine both messages
       const combinedMessages = [...someoneMessage, ...yourMessage];
-
-      // Sort combined messages from past to latest based on created_at
       const sortedMessages = combinedMessages.sort((a, b) =>
         new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
       );
 
-      // Set the sorted messages to state
       setChatMessages(sortedMessages);
-      // Open chat window after setting messages
       setIsChatOpen(true);
     } catch (err) {
       console.error("Error fetching chat messages:", err);
@@ -211,12 +197,11 @@ export const Messages = () => {
 
   const latestMessages = filteredMessages.reduce<Record<string, Message>>((acc, message) => {
     if (!acc[message.id] || new Date(message.created_at) > new Date(acc[message.id].created_at)) {
-      acc[message.id] = message; // Update to latest message
+      acc[message.id] = message;
     }
     return acc;
   }, {});
 
-  // Convert the latestMessages object back to an array
   const latestMessagesArray = Object.values(latestMessages);
 
   return (
@@ -243,21 +228,24 @@ export const Messages = () => {
                 <p>Error: {error}</p>
               ) : (
                 <div className="w-full flex flex-col gap-4">
-                  {latestMessagesArray.map((message) => (
+                  {latestMessagesArray.map((msg) => (
                     <div
-                      key={`${message.id}-${message.created_at}`} // Ensure uniqueness
+                      key={`${msg.id}-${msg.created_at}`}
                       className="w-full flex items-center gap-2 cursor-pointer"
-                      onClick={() => userId && handleUserClick(userId, message.id, message.for)} // Pass both IDs
+                      onClick={() => userId && handleUserClick(userId, msg.id, msg.for)}
                     >
+                      <div className="w-10 h-10 rounded-full bg-primary-3 flex items-center justify-center">
+                        <span className="text-lg font-bold">{msg.first_name ? msg.first_name[0] : 'U'}</span>
+                      </div>
                       <div className="w-full flex flex-col">
                         <div className="w-full flex justify-between items-center">
-                          <p className="text-sm font-semibold">{message.first_name}</p>
+                          <p className="text-sm font-semibold">{msg.first_name ? msg.first_name : 'User'}</p>
                           <p className="text-xs font-semibold opacity-80">
-                            {new Date(message.created_at).toLocaleString()} {/* Formatting the date */}
+                            {new Date(msg.created_at).toLocaleString()}
                           </p>
                         </div>
-                        <p className={`text-base font-bold ${message.message.length > 10 ? "line-clamp-1" : ""}`}>
-                          {message.message}
+                        <p className={`text-base font-bold ${msg.message.length > 10 ? "line-clamp-1" : ""}`}>
+                          {msg.message}
                         </p>
                       </div>
                     </div>
@@ -269,25 +257,35 @@ export const Messages = () => {
 
           {/* Chat Window */}
           {(!isMobile || isChatOpen) && (
-            <div className="w-full h-full border border-primary-3 rounded-r-xl flex flex-col overflow-y-auto custom-scrollbar relative">
+            <div className="w-full h-full border border-primary-3 rounded-r-xl flex flex-col overflow-hidden relative">
               {isMobile && (
                 <button
-                  className="p-2 m-2 text-secondary-1 absolute -top-3 -right-3"
+                  className="p-2 m-2 text-secondary-1 absolute top-0 left-0 z-10"
                   onClick={() => setIsChatOpen(false)}
                 >
                   <Icon icon="eva:arrow-back-outline" width="35" height="35" />
                 </button>
               )}
 
-              <div className="w-full h-full">
+              <div className="w-full h-full overflow-y-auto custom-scrollbar p-4">
                 {loading ? (
-                  <p>Loading messages...</p> // Replace with a spinner component if needed
+                  <p>Loading messages...</p>
                 ) : (
                   chatMessages.length > 0 ? (
                     chatMessages.map((msg) => (
-                      <div key={msg.id} className="p-2">
-                        <p><strong>{msg.first_name || 'Unknown'}:</strong> {msg.message}</p>
-                        <p className="text-xs">{new Date(msg.created_at).toLocaleString()}</p>
+                      <div
+                        key={msg.id}
+                        className={`flex ${msg.id === userId ? 'justify-end' : 'justify-start'} mb-4`}
+                      >
+                        <div className={`flex ${msg.id === userId ? 'flex-row-reverse' : 'flex-row'} items-end`}>
+                          <div className="w-8 h-8 rounded-full bg-primary-3 flex items-center justify-center mr-2">
+                            <span className="text-sm font-bold">{msg.first_name ? msg.first_name[0] : 'U'}</span>
+                          </div>
+                          <div className={`max-w-[70%] p-3 rounded-lg ${msg.id === userId ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'}`}>
+                            <p>{msg.message}</p>
+                            <p className="text-xs mt-1 opacity-70">{new Date(msg.created_at).toLocaleString()}</p>
+                          </div>
+                        </div>
                       </div>
                     ))
                   ) : (
@@ -297,7 +295,7 @@ export const Messages = () => {
               </div>
 
               {/* Message Input */}
-              <div className="w-full h-fit p-4">
+              <div className="w-full p-4 bg-shade-1">
                 <div className="w-full flex gap-2 justify-between items-center text-primary-2 bg-shade-8 rounded-full px-4">
                   <input
                     className="w-full p-3 outline-none ring-0 placeholder:text-primary-2 bg-transparent"
@@ -314,7 +312,6 @@ export const Messages = () => {
                     onClick={handleSendMessage}
                   >
                     <Icon
-
                       className="rotate-[-36deg] cursor-pointer -mt-1"
                       type="submit"
                       icon="proicons:send"
