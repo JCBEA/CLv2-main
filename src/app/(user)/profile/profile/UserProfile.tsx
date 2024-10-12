@@ -33,19 +33,8 @@ interface ProfileButtonProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-interface ProfileModalProps {
-  openModal: boolean;
-  setOpenModal: React.Dispatch<React.SetStateAction<boolean>>;
-  userDetails: UserDetail; // Add userDetails prop
-}
-
 export const UserProfile: React.FC<UserProfileProps> = ({ userDetail }) => {
-  const [open, setOpen] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-
-  const openModal = (isOpen: boolean) => {
-    setIsEditing(isOpen);
-  };
+  const [open, setOpen] = useState(false); // State to control Calendar and Messages
 
   return (
     <div className="min-h-dvh w-full text-primary-2">
@@ -133,7 +122,6 @@ const UserDetailDisplay = ({ userDetail }: { userDetail: UserDetail }) => {
       console.error("No token found, user may not be logged in.");
       return; // Optionally handle unauthorized state here
     }
-
     try {
       // Verify the token and handle it appropriately
       const { payload } = await jwtVerify(token, new TextEncoder().encode(JWT_SECRET));
@@ -167,7 +155,15 @@ const UserDetailDisplay = ({ userDetail }: { userDetail: UserDetail }) => {
     }
   };
 
+  const [openModal, setOpenModal] = useState<boolean>(false);
 
+  const openProfileModal = () => {
+      setOpenModal(true);
+  };
+
+  const closeProfileModal = () => {
+      setOpenModal(false);
+  };
   return (
     <>
       {isEditing ? (
@@ -236,15 +232,15 @@ const UserDetailDisplay = ({ userDetail }: { userDetail: UserDetail }) => {
             icon="material-symbols-light:edit-square-outline"
             width="35"
             height="35"
-            // onClick={() => setIsEditing(true)}
-            onClick={() => setIsEditing(true)}
+            onClick={openProfileModal}
           />
           {/* Temporary logout btn */}
-          <ProfileModal
-            openModal={isEditing}
-            setOpenModal={setIsEditing}
-            userDetails={userDetail} // Pass userDetail to modal
-          />
+          {openModal && (
+                <ProfileModal 
+                    openModal={openModal} 
+                    setOpenModal={closeProfileModal} 
+                />
+            )}
         </div>
       )}
     </>
@@ -286,4 +282,3 @@ const ProfileButton: React.FC<ProfileButtonProps> = ({ open, setOpen }) => {
     </div>
   );
 };
-

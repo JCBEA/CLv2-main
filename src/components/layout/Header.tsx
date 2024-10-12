@@ -62,9 +62,11 @@ export const Header = ({
 
     if (session) {
       setMenuItems([
+        { name: "Home", link: "/pofcon-landing-page" },
         { name: "Directory", link: "/creative-dashboard" },
         { name: "Gallery", link: "/g-user" },
         { name: "FAQ", link: "/faqs" },
+        { name: "Profile", link: "/profile" },
       ]);
     } else {
       setMenuItems([

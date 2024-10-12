@@ -201,7 +201,7 @@ export const Messages = () => {
     if (containerRef.current) {
       containerRef.current.scrollTop = containerRef.current.scrollHeight;
       if (firstTime) {
-        setFirstTime(false); // Set firstTime to false after first scroll
+        setFirstTime(false);
       }
     }
   }, [chatMessages]); // Run effect whenever chatMessages changes
