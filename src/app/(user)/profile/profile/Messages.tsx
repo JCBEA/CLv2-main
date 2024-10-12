@@ -5,8 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { getMessageId, getSession, getUserName } from "@/services/authservice";
 import { jwtVerify } from "jose";
-import { u } from "framer-motion/client";
-
+import { removeLocal } from "@/services/authservice";
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret';
 const messageId = getMessageId();
 
@@ -124,7 +123,7 @@ export const Messages = () => {
 
   useEffect(() => {
     const handleBeforeUnload = () => {
-      localStorage.removeItem('user');
+      removeLocal();
     };
 
     // Add event listener for refresh or unload
@@ -137,7 +136,7 @@ export const Messages = () => {
   }, []);
 
   const handleUserClick = async (userId: string, messageId: string, msgFor: string) => {
-    localStorage.removeItem("user");
+    removeLocal();
     setLoading(true);
     setChatMessages([]);
     const token = getSession();
@@ -311,7 +310,7 @@ export const Messages = () => {
                       </div>
                     ))
                   ) : (
-                    <p>No messages to display.</p>
+                    <p>Click specific messages to display.</p>
                   )
                 )}
               </div>
