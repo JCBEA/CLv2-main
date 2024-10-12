@@ -127,6 +127,19 @@ export const Messages = () => {
     }
   };
 
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      localStorage.removeItem('user');
+    };
+
+    // Add event listener for refresh or unload
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      // Clean up the event listener on component unmount
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []);
 
   const handleUserClick = async (userId: string, messageId: string, msgFor:string) => {
     localStorage.removeItem("user");
