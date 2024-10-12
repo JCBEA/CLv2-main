@@ -182,6 +182,13 @@ export const getUserName = () => {
   return null; // Return null or a default value if not in the browser
 };
 
+export const removeLocal = () => {
+  if (typeof window !== "undefined") {
+    localStorage.removeItem("messageId");
+    localStorage.removeItem("user");
+  }
+  return null; // Return null or a default value if not in the browser
+};
 
 export const logoutUser = () => {
   if (typeof window !== 'undefined') {

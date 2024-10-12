@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { getMessageId, getSession, getUserName } from "@/services/authservice";
 import { jwtVerify } from "jose";
-
+import { removeLocal } from "@/services/authservice";
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret';
 const messageId = getMessageId();
 
@@ -123,7 +123,7 @@ export const Messages = () => {
 
   useEffect(() => {
     const handleBeforeUnload = () => {
-      localStorage.removeItem('user');
+      removeLocal();
     };
 
     // Add event listener for refresh or unload
