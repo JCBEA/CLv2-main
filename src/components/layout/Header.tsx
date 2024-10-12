@@ -70,6 +70,7 @@ export const Header = ({
       ]);
     } else {
       setMenuItems([
+        { name: "Home", link: "/landing-page" },
         { name: "Directory", link: "/creative-dashboard" },
         { name: "Gallery", link: "/g-visitor" },
         { name: "FAQ", link: "/faqs" },
