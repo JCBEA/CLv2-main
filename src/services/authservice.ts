@@ -169,10 +169,10 @@ export const getSession = () => {
 };
 
 export const getMessageId = () => {
-  if (typeof window !== "undefined") {
-      return localStorage.getItem("messageId");
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem("messageId");
   }
-  return null; // Return null or a default value if not in the browser
+  return null;
 };
 
 export const getUserName = () => {

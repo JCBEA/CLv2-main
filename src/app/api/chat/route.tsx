@@ -47,7 +47,7 @@ export async function PUT(req: Request) {
   const userId = req.headers.get('Authorization'); // User ID from the Authorization header
 
   if (!userId) {
-    return NextResponse.json({ message: 'User ID or Username is missing' }, { status: 400 });
+    return NextResponse.json({ message: 'User ID is missing' }, { status: 400 });
   }
 
   try {
@@ -77,7 +77,18 @@ export async function PUT(req: Request) {
       return NextResponse.json({ message: 'Failed to insert message', error: insertError.message }, { status: 500 });
     }
 
-    return NextResponse.json({data: insertData }, { status: 200 });
+    // Fetch updated messages after insertion
+    const { data: updatedMessages, error: fetchError } = await supabase
+    .from('messages')
+    .select('id, first_name, message, created_at, for')
+    .or(`for.eq.${userId},id.eq.${userId}`);
+
+    if (fetchError) {
+      console.error('Error fetching updated messages:', fetchError);
+      return NextResponse.json({ message: 'Failed to fetch updated messages', error: fetchError.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ data: updatedMessages }, { status: 200 });
   } catch (error: any) {
     console.error('Error inserting message:', error);
     return NextResponse.json({ message: 'Error inserting message', error: error.message }, { status: 500 });

@@ -7,7 +7,6 @@ import { getMessageId, getSession, getUserName } from "@/services/authservice";
 import { jwtVerify } from "jose";
 import { removeLocal } from "@/services/authservice";
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret';
-const messageId = getMessageId();
 
 interface Message {
   id: string;
@@ -29,9 +28,13 @@ export const Messages = () => {
   const [chatMessages, setChatMessages] = useState<Message[]>([]);
   const [userDetails, setUserDetails] = useState<UserDetail[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
+  const [messageId, setMessageId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadingMsg, setLoadingMsg] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [newMessage, setNewMessage] = useState<string>("");
+  const [refreshKey, setRefreshKey] = useState(0);
+
 
   // Detect screen size
   useEffect(() => {
@@ -51,11 +54,12 @@ export const Messages = () => {
       const token = getSession();
       if (token) {
         try {
-          const messageId = getMessageId();
+          const messageId = localStorage.getItem("messageId");
           const { payload } = await jwtVerify(token, new TextEncoder().encode(JWT_SECRET));
           const userIdFromToken = payload.id as string;
           const userNameFromToken = payload.username as string;
           setUserId(userIdFromToken);
+          setMessageId(messageId);
 
           const response = await fetch('/api/chat', {
             method: 'GET',
@@ -81,9 +85,13 @@ export const Messages = () => {
         setError('No session token found');
       }
     };
+    
+    fetchMessages(); // Initial fetch
 
-    fetchMessages();
-  }, []);
+    const intervalId = setInterval(fetchMessages, 1000); // Fetch messages every 2 seconds
+    return () => clearInterval(intervalId); // Cleanup the interval on component unmount
+  }, [refreshKey]);
+  
 
   const handleSendMessage = async () => {
     const token = getSession();
@@ -96,10 +104,9 @@ export const Messages = () => {
       const messageData = {
         message: newMessage,
         forId: messageId,
-        created_at: new Date().toISOString(),
         first_name: getUser
       };
-
+  
       const response = await fetch("/api/chat", {
         method: "PUT",
         headers: {
@@ -108,18 +115,24 @@ export const Messages = () => {
         },
         body: JSON.stringify(messageData),
       });
-
+  
       if (!response.ok) {
         throw new Error("Failed to send message");
       }
-
-      const sentMessage = await response.json();
-      setChatMessages((prevMessages) => [...prevMessages, sentMessage]);
+  
+      const { data: updatedMessages } = await response.json(); // Now we get the updated messages
+  
+      // Update the state with the updated messages
+      setChatMessages(updatedMessages);
       setNewMessage("");
+      setRefreshKey((prev) => prev + 1); // Optionally trigger any refresh logic you have
     } catch (error) {
       console.error("Error sending message:", error);
+    } finally {
+      setLoadingMsg(false);
     }
   };
+  
 
   useEffect(() => {
     const handleBeforeUnload = () => {
@@ -186,6 +199,7 @@ export const Messages = () => {
 
       setChatMessages(sortedMessages);
       setIsChatOpen(true);
+      setRefreshKey((prev) => prev + 1); // Trigger re-fetch on user click
     } catch (err) {
       console.error("Error fetching chat messages:", err);
     } finally {
@@ -206,6 +220,8 @@ export const Messages = () => {
     }
   }, [chatMessages]); // Run effect whenever chatMessages changes
 
+
+
   const filteredMessages = messages.filter((message) => message.id !== userId);
 
   const latestMessages = filteredMessages.reduce<Record<string, Message>>((acc, message) => {
@@ -216,7 +232,6 @@ export const Messages = () => {
   }, {});
 
   const latestMessagesArray = Object.values(latestMessages);
-
   return (
     <div className="w-full md:px-6 md:py-4 bg-shade-1 rounded-b-xl">
       <div className="w-full flex flex-col gap-6 p-4 rounded-lg">
@@ -243,9 +258,21 @@ export const Messages = () => {
                 <div className="w-full flex flex-col gap-4">
                   {latestMessagesArray.map((msg) => (
                     <div
-                      key={`${msg.id}-${msg.created_at}`}
-                      className="w-full flex items-center gap-2 cursor-pointer"
-                      onClick={() => userId && handleUserClick(userId, msg.id, msg.for)}
+                      className={`w-full flex items-center gap-2 cursor-pointer ${
+                        msg.id == messageId ? 'bg-blue-500 text-white' : 'text-black' // Background color and text color based on condition
+                      }`}
+                      onClick={() => {
+                        // Always call handleUserClick regardless of the condition
+                        if (userId) {
+                          handleUserClick(userId, msg.id, msg.for);
+                          // Log based on the condition
+                          if (msg.id === messageId) {
+                            console.log("msg AUTO:" + messageId);
+                          } else {
+                            console.log("msg CLICK:" + messageId);
+                          }
+                        }
+                      }}
                     >
                       <div className="w-fit h-fit">
                         <div className="w-10 h-10 rounded-full bg-primary-2 text-secondary-1 flex items-center justify-center">
@@ -283,13 +310,12 @@ export const Messages = () => {
               )}
 
               <div ref={containerRef} className="w-full h-full overflow-y-auto custom-scrollbar lg:p-4 p-2">
-                {loading ? (
+                {loadingMsg ? (
                   <p>Loading messages...</p>
                 ) : (
                   chatMessages.length > 0 ? (
                     chatMessages.map((msg) => (
                       <div
-                        key={msg.id}
                         className={`flex ${msg.id === userId ? 'justify-end' : 'justify-start'} w-full mb-4 `}
                       >
                         <div className={`flex ${msg.id === userId ? 'flex-row-reverse' : 'flex-row'} items-end gap-2 overflow-hidden max-w-md md:max-w-lg lg:max-w-sm`}>
