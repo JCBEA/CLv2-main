@@ -1,10 +1,11 @@
 "use client";
 
 import { Icon } from "@iconify/react/dist/iconify.js";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { getMessageId, getSession, getUserName } from "@/services/authservice";
 import { jwtVerify } from "jose";
+import { u } from "framer-motion/client";
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret';
 const messageId = getMessageId();
@@ -193,6 +194,19 @@ export const Messages = () => {
     }
   };
 
+  const containerRef = useRef<HTMLDivElement>(null); // Reference to the container
+  const [firstTime, setFirstTime] = useState(true); // State to track the first load
+
+  useEffect(() => {
+    // Scroll to bottom logic
+    if (containerRef.current) {
+      containerRef.current.scrollTop = containerRef.current.scrollHeight;
+      if (firstTime) {
+        setFirstTime(false); // Set firstTime to false after first scroll
+      }
+    }
+  }, [chatMessages]); // Run effect whenever chatMessages changes
+
   const filteredMessages = messages.filter((message) => message.id !== userId);
 
   const latestMessages = filteredMessages.reduce<Record<string, Message>>((acc, message) => {
@@ -234,8 +248,10 @@ export const Messages = () => {
                       className="w-full flex items-center gap-2 cursor-pointer"
                       onClick={() => userId && handleUserClick(userId, msg.id, msg.for)}
                     >
-                      <div className="w-10 h-10 rounded-full bg-primary-3 flex items-center justify-center">
-                        <span className="text-lg font-bold">{msg.first_name ? msg.first_name[0] : 'U'}</span>
+                      <div className="w-fit h-fit">
+                        <div className="w-10 h-10 rounded-full bg-primary-3 flex items-center justify-center">
+                          <span className="text-lg font-bold">{msg.first_name ? msg.first_name[0] : 'U'}</span>
+                        </div>
                       </div>
                       <div className="w-full flex flex-col">
                         <div className="w-full flex justify-between items-center">
@@ -267,7 +283,7 @@ export const Messages = () => {
                 </button>
               )}
 
-              <div className="w-full h-full overflow-y-auto custom-scrollbar p-4">
+              <div ref={containerRef} className="w-full h-full overflow-y-auto custom-scrollbar p-4">
                 {loading ? (
                   <p>Loading messages...</p>
                 ) : (
@@ -275,17 +291,22 @@ export const Messages = () => {
                     chatMessages.map((msg) => (
                       <div
                         key={msg.id}
-                        className={`flex ${msg.id === userId ? 'justify-end' : 'justify-start'} mb-4`}
+                        className={`flex ${msg.id === userId ? 'justify-end' : 'justify-start'} w-full mb-4`}
                       >
-                        <div className={`flex ${msg.id === userId ? 'flex-row-reverse' : 'flex-row'} items-end`}>
-                          <div className="w-8 h-8 rounded-full bg-primary-3 flex items-center justify-center mr-2">
-                            <span className="text-sm font-bold">{msg.first_name ? msg.first_name[0] : 'U'}</span>
-                          </div>
-                          <div className={`max-w-[70%] p-3 rounded-lg ${msg.id === userId ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'}`}>
-                            <p className="break-words">{msg.message}</p>  {/* Add break-words to handle long text */}
-                            <p className="text-[10px] mt-1 opacity-70">{new Date(msg.created_at).toLocaleString()}</p>
+                        <div className={`flex ${msg.id === userId ? 'flex-row-reverse' : 'flex-row'} items-end gap-2`}>
+                          <div className="w-fit h-fit">
+                            <div className="w-8 h-8 rounded-full bg-primary-3 flex items-center justify-center relative">
+                              <span className="text-sm font-bold rounded-full">{msg.first_name ? msg.first_name[0] : 'U'}</span>
+                            </div>
                           </div>
 
+                          <div className={`max-w-sm w-full p-3 rounded-lg ${msg.id === userId ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'}`}>
+                            {/* Update the text container */}
+                            <p className="break-words overflow-wrap break-word">
+                              {msg.message}
+                            </p>
+                            <p className="text-[10px] mt-1 opacity-70">{new Date(msg.created_at).toLocaleString()}</p>
+                          </div>
                         </div>
                       </div>
                     ))
@@ -296,7 +317,7 @@ export const Messages = () => {
               </div>
 
               {/* Message Input */}
-              <div className="w-full p-4 bg-shade-1">
+              <div className="w-full p-4 bg-primary-1">
                 <div className="w-full flex gap-2 justify-between items-center text-primary-2 bg-shade-8 rounded-full px-4">
                   <input
                     className="w-full p-3 outline-none ring-0 placeholder:text-primary-2 bg-transparent"
