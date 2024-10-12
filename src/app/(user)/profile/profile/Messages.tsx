@@ -136,7 +136,7 @@ export const Messages = () => {
   }, []);
 
   const handleUserClick = async (userId: string, messageId: string, msgFor: string) => {
-    localStorage.removeItem("user");
+    removeLocal();
     setLoading(true);
     setChatMessages([]);
     const token = getSession();
