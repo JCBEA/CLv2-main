@@ -56,7 +56,7 @@ export const Messages = () => {
           const userIdFromToken = payload.id as string;
           const userNameFromToken = payload.username as string;
           setUserId(userIdFromToken);
-  
+
           const response = await fetch('/api/chat', {
             method: 'GET',
             headers: {
@@ -64,11 +64,11 @@ export const Messages = () => {
               'Append': userNameFromToken,
             },
           });
-  
+
           if (!response.ok) {
             throw new Error('Failed to fetch messages');
           }
-  
+
           const data = await response.json();
           setMessages(data.messages || []);
         } catch (err: any) {
@@ -81,7 +81,7 @@ export const Messages = () => {
         setError('No session token found');
       }
     };
-  
+
     fetchMessages();
   }, []);
 
@@ -161,7 +161,7 @@ export const Messages = () => {
     try {
       localStorage.setItem("messageId", messageId);
       const getMessageToken = getMessageId();
-      console.log("Token ID"+getMessageToken);
+      console.log("Token ID" + getMessageToken);
       const someoneMessage = messages.filter((msg) => msg.id === messageId);
       const yourMessage = messages.filter((msg) => (msg.id === userId && msg.for == messageId));
 
@@ -221,11 +221,11 @@ export const Messages = () => {
                       onClick={() => userId && handleUserClick(userId, msg.id, msg.for)}
                     >
                       <div className="w-10 h-10 rounded-full bg-primary-3 flex items-center justify-center">
-                        <span className="text-lg font-bold">{msg.first_name[0]}</span>
+                        <span className="text-lg font-bold">{msg.first_name ? msg.first_name[0] : 'U'}</span>
                       </div>
                       <div className="w-full flex flex-col">
                         <div className="w-full flex justify-between items-center">
-                          <p className="text-sm font-semibold">{msg.first_name[0]}</p>
+                          <p className="text-sm font-semibold">{msg.first_name ? msg.first_name : 'User'}</p>
                           <p className="text-xs font-semibold opacity-80">
                             {new Date(msg.created_at).toLocaleString()}
                           </p>
@@ -259,13 +259,13 @@ export const Messages = () => {
                 ) : (
                   chatMessages.length > 0 ? (
                     chatMessages.map((msg) => (
-                      <div 
-                        key={msg.id} 
+                      <div
+                        key={msg.id}
                         className={`flex ${msg.id === userId ? 'justify-end' : 'justify-start'} mb-4`}
                       >
                         <div className={`flex ${msg.id === userId ? 'flex-row-reverse' : 'flex-row'} items-end`}>
                           <div className="w-8 h-8 rounded-full bg-primary-3 flex items-center justify-center mr-2">
-                            <span className="text-sm font-bold">{msg.first_name[0]}</span>
+                            <span className="text-sm font-bold">{msg.first_name ? msg.first_name[0] : 'U'}</span>
                           </div>
                           <div className={`max-w-[70%] p-3 rounded-lg ${msg.id === userId ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'}`}>
                             <p>{msg.message}</p>
