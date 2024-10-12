@@ -290,7 +290,7 @@ export const Messages = () => {
                       </div>
                     ))
                   ) : (
-                    <p>No messages to display.</p>
+                    <p>Click specific messages to display.</p>
                   )
                 )}
               </div>
