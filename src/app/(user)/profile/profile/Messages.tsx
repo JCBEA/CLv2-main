@@ -282,9 +282,10 @@ export const Messages = () => {
                             <span className="text-sm font-bold">{msg.first_name ? msg.first_name[0] : 'U'}</span>
                           </div>
                           <div className={`max-w-[70%] p-3 rounded-lg ${msg.id === userId ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'}`}>
-                            <p>{msg.message}</p>
-                            <p className="text-xs mt-1 opacity-70">{new Date(msg.created_at).toLocaleString()}</p>
+                            <p className="break-words">{msg.message}</p>  {/* Add break-words to handle long text */}
+                            <p className="text-[10px] mt-1 opacity-70">{new Date(msg.created_at).toLocaleString()}</p>
                           </div>
+
                         </div>
                       </div>
                     ))
