@@ -19,9 +19,10 @@ interface HeaderProps {
   backgroundColor?: string;
   textColor?: string;
   buttonName?: string;
-  linkName: string;
+  linkName?: string;
   roundedCustom?: string;
   paddingLeftCustom?: string;
+  menuItems?: MenuItemProps[];
 }
 
 // MenuItem Component
