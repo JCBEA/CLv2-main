@@ -8,6 +8,7 @@ import { jwtVerify } from 'jose';
 import { logoutUser } from "@/services/authservice";
 import { useRouter } from 'next/navigation';
 import { getSession } from "@/services/authservice";
+import { ProfileModal } from "./ProfileModal";
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret';
 export interface UserDetail {
@@ -32,8 +33,19 @@ interface ProfileButtonProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+interface ProfileModalProps {
+  openModal: boolean;
+  setOpenModal: React.Dispatch<React.SetStateAction<boolean>>;
+  userDetails: UserDetail; // Add userDetails prop
+}
+
 export const UserProfile: React.FC<UserProfileProps> = ({ userDetail }) => {
-  const [open, setOpen] = useState(false); // State to control Calendar and Messages
+  const [open, setOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+
+  const openModal = (isOpen: boolean) => {
+    setIsEditing(isOpen);
+  };
 
   return (
     <div className="min-h-dvh w-full text-primary-2">
@@ -66,7 +78,7 @@ const ProfileDetails: React.FC<{ userDetail: UserDetail }> = ({ userDetail }) =>
     } catch (error) {
       console.error('Logout failed', error);
     }
-    
+
   }
   return (
     <div className="w-full md:max-w-[80%] mx-auto flex lg:flex-row flex-col justify-start lg:items-start items-center gap-8 lg:h-36 h-fit text-secondary-1">
@@ -121,10 +133,11 @@ const UserDetailDisplay = ({ userDetail }: { userDetail: UserDetail }) => {
       console.error("No token found, user may not be logged in.");
       return; // Optionally handle unauthorized state here
     }
+
     try {
       // Verify the token and handle it appropriately
       const { payload } = await jwtVerify(token, new TextEncoder().encode(JWT_SECRET));
-      
+
       // Log the payload for debugging
       console.log("Retrieved token payload:", payload.id);
 
@@ -152,51 +165,51 @@ const UserDetailDisplay = ({ userDetail }: { userDetail: UserDetail }) => {
     } catch (error) {
       console.error("Error updating user details:", error);
     }
-};
+  };
 
 
   return (
     <>
       {isEditing ? (
-        <div>
+        <div className="text-primary-2">
           {/* Input fields for editing user details */}
           <div>
-            <small className="font-bold text-primary-2 opacity-80 capitalize">Location</small>
+            <small className="font-bold opacity-80 capitalize">Location</small>
             <input
               type="text"
               name="address"
               value={formData.address}
               onChange={handleInputChange}
-              className="text-primary-2 font-bold"
+              className="font-bold"
             />
           </div>
           <div>
-            <small className="font-bold text-primary-2 opacity-80 capitalize">Contact Number</small>
+            <small className="font-bold opacity-80 capitalize">Contact Number</small>
             <input
               type="text"
               name="mobileNo"
               value={formData.mobileNo}
               onChange={handleInputChange}
-              className="text-primary-2 font-bold"
+              className="font-bold"
             />
           </div>
           <div>
-            <small className="font-bold text-primary-2 opacity-80 capitalize">About me</small>
+            <small className="font-bold opacity-80 capitalize">About me</small>
             <textarea
               name="bio"
               value={formData.bio}
               onChange={handleInputChange}
-              className="text-primary-2 font-bold"
+              className="font-bold"
             />
           </div>
           <div>
-            <small className="font-bold text-primary-2 opacity-80 capitalize">Creative Field</small>
+            <small className="font-bold opacity-80 capitalize">Creative Field</small>
             <input
               type="text"
               name="creative_field"
               value={formData.creative_field}
               onChange={handleInputChange}
-              className="text-primary-2 font-bold"
+              className="font-bold"
             />
           </div>
           <button onClick={handleSave} className="bg-shade-1 text-secondary-1 uppercase py-2 px-4 rounded-lg font-semibold">
@@ -207,24 +220,31 @@ const UserDetailDisplay = ({ userDetail }: { userDetail: UserDetail }) => {
           </button>
         </div>
       ) : (
-        <div>
+        <div className="text-primary-2">
           {/* Display user details */}
-          <small className="font-bold text-primary-2 opacity-80 capitalize">Location</small>
-          <p className="text-primary-2 font-bold">{formData.address}</p>
-          <small className="font-bold text-primary-2 opacity-80 capitalize">Contact Number</small>
-          <p className="text-primary-2 font-bold">{formData.mobileNo}</p>
-          <small className="font-bold text-primary-2 opacity-80 capitalize">About me</small>
-          <p className="text-primary-2 font-bold">{formData.bio}</p>
-          <small className="font-bold text-primary-2 opacity-80 capitalize">Creative Field</small>
-          <p className="text-primary-2 font-bold">{formData.creative_field}</p>
+          <small className="font-bold opacity-80 capitalize">Location</small>
+          <p className="font-bold">{formData.address}</p>
+          <small className="font-bold opacity-80 capitalize">Contact Number</small>
+          <p className="font-bold">{formData.mobileNo}</p>
+          <small className="font-bold opacity-80 capitalize">About me</small>
+          <p className="font-bold">{formData.bio}</p>
+          <small className="font-bold opacity-80 capitalize">Creative Field</small>
+          <p className="font-bold">{formData.creative_field}</p>
+          {/* Edith */}
           <Icon
-                className="absolute top-2 right-2 cursor-pointer"
-                icon="material-symbols-light:edit-square-outline"
-                width="35"
-                height="35"
-                onClick={() => setIsEditing(true)}
-              />
-            {/* Temporary logout btn */}
+            className="absolute top-2 right-2 cursor-pointer"
+            icon="material-symbols-light:edit-square-outline"
+            width="35"
+            height="35"
+            // onClick={() => setIsEditing(true)}
+            onClick={() => setIsEditing(true)}
+          />
+          {/* Temporary logout btn */}
+          <ProfileModal
+            openModal={isEditing}
+            setOpenModal={setIsEditing}
+            userDetails={userDetail} // Pass userDetail to modal
+          />
         </div>
       )}
     </>
@@ -266,3 +286,4 @@ const ProfileButton: React.FC<ProfileButtonProps> = ({ open, setOpen }) => {
     </div>
   );
 };
+

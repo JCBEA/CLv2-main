@@ -248,8 +248,8 @@ export const Messages = () => {
                       onClick={() => userId && handleUserClick(userId, msg.id, msg.for)}
                     >
                       <div className="w-fit h-fit">
-                        <div className="w-10 h-10 rounded-full bg-primary-3 flex items-center justify-center">
-                          <span className="text-lg font-bold">{msg.first_name ? msg.first_name[0] : 'U'}</span>
+                        <div className="w-10 h-10 rounded-full bg-primary-2 text-secondary-1 flex items-center justify-center">
+                          <span className="text-lg font-semibold">{msg.first_name ? msg.first_name[0] : 'U'}</span>
                         </div>
                       </div>
                       <div className="w-full flex flex-col">
@@ -282,7 +282,7 @@ export const Messages = () => {
                 </button>
               )}
 
-              <div ref={containerRef} className="w-full h-full overflow-y-auto custom-scrollbar p-4">
+              <div ref={containerRef} className="w-full h-full overflow-y-auto custom-scrollbar lg:p-4 p-2">
                 {loading ? (
                   <p>Loading messages...</p>
                 ) : (
@@ -290,18 +290,18 @@ export const Messages = () => {
                     chatMessages.map((msg) => (
                       <div
                         key={msg.id}
-                        className={`flex ${msg.id === userId ? 'justify-end' : 'justify-start'} w-full mb-4`}
+                        className={`flex ${msg.id === userId ? 'justify-end' : 'justify-start'} w-full mb-4 `}
                       >
-                        <div className={`flex ${msg.id === userId ? 'flex-row-reverse' : 'flex-row'} items-end gap-2`}>
+                        <div className={`flex ${msg.id === userId ? 'flex-row-reverse' : 'flex-row'} items-end gap-2 overflow-hidden max-w-md md:max-w-lg lg:max-w-sm`}>
                           <div className="w-fit h-fit">
                             <div className="w-8 h-8 rounded-full bg-primary-3 flex items-center justify-center relative">
-                              <span className="text-sm font-bold rounded-full">{msg.first_name ? msg.first_name[0] : 'U'}</span>
+                              <span className="text-sm font-semibold rounded-full">{msg.first_name ? msg.first_name[0] : 'U'}</span>
                             </div>
                           </div>
 
-                          <div className={`max-w-sm w-full p-3 rounded-lg ${msg.id === userId ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'}`}>
-                            {/* Update the text container */}
-                            <p className="break-words overflow-wrap break-word">
+                          <div className={`w-full p-3 rounded-lg  ${msg.id === userId ? 'bg-shade-3 text-white' : 'bg-gray-200 text-primary-2'}`}>
+                            {/* break all to prevent overflow hahahah english amp*/}
+                            <p className="break-all">
                               {msg.message}
                             </p>
                             <p className="text-[10px] mt-1 opacity-70">{new Date(msg.created_at).toLocaleString()}</p>
