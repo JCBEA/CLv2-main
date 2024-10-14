@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { getMessageId, getSession, getUserName } from "@/services/authservice";
 import { jwtVerify } from "jose";
 import { removeLocal } from "@/services/authservice";
+import { supabase } from "@/services/supabaseClient";
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret';
 
 interface Message {
@@ -34,6 +35,24 @@ export const Messages = () => {
   const [error, setError] = useState<string | null>(null);
   const [newMessage, setNewMessage] = useState<string>("");
   const [refreshKey, setRefreshKey] = useState(0);
+
+
+  useEffect(() => {
+    const subscription = supabase
+      .channel('articles')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'messages'
+      }, (payload: any) => {
+        setChatMessages(prev => [...prev, payload.new]);
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(subscription);
+    };
+  }, []);
 
 
   // Detect screen size
