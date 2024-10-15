@@ -344,7 +344,7 @@ export const Messages = () => {
           {/* Chat Window */}
           {(!isMobile || isChatOpen) && (
             <div className="w-full h-full border border-primary-3 rounded-r-xl flex flex-col overflow-hidden">
-              <div className="h-fit p-2 bg-primary-1 border-b-2 border-primary-3 w-full flex justify-between items-center">
+              <div className="h-fit min-h-16 p-2 bg-primary-1 border-b-2 border-primary-3 w-full flex justify-between items-center">
                 <div className="h-fit w-fit">
                   {/* display user name here and profile picture */}
                   {chatMessages.length > 0 && (
