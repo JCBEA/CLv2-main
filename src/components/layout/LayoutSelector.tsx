@@ -2,9 +2,9 @@
 'use client'
 
 import React from 'react';
-import { useAuth } from '@/context/AuthContext';
 import AuthLayout from '@/app/(pages)/layout';
 import DashboardLayout from '@/app/(user)/layout';
+import { useAuth } from '@/context/authcontext';
 
 export const LayoutSelector = ({ children }: { children: React.ReactNode }) => {
   const { user } = useAuth();

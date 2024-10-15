@@ -126,7 +126,7 @@ export const CalendarEvent: React.FC = () => {
   };
 
   return (
-    <div className="w-full max-w-[90%] mx-auto md:p-6 bg-shade-2 my-[10dvh] border border-black">
+    <div className="w-full max-w-[90%] mx-auto md:p-6 bg-shade-2 my-[10dvh] border border-black  lg:block hidden">
       <h1 className="text-5xl font-semibold pl-4 title pb-8">Events Calendar</h1>
       <div className="w-full flex flex-col p-4 rounded-lg">
         <div className="w-full flex flex-row justify-between items-center pb-12">

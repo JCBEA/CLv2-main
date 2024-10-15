@@ -73,6 +73,7 @@ export const Header = ({
         { name: "Gallery", link: "/g-user" },
         { name: "FAQ", link: "/faqs" },
         { name: "Profile", link: "/profile" },
+        { name: "Events", link: "/events" },
       ]);
     } else {
       setMenuItems([
@@ -80,6 +81,7 @@ export const Header = ({
         { name: "Directory", link: "/creative-dashboard" },
         { name: "Gallery", link: "/g-visitor" },
         { name: "FAQ", link: "/faqs" },
+        { name: "Events", link: "/events" },
         { name: "Log In", link: "/signin" },
       ]);
     }
@@ -147,7 +149,7 @@ export const Header = ({
 
           {/* Menu Section */}
           <motion.div
-            className="w-fit lg:flex justify-center items-center lg:gap-14 hidden"
+            className="w-fit xl:flex justify-center items-center lg:gap-14 hidden"
             initial="hidden"
             animate="visible"
             variants={{
@@ -195,7 +197,7 @@ export const Header = ({
 
           {/* Mobile Menu Icon */}
           <motion.div
-            className="lg:hidden block text-secondary-2"
+            className="xl:hidden block text-secondary-2"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.8, duration: 0.8, ease: "easeOut" }}
