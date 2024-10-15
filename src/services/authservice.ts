@@ -196,6 +196,7 @@ export const logoutUser = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("messageId");
     localStorage.removeItem("user");
+    localStorage.removeItem("messageTo");
   }
 };
 
