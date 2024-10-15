@@ -1,4 +1,4 @@
-// api/collection
+// api/collections
 
 import { NextResponse } from 'next/server';
 import { supabase } from '@/services/supabaseClient';
