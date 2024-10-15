@@ -70,7 +70,7 @@ export default function FeaturedCollections() {
               </div>
               <div className="p-6">
                 <p className="text-gray-600 mb-4">{item.description}</p>
-                <Link href={`/collections/${item.id}`}>
+                <Link href={`/g-user/collections/${item.id}`}>
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
