@@ -104,13 +104,13 @@ export const Messages = () => {
         setError('No session token found');
       }
     };
-    
+
     fetchMessages(); // Initial fetch
 
     const intervalId = setInterval(fetchMessages, 1000); // Fetch messages every 2 seconds
     return () => clearInterval(intervalId); // Cleanup the interval on component unmount
   }, [refreshKey]);
-  
+
 
   const handleSendMessage = async () => {
     const token = getSession();
@@ -125,7 +125,7 @@ export const Messages = () => {
         forId: messageId,
         first_name: getUser
       };
-  
+
       const response = await fetch("/api/chat", {
         method: "PUT",
         headers: {
@@ -134,13 +134,13 @@ export const Messages = () => {
         },
         body: JSON.stringify(messageData),
       });
-  
+
       if (!response.ok) {
         throw new Error("Failed to send message");
       }
-  
+
       const { data: updatedMessages } = await response.json(); // Now we get the updated messages
-  
+
       // Update the state with the updated messages
       setChatMessages(updatedMessages);
       setNewMessage("");
@@ -151,7 +151,7 @@ export const Messages = () => {
       setLoadingMsg(false);
     }
   };
-  
+
 
   useEffect(() => {
     const handleBeforeUnload = () => {
@@ -255,7 +255,7 @@ export const Messages = () => {
     } finally {
       setLoading(false);
     }
-  } ;
+  };
 
   const containerRef = useRef<HTMLDivElement>(null); // Reference to the container
   const [firstTime, setFirstTime] = useState(true); // State to track the first load
@@ -308,17 +308,16 @@ export const Messages = () => {
                 <div className="w-full flex flex-col gap-4">
                   {latestMessagesArray.map((msg) => (
                     <div
-                    key={msg.id}
-                    className={`w-full flex items-center gap-2 cursor-pointer ${
-                      msg.id == messageId ? 'bg-blue-500 text-white' : 'text-black'
-                    }`}
-                    onClick={() => {
-                      if (userId) {
-                        handleUserClick(userId, msg.id, msg.for);
-                        console.log("msg CLICK: " + messageId);
-                      }
-                    }}
-                  >
+                      key={msg.id}
+                      className={`w-full flex items-center gap-2 p-4 rounded-lg cursor-pointer text-primary-2 ${msg.id == messageId ? 'bg-shade-8/60 ' : ''
+                        }`}
+                      onClick={() => {
+                        if (userId) {
+                          handleUserClick(userId, msg.id, msg.for);
+                          console.log("msg CLICK: " + messageId);
+                        }
+                      }}
+                    >
                       <div className="w-fit h-fit">
                         <div className="w-10 h-10 rounded-full bg-primary-2 text-secondary-1 flex items-center justify-center">
                           <span className="text-lg font-semibold">{msg.first_name ? msg.first_name[0] : 'U'}</span>
@@ -344,15 +343,36 @@ export const Messages = () => {
 
           {/* Chat Window */}
           {(!isMobile || isChatOpen) && (
-            <div className="w-full h-full border border-primary-3 rounded-r-xl flex flex-col overflow-hidden relative">
-              {isMobile && (
-                <button
-                  className="p-2 m-2 text-secondary-1 absolute top-0 left-0 z-10"
-                  onClick={() => setIsChatOpen(false)}
-                >
-                  <Icon icon="eva:arrow-back-outline" width="35" height="35" />
-                </button>
-              )}
+            <div className="w-full h-full border border-primary-3 rounded-r-xl flex flex-col overflow-hidden">
+              <div className="h-fit p-2 bg-primary-1 border-b-2 border-primary-3 w-full flex justify-between items-center">
+                <div className="h-fit w-fit">
+                  {/* display user name here and profile picture */}
+                  {chatMessages.length > 0 && (
+                    <div className="flex items-center gap-2 p-1">
+                      <div className="w-10 h-10 rounded-full bg-primary-2 text-secondary-1 flex items-center justify-center">
+                        <span className="text-lg font-semibold">
+                          {chatMessages[0].first_name
+                            ? chatMessages[0].first_name[0]
+                            : 'U'}
+                        </span>
+                      </div>
+                      <p className="text-lg font-bold">
+                        {chatMessages[0].first_name
+                          ? chatMessages[0].first_name
+                          : 'User'}
+                      </p>
+                    </div>
+                  )}
+                </div>
+                {isMobile && ( 
+                  <button
+                    className=" text-secondary-1 h-fit z-10"
+                    onClick={() => setIsChatOpen(false)}
+                  >
+                    <Icon icon="eva:arrow-back-outline" width="25" height="25" />
+                  </button>
+                )}
+              </div>
 
               <div ref={containerRef} className="w-full h-full overflow-y-auto custom-scrollbar lg:p-4 p-2">
                 {loadingMsg ? (
