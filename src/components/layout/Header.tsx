@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import Link from "next/link";
 import { getSession, logoutUser } from "@/services/authservice";
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 // Define Props Interfaces
 interface MenuItemProps {
@@ -27,14 +27,20 @@ interface HeaderProps {
 
 // MenuItem Component
 const MenuItem = ({ name, link }: MenuItemProps) => {
+  const pathname = usePathname();
+  // Check if the current route is active
+  const isActive = pathname === link;
+
   return (
     <motion.a
       href={link}
-      className="text-base uppercase font-semibold whitespace-nowrap relative"
-      whileHover={{ scale: 1.1 }}
+      className={`text-base uppercase font-semibold whitespace-nowrap relative ${
+        isActive ? 'text-tertiary-1 font-bold text-lg' : 'text-primary-2'  // Active color condition
+      }`}
+      whileHover={{ scale: 1.1, color: "#B6E3CE" }}
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, ease: "easeOut" }}
+      transition={{ duration: 0.3, ease: 'easeOut' }}
     >
       {name}
     </motion.a>

@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { getMessageId, getSession, getUserName } from "@/services/authservice";
 import { jwtVerify } from "jose";
 import { removeLocal } from "@/services/authservice";
+import { supabase } from "@/services/supabaseClient";
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret';
 
 interface Message {
@@ -34,6 +35,24 @@ export const Messages = () => {
   const [error, setError] = useState<string | null>(null);
   const [newMessage, setNewMessage] = useState<string>("");
   const [refreshKey, setRefreshKey] = useState(0);
+
+
+  useEffect(() => {
+    const subscription = supabase
+      .channel('articles')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'messages'
+      }, (payload: any) => {
+        setChatMessages(prev => [...prev, payload.new]);
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(subscription);
+    };
+  }, []);
 
 
   // Detect screen size
@@ -148,6 +167,37 @@ export const Messages = () => {
     };
   }, []);
 
+
+  // useEffect(() => {
+  //   const token = getSession();
+  //   if (!token) return;
+  //   const getUpdatedData = async () => {
+  //     try {
+  //       const { payload } = await jwtVerify(token, new TextEncoder().encode(JWT_SECRET));
+  //       const userIdFromToken = payload.id as string;
+  //       const getUser = getUserName();
+  //       const messageId = getMessageId();
+  //       const response = await fetch('/api/forRefresh', {
+  //         method: 'GET',
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           "Authorization": userIdFromToken,
+  //         },
+  //       });
+
+  //       if (response.status === 200) {
+  //         const data = await response.json();
+  //         setChatMessages(data.messages);
+  //       } else {
+  //         console.error('Failed to fetch messages');
+  //       }
+  //     } catch (error) {
+  //       console.error('Error fetching messages:', error);
+  //     }
+  //   };
+
+  // }, []);
+
   const handleUserClick = async (userId: string, messageId: string, msgFor: string) => {
     removeLocal();
     setLoading(true);
@@ -205,7 +255,7 @@ export const Messages = () => {
     } finally {
       setLoading(false);
     }
-  };
+  } ;
 
   const containerRef = useRef<HTMLDivElement>(null); // Reference to the container
   const [firstTime, setFirstTime] = useState(true); // State to track the first load
@@ -258,22 +308,17 @@ export const Messages = () => {
                 <div className="w-full flex flex-col gap-4">
                   {latestMessagesArray.map((msg) => (
                     <div
-                      className={`w-full flex items-center gap-2 cursor-pointer ${
-                        msg.id == messageId ? 'bg-blue-500 text-white' : 'text-black' // Background color and text color based on condition
-                      }`}
-                      onClick={() => {
-                        // Always call handleUserClick regardless of the condition
-                        if (userId) {
-                          handleUserClick(userId, msg.id, msg.for);
-                          // Log based on the condition
-                          if (msg.id === messageId) {
-                            console.log("msg AUTO:" + messageId);
-                          } else {
-                            console.log("msg CLICK:" + messageId);
-                          }
-                        }
-                      }}
-                    >
+                    key={msg.id}
+                    className={`w-full flex items-center gap-2 cursor-pointer ${
+                      msg.id == messageId ? 'bg-blue-500 text-white' : 'text-black'
+                    }`}
+                    onClick={() => {
+                      if (userId) {
+                        handleUserClick(userId, msg.id, msg.for);
+                        console.log("msg CLICK: " + messageId);
+                      }
+                    }}
+                  >
                       <div className="w-fit h-fit">
                         <div className="w-10 h-10 rounded-full bg-primary-2 text-secondary-1 flex items-center justify-center">
                           <span className="text-lg font-semibold">{msg.first_name ? msg.first_name[0] : 'U'}</span>
