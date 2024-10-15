@@ -1,50 +1,52 @@
-'use client'
+'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 
-async function getCollections() {
-  // This would be an API call in a real application
-  return [
-    {
-      id: 1,
-      title: "FLOWERS 2020",
-      description: "A stunning exploration of floral beauty.",
-      thumbnail: "/images/indiworks/1.png",
-      slug: "flowers-2020"
-    },
-    {
-      id: 2,
-      title: "WAVES 2020",
-      description: "Capturing the power and serenity of the ocean.",
-      thumbnail: "/images/indiworks/2.png",
-      slug: "waves-2020"
-    },
-    {
-      id: 3,
-      title: "SCULPTURE 2021",
-      description: "Modern sculptural works that challenge perception.",
-      thumbnail: "/images/indiworks/3.png",
-      slug: "sculpture-2021"
-    },
-  ];
+async function fetchCollections() {
+  const response = await fetch('/api/collections');
+  if (!response.ok) {
+    throw new Error('Failed to fetch collections');
+  }
+  const { imageCollection } = await response.json(); // Adjusted to match the API response
+  return imageCollection || []; // Return an empty array if undefined
 }
 
-export default async function BrowseCollectionsPage() {
-  const collections = await getCollections();
+export default function BrowseCollectionsPage() {
+  const [collections, setCollections] = useState<Collection[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadCollections = async () => {
+      try {
+        const fetchedCollections = await fetchCollections();
+        setCollections(fetchedCollections);
+      } catch (err: any) {
+        setError(err.message);
+      }
+    };
+
+    loadCollections();
+  }, []);
+
+  if (error) {
+    return <div className="text-red-600 text-center mt-8">{error}</div>;
+  }
 
   return <CollectionsList initialCollections={collections} />;
 }
 
-
 type Collection = {
   id: number;
+  image_id: string; // Add this field if needed
   title: string;
-  description: string;
-  thumbnail: string;
+  artist: string; // You can include artist if you want to display it
+  year: string;   // You can include year if you want to display it
+  image_path: string;
   slug: string;
+  desc: string;   // Assuming you want to use this as description
 };
 
 function CollectionsList({ initialCollections }: { initialCollections: Collection[] }) {
@@ -52,7 +54,7 @@ function CollectionsList({ initialCollections }: { initialCollections: Collectio
 
   const filteredCollections = initialCollections.filter(collection =>
     collection.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    collection.description.toLowerCase().includes(searchTerm.toLowerCase())
+    collection.desc.toLowerCase().includes(searchTerm.toLowerCase()) // Adjusted to use desc
   );
 
   return (
@@ -85,7 +87,7 @@ function CollectionsList({ initialCollections }: { initialCollections: Collectio
             >
               <div className="relative h-48">
                 <Image
-                  src={collection.thumbnail}
+                  src={collection.image_path} // Changed to use image_path
                   alt={collection.title}
                   fill
                   style={{ objectFit: 'cover' }}
@@ -93,7 +95,7 @@ function CollectionsList({ initialCollections }: { initialCollections: Collectio
               </div>
               <div className="p-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-2">{collection.title}</h2>
-                <p className="text-gray-600 mb-4">{collection.description}</p>
+                <p className="text-gray-600 mb-4">{collection.desc}</p> {/* Changed to use desc */}
                 <Link href={`/g-user/collections/${collection.slug}`}>
                   <motion.button
                     whileHover={{ scale: 1.05 }}
