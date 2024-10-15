@@ -39,3 +39,17 @@
   scrollbar-width: thin; /* Make scrollbar thinner */
   scrollbar-color: #fa8811 #faefd3; /* Thumb color and track color */
 }
+
+
+.scroll-none {
+  scrollbar-width: none;  /* Firefox */
+  
+  /* For WebKit-based browsers (Chrome, Safari) */
+  -webkit-overflow-scrolling: touch; /* smooth scrolling for iOS */
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  overflow: -moz-scrollbars-none; /* Legacy Firefox browsers */
+}
+
+.scroll-none::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Edge */
+}
