@@ -8,7 +8,7 @@ import { motion } from 'framer-motion';
 const featuredItems = [
   {
     id: 1,
-    title: "FLOWERS 2020",
+    title: "flower-2020",
     description: "Her serene expression, framed by delicate petals, creates an effect of quiet beauty.",
     img: "/images/indiworks/1.png",
     artist: "Jane Doe",
@@ -70,7 +70,7 @@ export default function FeaturedCollections() {
               </div>
               <div className="p-6">
                 <p className="text-gray-600 mb-4">{item.description}</p>
-                <Link href={`/g-user/collections/${item.id}`}>
+                <Link href={`/g-user/collections/${item.title}`}>
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
