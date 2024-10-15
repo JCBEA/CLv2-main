@@ -83,23 +83,17 @@ export default function FeaturedCollections() {
             </motion.div>
           ))}
         </div>
-        
-        <motion.div 
-          className="mt-16 text-center"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-        >
-          <Link href="/g-user/publish">
+        <div className="mt-12 text-center">
+          <Link href="/g-user/collections">
             <motion.button
-              whileHover={{ scale: 1.05, boxShadow: "0 10px 20px rgba(0,0,0,0.1)" }}
+              whileHover={{ scale: 1.05, backgroundColor: "#4a5568" }}
               whileTap={{ scale: 0.95 }}
-              className="bg-gray-600 text-white px-8 py-4 rounded-full text-lg font-bold hover:bg-gray-700 transition duration-300 shadow-lg"
+              className="bg-gray-700 text-white px-10 py-4 rounded-full text-lg font-medium transition duration-300 ease-in-out transform hover:shadow-xl"
             >
-              ADD MORE FEATURED COLLECTIONS
+              BROWSE ALL COLLECTIONS
             </motion.button>
           </Link>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

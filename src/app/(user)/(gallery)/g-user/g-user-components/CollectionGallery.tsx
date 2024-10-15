@@ -125,18 +125,23 @@ export default function CollectionsCarousel() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </button>
-        </div>
-        <div className="mt-12 text-center">
-          <Link href="/g-user/collections">
+        </div>           
+        <motion.div 
+          className="mt-16 text-center"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          <Link href="/g-user/publish">
             <motion.button
-              whileHover={{ scale: 1.05, backgroundColor: "#4a5568" }}
+              whileHover={{ scale: 1.05, boxShadow: "0 10px 20px rgba(0,0,0,0.1)" }}
               whileTap={{ scale: 0.95 }}
-              className="bg-gray-700 text-white px-10 py-4 rounded-full text-lg font-medium transition duration-300 ease-in-out transform hover:shadow-xl"
+              className="bg-gray-600 text-white px-8 py-4 rounded-full text-lg font-bold hover:bg-gray-700 transition duration-300 shadow-lg"
             >
-              BROWSE ALL COLLECTIONS
+              ADD MORE COLLECTIONS
             </motion.button>
           </Link>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
