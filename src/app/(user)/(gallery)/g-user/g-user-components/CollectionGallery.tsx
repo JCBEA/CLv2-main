@@ -1,36 +1,54 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-
-const collections = [
-  {
-    id: 1,
-    title: "FLOWERS 2020",
-    description: "Her serene expression, framed by delicate petals in shades of pink, violet, and gold, contrasts within the soft, muted background, drawing attention to her radiant presence.",
-    img: "/images/indiworks/1.png",
-    slug: "flowers-2020"
-  },
-  {
-    id: 2,
-    title: "WAVES 2020",
-    description: "A powerful depiction of the sea's strength and beauty, this artwork captures the raw energy of nature. The waves crashing onto the shore symbolize life's ups and downs.",
-    img: "/images/indiworks/2.png",
-    slug: "waves-2020"
-  },
-  {
-    id: 3,
-    title: "SCULPTURE 2021",
-    description: "This sculpture evokes feelings of contemplation and solitude. The intricate details highlight the craftsmanship, while the muted background focuses on the artwork's depth.",
-    img: "/images/indiworks/3.png",
-    slug: "sculpture-2021"
-  },
-];
+import { getSession } from '@/services/authservice';
+import { jwtVerify } from 'jose';
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret';
+interface Collection {
+  id: string; // or number, depending on your schema
+  image_path: string;
+  artist:string;
+  title: string;
+  desc: string;
+  slug: string;
+}
 
 export default function CollectionsCarousel() {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [collections, setCollections] = useState<Collection[]>([]); // Specify the type here
+
+
+  // Fetch image collections when the component mounts
+  useEffect(() => {
+    const fetchCollections = async () => {
+      try {
+        const token = getSession();
+        if(!token) return;
+        const { payload } = await jwtVerify(token, new TextEncoder().encode(JWT_SECRET));
+        const userId = payload.id as string;
+        const response = await fetch('/api/session_collection', {
+          method: 'GET',
+          headers: {
+            Authorization: userId,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch collections');
+        }
+
+        const data = await response.json();
+        setCollections(data.messages); // Update state with the fetched collections
+      } catch (error) {
+        console.error('Error fetching collections:', error);
+      }
+    };
+
+    fetchCollections();
+  }, []);
 
   const nextSlide = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % collections.length);
@@ -39,6 +57,10 @@ export default function CollectionsCarousel() {
   const prevSlide = () => {
     setCurrentIndex((prevIndex) => (prevIndex - 1 + collections.length) % collections.length);
   };
+
+  if (collections.length === 0) {
+    return <div className="text-center">Loading collections...</div>;
+  }
 
   return (
     <div className="bg-gradient-to-b from-gray-50 to-gray-100 py-20 px-4 sm:px-6 lg:px-8">
@@ -70,7 +92,7 @@ export default function CollectionsCarousel() {
               >
                 <div className="w-full md:w-1/2 h-64 md:h-full relative">
                   <Image
-                    src={collections[currentIndex].img}
+                    src={collections[currentIndex].image_path} // Now it should be typed correctly
                     alt={collections[currentIndex].title}
                     layout="fill"
                     objectFit="cover"
@@ -92,7 +114,7 @@ export default function CollectionsCarousel() {
                     transition={{ delay: 0.3, duration: 0.5 }}
                     className="text-gray-600 mb-8 leading-relaxed"
                   >
-                    {collections[currentIndex].description}
+                    {collections[currentIndex].desc}
                   </motion.p>
                   <Link href={`/g-user/collections/${collections[currentIndex].slug}`}>
                     <motion.button
