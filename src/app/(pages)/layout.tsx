@@ -12,10 +12,10 @@ export default function MainLayout({
     <html lang="en">
       <body className="flex flex-col min-h-screen">
         <Header
-          linkName="/events"
+          linkName="/signin"
           roundedCustom="lg:rounded-bl-3xl"
           paddingLeftCustom="lg:pl-14"
-          buttonName="Join Mukna"
+          buttonName="Log in"
         />
         <main className="flex-grow">
           {children}

@@ -34,9 +34,8 @@ const MenuItem = ({ name, link }: MenuItemProps) => {
   return (
     <motion.a
       href={link}
-      className={`text-base uppercase font-semibold whitespace-nowrap relative ${
-        isActive ? 'text-tertiary-1 font-bold text-lg' : 'text-primary-2'  // Active color condition
-      }`}
+      className={`text-base uppercase font-semibold whitespace-nowrap relative ${isActive ? 'text-tertiary-1 font-bold text-lg' : 'text-primary-2'  // Active color condition
+        }`}
       whileHover={{ scale: 1.1, color: "#B6E3CE" }}
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -72,8 +71,8 @@ export const Header = ({
         { name: "Directory", link: "/creative-dashboard" },
         { name: "Gallery", link: "/g-user" },
         { name: "FAQ", link: "/faqs" },
-        { name: "Profile", link: "/profile" },
         { name: "Events", link: "/events" },
+        { name: "Profile", link: "/profile" },
       ]);
     } else {
       setMenuItems([
@@ -82,7 +81,7 @@ export const Header = ({
         { name: "Gallery", link: "/g-visitor" },
         { name: "FAQ", link: "/faqs" },
         { name: "Events", link: "/events" },
-        { name: "Log In", link: "/signin" },
+        { name: "Profile", link: "/profile" },
       ]);
     }
   };
@@ -129,9 +128,8 @@ export const Header = ({
       className={`w-full h-[10dvh] fixed top-0 z-[1000] ${paddingLeftCustom} transition-colors duration-500`}
     >
       <motion.div
-        className={`w-full h-full ${roundedCustom} ${textColor} ${
-          isScrolled ? "bg-primary-1/60 backdrop-blur-md" : backgroundColor
-        }`}
+        className={`w-full h-full ${roundedCustom} ${textColor} ${isScrolled ? "bg-primary-1/60 backdrop-blur-md" : backgroundColor
+          }`}
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 1.0, ease: "easeOut" }}
