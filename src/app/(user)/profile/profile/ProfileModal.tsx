@@ -5,7 +5,9 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import { motion, AnimatePresence } from "framer-motion";
 import { UserDetail } from "./UserProfile";
 import { supabase } from "@/services/supabaseClient";
-
+import { getSession } from "@/services/authservice";
+import { jwtVerify } from "jose";
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret';
 interface ProfileModalProps {
     openModal: boolean;
     setOpenModal: React.Dispatch<React.SetStateAction<boolean>>;
@@ -33,44 +35,55 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
         };
     }, [openModal]);
 
+    const [isEditing, setIsEditing] = useState(false);
+
     // Handle input change within modal
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
-        console.log(name, value); // Check if the values are correct
         setFormData((prev) => ({ ...prev, [name]: value }));
-    };
-
-    const handleSave = async () => {
-        console.log("Form Data being saved:", formData); // To verify
+      };
     
-        try {
-            // Use Supabase to update the user's details
-            const { data, error } = await supabase
-                .from('userDetails') // Replace with your actual table name
-                .update({
-                    first_name: formData.first_name,
-                    bday: formData.bday,
-                    address: formData.address,
-                    facebook: formData.facebook,
-                    instagram: formData.instagram,
-                    email: formData.email,
-                    creative_field: formData.creative_field,
-                    mobileNo: formData.mobileNo,
-                    portfolioLink: formData.portfolioLink,
-                    bio: formData.bio
-                })
-                .eq('id', formData.id); // Use the user's unique identifier (id)
+      const handleSave = async () => {
+        const token = getSession();
     
-            if (error) {
-                console.error("Error updating user data:", error.message);
-            } else {
-                console.log("User data updated successfully:", data);
-                setOpenModal(false); // Close the modal after saving
-            }
-        } catch (error) {
-            console.error("An error occurred while updating data:", error);
+        // Check if the token exists
+        if (!token) {
+          console.error("No token found, user may not be logged in.");
+          return; // Optionally handle unauthorized state here
         }
-    };
+        try {
+          // Verify the token and handle it appropriately
+          const { payload } = await jwtVerify(token, new TextEncoder().encode(JWT_SECRET));
+    
+          // Log the payload for debugging
+          console.log("Retrieved token payload:", payload.id);
+    
+          const response = await fetch("/api/creatives", {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `${payload.id}`,
+            },
+            body: JSON.stringify({
+              detailsid: payload.id,
+              userDetails: formData,
+            }),
+          });
+    
+          if (!response.ok) {
+            const errorData = await response.json(); // Get the error message
+            console.error("Error response:", errorData);
+            throw new Error(errorData.message);
+          }
+    
+          // Handle success
+          console.log("User details updated successfully");
+          setIsEditing(false); // Exit edit mode
+        } catch (error) {
+          console.error("Error updating user details:", error);
+        }
+      };
+    
 
 
 
@@ -256,9 +269,10 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                                         whileHover={{ scale: 1.05, backgroundColor: "#403737", color: "white" }}
                                         whileTap={{ scale: 0.95 }}
                                         className="w-44 py-2.5 font-semibold bg-shade-2 rounded-full"
-                                        onClick={handleSave} // Add the save function here
+                                        onClick={handleSave}
+                                        disabled={isEditing}
                                     >
-                                        Save
+                                        {isEditing ? "Saving..." : "Save"}
                                     </motion.button>
 
                                 </div>

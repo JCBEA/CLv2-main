@@ -25,26 +25,28 @@ interface HeaderProps {
   menuItems?: MenuItemProps[];
 }
 
+
 // MenuItem Component
 const MenuItem = ({ name, link }: MenuItemProps) => {
   const pathname = usePathname();
-  // Check if the current route is active
+  // Check if the current route is active 
   const isActive = pathname === link;
 
   return (
     <motion.a
       href={link}
-      className={`text-base uppercase font-semibold whitespace-nowrap relative ${isActive ? 'text-tertiary-1 font-bold text-lg' : 'text-primary-2'  // Active color condition
-        }`}
-      whileHover={{ scale: 1.1, color: "#B6E3CE" }}
+      className={`text-base uppercase font-semibold whitespace-nowrap relative duration-300
+        ${isActive ? 'text-shade-1 font-bold text-lg' : 'text-primary-2'} // Active link styles
+        group-hover:text-primary-2 hover:!text-primary-3`} // Hover styles
+      whileHover={{ scale: 1.1 }}
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, ease: 'easeOut' }}
     >
       {name}
     </motion.a>
   );
 };
+
 
 // Header Component
 export const Header = ({
@@ -128,8 +130,7 @@ export const Header = ({
       className={`w-full h-[10dvh] fixed top-0 z-[1000] ${paddingLeftCustom} transition-colors duration-500`}
     >
       <motion.div
-        className={`w-full h-full ${roundedCustom} ${textColor} ${isScrolled ? "bg-primary-1/60 backdrop-blur-md" : backgroundColor
-          }`}
+        className={`w-full h-full ${roundedCustom} ${textColor} ${backgroundColor}`}
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 1.0, ease: "easeOut" }}
@@ -147,7 +148,7 @@ export const Header = ({
 
           {/* Menu Section */}
           <motion.div
-            className="w-fit xl:flex justify-center items-center lg:gap-14 hidden"
+            className="w-fit group xl:flex justify-center items-center lg:gap-14 hidden"
             initial="hidden"
             animate="visible"
             variants={{
@@ -168,8 +169,8 @@ export const Header = ({
             {isLoggedIn ? (
               <motion.button
                 onClick={handleLogout}
-                className="uppercase w-44 py-1.5 font-semibold rounded-full bg-shade-2"
-                whileHover={{ scale: 1.1, backgroundColor: "#403737", color: "#fff" }}
+                className="uppercase w-44 py-1.5 font-semibold rounded-full bg-shade-1 text-secondary-1"
+                whileHover={{ scale: 1.1, backgroundColor: "#B6E3CE", color: "#403737" }}
                 whileTap={{ scale: 0.95 }}
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
