@@ -14,6 +14,8 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret';
 export interface UserDetail {
   id: string; // Assuming there's an id for user identification
   first_name: string;
+  bday: string;
+  email: string;
   creative_field: string;
   address: string;
   mobileNo: string;
@@ -234,13 +236,16 @@ const UserDetailDisplay = ({ userDetail }: { userDetail: UserDetail }) => {
             height="35"
             onClick={openProfileModal}
           />
-          {/* Temporary logout btn */}
-          {openModal && (
-                <ProfileModal 
-                    openModal={openModal} 
-                    setOpenModal={closeProfileModal} 
-                />
-            )}
+
+         {/* Pass formData to ProfileModal */}
+        {openModal && (
+          <ProfileModal
+            openModal={openModal}
+            setOpenModal={closeProfileModal}
+            formData={formData} // Passing formData as prop
+            setFormData={setFormData} // Passing setFormData to update in modal
+          />
+        )}
         </div>
       )}
     </>

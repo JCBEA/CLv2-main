@@ -37,7 +37,7 @@ export const Messages = () => {
   const [error, setError] = useState<string | null>(null);
   const [newMessage, setNewMessage] = useState<string>("");
   const [getFirstName, setFirstName] = useState<string | null>(null);
-  const [getSuggeted, setSuggested] = useState< | null>(null);
+  const [getSuggeted, setSuggested] = useState<| null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
 
@@ -114,7 +114,7 @@ export const Messages = () => {
       supabase.removeChannel(subscription);
     };
   }, []);
-  
+
 
 
   // Detect screen size
@@ -225,10 +225,10 @@ export const Messages = () => {
   useEffect(() => {
     const getFname = localStorage.getItem("messageTo");
     setFirstName(getFname);
-  },[refreshKey]);
+  }, [refreshKey]);
 
-  const handleUserClick = async (userId: string, messageId: string, msgFname:string) => {
-    localStorage.setItem("messageTo",msgFname);
+  const handleUserClick = async (userId: string, messageId: string, msgFname: string) => {
+    localStorage.setItem("messageTo", msgFname);
     const getFname = localStorage.getItem("messageTo");
     setFirstName(getFname);
     removeLocal();
@@ -287,20 +287,17 @@ export const Messages = () => {
     }
   };
 
-  const containerRef = useRef<HTMLDivElement>(null); // Reference to the container
-  const [firstTime, setFirstTime] = useState(true); // State to track the first load
+
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Scroll to bottom logic
     if (containerRef.current) {
       containerRef.current.scrollTop = containerRef.current.scrollHeight;
-      if (firstTime) {
-        setFirstTime(false);
-      }
     }
-  }, [chatMessages]); // Run effect whenever chatMessages changes
+  }, [chatMessages, messageId]);// Run effect whenever chatMessages changes
 
-
+  
 
   const filteredMessages = messages.filter((message) => message.id !== userId);
 
@@ -392,34 +389,24 @@ export const Messages = () => {
             <div className="w-full h-full border border-primary-3 rounded-r-xl flex flex-col overflow-hidden">
               <div className="h-fit min-h-16 p-2 bg-primary-1 border-b-2 border-primary-3 w-full flex justify-between items-center">
                 <div className="h-fit w-fit">
-                  {/* display user name here and profile picture */}
-                  {chatMessages.length > 0 &&(
+                  {chatMessages.length > 0 && getFirstName ? (
                     <div className="flex items-center gap-2 p-1">
                       <div className="w-10 h-10 rounded-full bg-primary-2 text-secondary-1 flex items-center justify-center">
                         <span className="text-lg font-semibold">
                           {getFirstName?.[0] ?? 'U'}
                         </span>
                       </div>
-                      <p className="text-lg font-bold">
-                      {getFirstName ?? 'User'}
-                      </p>
+                      <p className="text-lg font-bold">{getFirstName ?? 'User'}</p>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2 p-1">
+                      <div className="w-10 h-10 rounded-full bg-gray-200 text-secondary-1 flex items-center justify-center">
+                        <span className="text-lg font-semibold">?</span>
+                      </div>
+                      <p className="text-lg font-bold">Select a user to chat with</p>
                     </div>
                   )}
-                  {chatMessages.length == 0 && (
-                      <div className="flex items-center gap-2 p-1">
-                        <div className={`w-10 h-10 rounded-full ${getFirstName ? 'bg-primary-2' : ''} text-secondary-1 flex items-center justify-center`}>
-                          <span className="text-lg font-semibold">
-                          {getFirstName ? getFirstName[0] : ''}
-                          </span>
-                        </div>
-                        <p className="text-lg font-bold">
-                        {getFirstName ?? ''}
-                        </p>
-                      </div>
-
-                  )}
                 </div>
-
 
                 {isMobile && (
                   <button
@@ -431,33 +418,54 @@ export const Messages = () => {
                 )}
               </div>
 
+
+              {/* Chat Messages Area */}
               <div ref={containerRef} className="w-full h-full overflow-y-auto custom-scrollbar lg:p-4 p-2">
                 {loadingMsg ? (
                   <p>Loading messages...</p>
-                ) : (
-                  chatMessages.length > 0 ? (
-                    chatMessages
-                      .filter(msg => msg.for == messageId && msg.id == userId || msg.id == messageId && msg.for == userId)
-                      .map((msg) => (
-                        <div className={`flex ${msg.id === userId ? 'justify-end' : 'justify-start'} w-full mb-4`}>
-                          <div className={`flex ${msg.id === userId ? 'flex-row-reverse' : 'flex-row'} items-end gap-2 overflow-hidden max-w-md md:max-w-lg lg:max-w-sm`}>
+                ) : chatMessages.length > 0 ? (
+                  <>
+                    {chatMessages
+                      .filter(
+                        (msg) =>
+                          (msg.for == messageId && msg.id == userId) ||
+                          (msg.id == messageId && msg.for == userId)
+                      )
+                      .map((msg, index) => (
+                        <div
+                          key={index}
+                          className={`flex ${msg.id === userId ? 'justify-end' : 'justify-start'
+                            } w-full mb-4`}
+                        >
+                          <div
+                            className={`flex ${msg.id === userId ? 'flex-row-reverse' : 'flex-row'
+                              } items-end gap-2 overflow-hidden max-w-md md:max-w-lg lg:max-w-sm`}
+                          >
                             <div className="w-fit h-fit">
                               <div className="w-8 h-8 rounded-full bg-primary-3 flex items-center justify-center relative">
-                                <span className="text-sm font-semibold rounded-full">{msg.first_name ? msg.first_name[0] : 'U'}</span>
+                                <span className="text-sm font-semibold rounded-full">
+                                  {msg.first_name ? msg.first_name[0] : 'U'}
+                                </span>
                               </div>
                             </div>
-                
-                            <div className={`w-full p-3 rounded-lg ${msg.id === userId ? 'bg-shade-3 text-white' : 'bg-gray-200 text-primary-2'}`}>
-                              {/* break all to prevent overflow */}
+
+                            <div
+                              className={`w-full p-3 rounded-lg ${msg.id === userId
+                                ? 'bg-shade-3 text-white'
+                                : 'bg-gray-200 text-primary-2'
+                                }`}
+                            >
                               <p className="break-all">{msg.message}</p>
-                              <p className="text-[10px] mt-1 opacity-70">{new Date(msg.created_at).toLocaleString()}</p>
+                              <p className="text-[10px] mt-1 opacity-70">
+                                {new Date(msg.created_at).toLocaleString()}
+                              </p>
                             </div>
                           </div>
                         </div>
-                      ))
-                  ) : (
-                    <p>No messages yet. Start the conversation!</p>
-                  )
+                      ))}
+                  </>
+                ) : (
+                  <p>No messages yet. Start the conversation!</p>
                 )}
               </div>
 
