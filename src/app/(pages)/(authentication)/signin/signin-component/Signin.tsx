@@ -6,9 +6,9 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-
 import { useState } from "react";
-
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 export const Signin = () => {
   return (
     <div className="w-full min-h-dvh lg:py-[20dvh] py-[15dvh] bg-[url('/images/signup/background.jpg')] bg-cover bg-no-repeat relative">
@@ -70,6 +70,7 @@ export const Form = () => {
     try {
         const user = await loginUser(username, password);
         console.log("Logged in user:", user);
+        toast.success("Successfully Login!", { position: "bottom-center" });
         if (user) {
             // Store the token in local storage or cookies
             localStorage.setItem("token", user.token); // Example: Store JWT in localStorage
@@ -77,6 +78,7 @@ export const Form = () => {
         }
     } catch (err) {
         console.error(err);
+        toast.error("Invalid username or password", { position: "bottom-center" });
         setError("Invalid username or password");
     } finally {
         setLoading(false);
@@ -139,6 +141,7 @@ export const Form = () => {
           Sign up
         </Link>
       </div>
+      <ToastContainer/>
     </form>
   );
 };

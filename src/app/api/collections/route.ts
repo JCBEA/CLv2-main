@@ -4,6 +4,8 @@ import { NextResponse } from 'next/server';
 import { supabase } from '@/services/supabaseClient';
 
 export async function GET(req: Request) {
+  const headers = req.headers;
+  const slug = headers.get("Slug");
   try {
     // Fetch all records from the 'image_collection' table
     const { data: fetchCollection, error: fetchError } = await supabase
@@ -18,8 +20,8 @@ export async function GET(req: Request) {
     // Fetch all records from the 'child_collection' table
     const { data: fetchChildCollection, error: fetchChildError } = await supabase
       .from('child_collection')
-      .select('*'); // Selects all columns
-
+      .select('*')
+      .eq('sluger', slug);
     if (fetchChildError) {
       console.error('Error fetching child collection:', fetchChildError);
       return NextResponse.json({ message: 'Failed to fetch child collection', error: fetchChildError.message }, { status: 500 });
