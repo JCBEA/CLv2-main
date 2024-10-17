@@ -2,6 +2,19 @@ import { notFound } from 'next/navigation';
 import { supabase } from '@/services/supabaseClient'; // Adjust the import path as needed
 import CollectionDisplay from './CollectionDisplay'; // Adjust the import path to your component
 
+// Define the CollectionProps interface
+interface CollectionProps {
+  collection: {
+    images: {
+      image_path: string;
+      title: string;
+      desc: string;
+      artist: string;
+      year: string;
+    }[];
+  };
+}
+
 async function getCollection(slug: string) {
   const { data, error } = await supabase
     .from('child_collection')
@@ -15,14 +28,18 @@ async function getCollection(slug: string) {
 
   if (data && data.length > 0) {
     const collection = data[0];
-    const images = data.map(item => item.path);
+
+    // Map the images correctly according to the CollectionProps interface
+    const images = data.map(item => ({
+      image_path: item.path, // Assuming 'path' is the correct field for the image URL
+      title: item.title,     // Adjust these fields according to your actual data structure
+      desc: item.desc,
+      artist: item.artist,
+      year: item.year,
+    }));
 
     return {
-      title: collection.title,
-      description: collection.desc,
-      images: images,
-      artist: collection.artist,
-      year: collection.year,
+      collection: { images }, // Return the collection object as expected in CollectionProps
     };
   }
 
@@ -30,11 +47,11 @@ async function getCollection(slug: string) {
 }
 
 export default async function ViewCollectionPage({ params }: { params: { slug: string } }) {
-  const collection = await getCollection(params.slug);
+  const collectionData = await getCollection(params.slug);
 
-  if (!collection) {
+  if (!collectionData) {
     notFound();
   }
 
-  return <CollectionDisplay collection={collection} />;
+  return <CollectionDisplay collection={collectionData.collection} />;
 }
