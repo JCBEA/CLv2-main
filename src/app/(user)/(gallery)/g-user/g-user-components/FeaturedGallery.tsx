@@ -1,35 +1,55 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 
-const featuredItems = [
-  {
-    id: 1,
-    title: "FLOWERS 2020",
-    description: "Her serene expression, framed by delicate petals, creates an effect of quiet beauty.",
-    img: "/images/indiworks/1.png",
-    artist: "Jane Doe",
-  },
-  {
-    id: 2,
-    title: "WAVES 2020",
-    description: "A powerful depiction of the sea's strength and beauty, capturing the raw energy of nature.",
-    img: "/images/indiworks/2.png",
-    artist: "John Smith",
-  },
-  {
-    id: 3,
-    title: "SCULPTURE 2021",
-    description: "This sculpture evokes feelings of contemplation and solitude, highlighting intricate craftsmanship.",
-    img: "/images/indiworks/3.png",
-    artist: "Alex Johnson",
-  },
-];
+// Define the type for the collection items
+interface CollectionItem {
+  id: number;
+  title: string;
+  desc: string;
+  image_path: string; // Use the correct field from the database
+  artist: string;
+  slug: string;
+}
 
 export default function FeaturedCollections() {
+  const [featuredItems, setFeaturedItems] = useState<CollectionItem[]>([]); // Array of CollectionItem
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null); // Allow both string and null types
+
+  // Fetch data from the API
+  useEffect(() => {
+    const fetchCollection = async () => {
+      try {
+        const response = await fetch('/api/collections');
+        const data = await response.json();
+
+        if (response.ok) {
+          setFeaturedItems(data.imageCollection); // Assuming the API returns imageCollection
+        } else {
+          setError(data.message);
+        }
+      } catch (err) {
+        setError('Failed to fetch collections');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCollection();
+  }, []);
+
+  if (loading) {
+    return <p>Loading featured collections...</p>;
+  }
+
+  if (error) {
+    return <p>{error}</p>;
+  }
+
   return (
     <section className="bg-white py-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -41,14 +61,14 @@ export default function FeaturedCollections() {
         >
           <h2 className="text-4xl font-bold text-gray-900 mb-4">Featured Collections</h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-          Showcasing your most exceptional artworks
+            Showcasing your most exceptional artworks
           </p>
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
           {featuredItems.map((item, index) => (
             <motion.div
-              key={item.id}
+              key={item.id} // Now TypeScript knows 'id' exists
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
@@ -56,7 +76,7 @@ export default function FeaturedCollections() {
             >
               <div className="relative h-64">
                 <Image
-                  src={item.img}
+                  src={item.image_path}
                   alt={item.title}
                   layout="fill"
                   objectFit="cover"
@@ -69,8 +89,8 @@ export default function FeaturedCollections() {
                 </div>
               </div>
               <div className="p-6">
-                <p className="text-gray-600 mb-4">{item.description}</p>
-                <Link href={`/g-user/collections/${item.id}`}>
+                <p className="text-gray-600 mb-4">{item.desc}</p>
+                <Link href={`/g-user/collections/${item.slug}`}>
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}

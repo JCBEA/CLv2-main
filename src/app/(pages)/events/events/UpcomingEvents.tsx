@@ -78,17 +78,17 @@ export const UpcomingEvents = () => {
   return (
     <div className="w-full h-fit min-h-dvh max-w-[90%] mx-auto py-[15dvh] flex flex-col gap-6">
       <div className="w-full">
-        <h1 className="font-extrabold text-6xl text-primary-3 uppercase text-center">
+        <h1 className="font-extrabold lg:text-6xl md:text-5xl text-4xl text-primary-3 uppercase text-center">
           upcoming events
         </h1>
       </div>
       {/* Calendar showing the current date or month year */}
-      <div className="w-full h-fit flex justify-center items-center pb-12">
+      <div className="w-full h-fit flex justify-center items-center text-center pb-12">
         <div className="w-fit flex gap-6 justify-center items-center">
           {/* Previous Month Arrow */}
           <Icon icon="ph:arrow-left" width="35" height="35" onClick={goToPreviousMonth} className="cursor-pointer" />
           {/* Month and Year */}
-          <h1 className="font-bold text-4xl uppercase">{currentMonthYear}</h1>
+          <h1 className="font-bold md:text-4xl text-2xl uppercase">{currentMonthYear}</h1>
           {/* Next Month Arrow */}
           <Icon icon="ph:arrow-right" width="35" height="35" onClick={goToNextMonth} className="cursor-pointer" />
         </div>

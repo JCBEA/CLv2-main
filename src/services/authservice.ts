@@ -186,6 +186,7 @@ export const removeLocal = () => {
   if (typeof window !== "undefined") {
     localStorage.removeItem("messageId");
     localStorage.removeItem("user");
+    // localStorage.removeItem("messageTo");
   }
   return null; // Return null or a default value if not in the browser
 };
@@ -195,6 +196,7 @@ export const logoutUser = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("messageId");
     localStorage.removeItem("user");
+    localStorage.removeItem("messageTo");
   }
 };
 

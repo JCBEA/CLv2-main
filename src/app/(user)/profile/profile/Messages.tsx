@@ -27,25 +27,86 @@ export const Messages = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [chatMessages, setChatMessages] = useState<Message[]>([]);
-  const [userDetails, setUserDetails] = useState<UserDetail[]>([]);
+  const [input, setInput] = useState('');
+  const [suggestions, setSuggestions] = useState([]);
+  const [allUsers, setAllUsers] = useState([]);
   const [userId, setUserId] = useState<string | null>(null);
   const [messageId, setMessageId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadingMsg, setLoadingMsg] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [newMessage, setNewMessage] = useState<string>("");
+  const [getFirstName, setFirstName] = useState<string | null>(null);
+  const [getSuggeted, setSuggested] = useState<| null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
 
   useEffect(() => {
+    const fetchUserDetails = async () => {
+      const token = getSession();
+      if (!token) return;
+      try {
+        const { payload } = await jwtVerify(token, new TextEncoder().encode(JWT_SECRET));
+        const userId = payload.id as string;
+        const response = await fetch('/api/chat/search_user', {
+          method: 'GET',
+          headers: {
+            Authorization: userId, // Replace with actual userId logic
+          },
+        });
+        const data = await response.json();
+        if (data.userDetails) {
+          setAllUsers(data.userDetails); // Store all user details
+        }
+      } catch (error) {
+        console.error('Error fetching user details:', error);
+      }
+    };
+
+    fetchUserDetails();
+  }, []);
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    setInput(value);
+
+    // Update suggestions based on input
+    if (value) {
+      const filteredSuggestions = allUsers.filter((user: UserDetail) =>
+        user.first_name.toLowerCase().includes(value.toLowerCase())
+      );
+      setSuggestions(filteredSuggestions);
+    } else {
+      setSuggestions([]);
+    }
+  };
+
+  const handleSuggestionClick = async (suggestion: UserDetail) => {
+    setInput(suggestion.first_name);
+    setSuggestions([]);
+    localStorage.setItem("messageId", suggestion.detailsid)
+    localStorage.setItem("messageTo", suggestion.first_name)
+    const getFirstName = localStorage.getItem("messageTo") || ""
+    setFirstName(getFirstName);
+    const messageId = localStorage.getItem("messageId") || "";
+
+    await handleUserClick(suggestion.detailsid, messageId, getFirstName);
+  };
+
+
+
+
+
+  useEffect(() => {
     const subscription = supabase
-      .channel('articles')
+      .channel('fetchmsg')
       .on('postgres_changes', {
         event: '*',
         schema: 'public',
         table: 'messages'
       }, (payload: any) => {
         setChatMessages(prev => [...prev, payload.new]);
+        setMessages(prev => [...prev, payload.new]);
       })
       .subscribe();
 
@@ -53,6 +114,7 @@ export const Messages = () => {
       supabase.removeChannel(subscription);
     };
   }, []);
+
 
 
   // Detect screen size
@@ -104,13 +166,10 @@ export const Messages = () => {
         setError('No session token found');
       }
     };
-    
-    fetchMessages(); // Initial fetch
 
-    const intervalId = setInterval(fetchMessages, 1000); // Fetch messages every 2 seconds
-    return () => clearInterval(intervalId); // Cleanup the interval on component unmount
+    fetchMessages();
   }, [refreshKey]);
-  
+
 
   const handleSendMessage = async () => {
     const token = getSession();
@@ -125,7 +184,7 @@ export const Messages = () => {
         forId: messageId,
         first_name: getUser
       };
-  
+
       const response = await fetch("/api/chat", {
         method: "PUT",
         headers: {
@@ -134,24 +193,19 @@ export const Messages = () => {
         },
         body: JSON.stringify(messageData),
       });
-  
+
       if (!response.ok) {
         throw new Error("Failed to send message");
       }
-  
-      const { data: updatedMessages } = await response.json(); // Now we get the updated messages
-  
-      // Update the state with the updated messages
-      setChatMessages(updatedMessages);
       setNewMessage("");
-      setRefreshKey((prev) => prev + 1); // Optionally trigger any refresh logic you have
+      setRefreshKey((prev) => prev + 1);
     } catch (error) {
       console.error("Error sending message:", error);
     } finally {
       setLoadingMsg(false);
     }
   };
-  
+
 
   useEffect(() => {
     const handleBeforeUnload = () => {
@@ -168,44 +222,22 @@ export const Messages = () => {
   }, []);
 
 
-  // useEffect(() => {
-  //   const token = getSession();
-  //   if (!token) return;
-  //   const getUpdatedData = async () => {
-  //     try {
-  //       const { payload } = await jwtVerify(token, new TextEncoder().encode(JWT_SECRET));
-  //       const userIdFromToken = payload.id as string;
-  //       const getUser = getUserName();
-  //       const messageId = getMessageId();
-  //       const response = await fetch('/api/forRefresh', {
-  //         method: 'GET',
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           "Authorization": userIdFromToken,
-  //         },
-  //       });
+  useEffect(() => {
+    const getFname = localStorage.getItem("messageTo");
+    setFirstName(getFname);
+  }, [refreshKey]);
 
-  //       if (response.status === 200) {
-  //         const data = await response.json();
-  //         setChatMessages(data.messages);
-  //       } else {
-  //         console.error('Failed to fetch messages');
-  //       }
-  //     } catch (error) {
-  //       console.error('Error fetching messages:', error);
-  //     }
-  //   };
-
-  // }, []);
-
-  const handleUserClick = async (userId: string, messageId: string, msgFor: string) => {
+  const handleUserClick = async (userId: string, messageId: string, msgFname: string) => {
+    localStorage.setItem("messageTo", msgFname);
+    const getFname = localStorage.getItem("messageTo");
+    setFirstName(getFname);
     removeLocal();
     setLoading(true);
+    setIsChatOpen(true);
     setChatMessages([]);
     const token = getSession();
     if (!token) return;
     try {
-      const messageId = getMessageId();
       const { payload } = await jwtVerify(token, new TextEncoder().encode(JWT_SECRET));
       const userIdFromToken = payload.id as string;
       const userNameFromToken = payload.username as string;
@@ -225,12 +257,12 @@ export const Messages = () => {
 
       const data = await response.json();
       setMessages(data.messages || []);
-      setUserDetails(data.userDetails || []);
       if (data.userDetails && Array.isArray(data.userDetails)) {
         data.userDetails.forEach((userDetail: UserDetail) => {
           const first_name = userDetail.first_name
           localStorage.setItem("user", first_name);
         });
+        setIsChatOpen(true);
       }
     } catch (err: any) {
       setError(err.message);
@@ -240,7 +272,7 @@ export const Messages = () => {
       const getMessageToken = getMessageId();
       console.log("Token ID" + getMessageToken);
       const someoneMessage = messages.filter((msg) => msg.id === messageId);
-      const yourMessage = messages.filter((msg) => (msg.id === userId && msg.for == messageId));
+      const yourMessage = messages.filter((msg) => (msg.id === userId || msg.for == messageId));
 
       const combinedMessages = [...someoneMessage, ...yourMessage];
       const sortedMessages = combinedMessages.sort((a, b) =>
@@ -250,27 +282,22 @@ export const Messages = () => {
       setChatMessages(sortedMessages);
       setIsChatOpen(true);
       setRefreshKey((prev) => prev + 1); // Trigger re-fetch on user click
-    } catch (err) {
-      console.error("Error fetching chat messages:", err);
     } finally {
       setLoading(false);
     }
-  } ;
+  };
 
-  const containerRef = useRef<HTMLDivElement>(null); // Reference to the container
-  const [firstTime, setFirstTime] = useState(true); // State to track the first load
+
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Scroll to bottom logic
     if (containerRef.current) {
       containerRef.current.scrollTop = containerRef.current.scrollHeight;
-      if (firstTime) {
-        setFirstTime(false);
-      }
     }
-  }, [chatMessages]); // Run effect whenever chatMessages changes
+  }, [chatMessages, messageId]);// Run effect whenever chatMessages changes
 
-
+  
 
   const filteredMessages = messages.filter((message) => message.id !== userId);
 
@@ -280,6 +307,7 @@ export const Messages = () => {
     }
     return acc;
   }, {});
+
 
   const latestMessagesArray = Object.values(latestMessages);
   return (
@@ -291,9 +319,25 @@ export const Messages = () => {
           <input
             className="w-full bg-transparent placeholder:text-secondary-2 outline-none"
             type="text"
+            value={input}
+            onChange={handleChange}
             placeholder="Search Direct Messages"
           />
         </div>
+        {suggestions.length > 0 && (
+          <ul className="suggestions-list absolute top-[880px] left-[100px] md:top-[850px] md:left-[120px] lg:top-[740px] xl:top-[710px] bg-white bg-opacity-[0.8] p-2 rounded-md">
+            {suggestions.map((suggestion: UserDetail) => (
+              <li
+                onClick={() => handleSuggestionClick(suggestion)}
+                className="suggestion-item cursor-pointer hover:underline font-bold"
+              >
+                {suggestion.first_name}
+              </li>
+            ))}
+          </ul>
+        )}
+
+
 
         {/* Main Content */}
         <div className="w-full h-[70dvh] flex bg-primary-1 text-primary-2 rounded-xl overflow-hidden">
@@ -308,17 +352,15 @@ export const Messages = () => {
                 <div className="w-full flex flex-col gap-4">
                   {latestMessagesArray.map((msg) => (
                     <div
-                    key={msg.id}
-                    className={`w-full flex items-center gap-2 cursor-pointer ${
-                      msg.id == messageId ? 'bg-blue-500 text-white' : 'text-black'
-                    }`}
-                    onClick={() => {
-                      if (userId) {
-                        handleUserClick(userId, msg.id, msg.for);
-                        console.log("msg CLICK: " + messageId);
-                      }
-                    }}
-                  >
+                      className={`w-full flex items-center gap-2 p-4 rounded-lg cursor-pointer text-primary-2 ${msg.id == messageId ? 'bg-shade-8/60 ' : ''
+                        }`}
+                      onClick={() => {
+                        if (userId) {
+                          handleUserClick(userId, msg.id, msg.first_name);
+                          console.log("msg CLICK: " + messageId);
+                        }
+                      }}
+                    >
                       <div className="w-fit h-fit">
                         <div className="w-10 h-10 rounded-full bg-primary-2 text-secondary-1 flex items-center justify-center">
                           <span className="text-lg font-semibold">{msg.first_name ? msg.first_name[0] : 'U'}</span>
@@ -344,49 +386,90 @@ export const Messages = () => {
 
           {/* Chat Window */}
           {(!isMobile || isChatOpen) && (
-            <div className="w-full h-full border border-primary-3 rounded-r-xl flex flex-col overflow-hidden relative">
-              {isMobile && (
-                <button
-                  className="p-2 m-2 text-secondary-1 absolute top-0 left-0 z-10"
-                  onClick={() => setIsChatOpen(false)}
-                >
-                  <Icon icon="eva:arrow-back-outline" width="35" height="35" />
-                </button>
-              )}
-
-              <div ref={containerRef} className="w-full h-full overflow-y-auto custom-scrollbar lg:p-4 p-2">
-                {loadingMsg ? (
-                  <p>Loading messages...</p>
-                ) : (
-                  chatMessages.length > 0 ? (
-                    chatMessages.map((msg) => (
-                      <div
-                        className={`flex ${msg.id === userId ? 'justify-end' : 'justify-start'} w-full mb-4 `}
-                      >
-                        <div className={`flex ${msg.id === userId ? 'flex-row-reverse' : 'flex-row'} items-end gap-2 overflow-hidden max-w-md md:max-w-lg lg:max-w-sm`}>
-                          <div className="w-fit h-fit">
-                            <div className="w-8 h-8 rounded-full bg-primary-3 flex items-center justify-center relative">
-                              <span className="text-sm font-semibold rounded-full">{msg.first_name ? msg.first_name[0] : 'U'}</span>
-                            </div>
-                          </div>
-
-                          <div className={`w-full p-3 rounded-lg  ${msg.id === userId ? 'bg-shade-3 text-white' : 'bg-gray-200 text-primary-2'}`}>
-                            {/* break all to prevent overflow hahahah english amp*/}
-                            <p className="break-all">
-                              {msg.message}
-                            </p>
-                            <p className="text-[10px] mt-1 opacity-70">{new Date(msg.created_at).toLocaleString()}</p>
-                          </div>
-                        </div>
+            <div className="w-full h-full border border-primary-3 rounded-r-xl flex flex-col overflow-hidden">
+              <div className="h-fit min-h-16 p-2 bg-primary-1 border-b-2 border-primary-3 w-full flex justify-between items-center">
+                <div className="h-fit w-fit">
+                  {chatMessages.length > 0 && getFirstName ? (
+                    <div className="flex items-center gap-2 p-1">
+                      <div className="w-10 h-10 rounded-full bg-primary-2 text-secondary-1 flex items-center justify-center">
+                        <span className="text-lg font-semibold">
+                          {getFirstName?.[0] ?? 'U'}
+                        </span>
                       </div>
-                    ))
+                      <p className="text-lg font-bold">{getFirstName ?? 'User'}</p>
+                    </div>
                   ) : (
-                    <p>Click specific messages to display.</p>
-                  )
+                    <div className="flex items-center gap-2 p-1">
+                      <div className="w-10 h-10 rounded-full bg-gray-200 text-secondary-1 flex items-center justify-center">
+                        <span className="text-lg font-semibold">?</span>
+                      </div>
+                      <p className="text-lg font-bold">Select a user to chat with</p>
+                    </div>
+                  )}
+                </div>
+
+                {isMobile && (
+                  <button
+                    className="text-secondary-1 h-fit z-10"
+                    onClick={() => setIsChatOpen(false)}
+                  >
+                    <Icon icon="eva:arrow-back-outline" width="25" height="25" />
+                  </button>
                 )}
               </div>
 
-              {/* Message Input */}
+
+              {/* Chat Messages Area */}
+              <div ref={containerRef} className="w-full h-full overflow-y-auto custom-scrollbar lg:p-4 p-2">
+                {loadingMsg ? (
+                  <p>Loading messages...</p>
+                ) : chatMessages.length > 0 ? (
+                  <>
+                    {chatMessages
+                      .filter(
+                        (msg) =>
+                          (msg.for == messageId && msg.id == userId) ||
+                          (msg.id == messageId && msg.for == userId)
+                      )
+                      .map((msg, index) => (
+                        <div
+                          key={index}
+                          className={`flex ${msg.id === userId ? 'justify-end' : 'justify-start'
+                            } w-full mb-4`}
+                        >
+                          <div
+                            className={`flex ${msg.id === userId ? 'flex-row-reverse' : 'flex-row'
+                              } items-end gap-2 overflow-hidden max-w-md md:max-w-lg lg:max-w-sm`}
+                          >
+                            <div className="w-fit h-fit">
+                              <div className="w-8 h-8 rounded-full bg-primary-3 flex items-center justify-center relative">
+                                <span className="text-sm font-semibold rounded-full">
+                                  {msg.first_name ? msg.first_name[0] : 'U'}
+                                </span>
+                              </div>
+                            </div>
+
+                            <div
+                              className={`w-full p-3 rounded-lg ${msg.id === userId
+                                ? 'bg-shade-3 text-white'
+                                : 'bg-gray-200 text-primary-2'
+                                }`}
+                            >
+                              <p className="break-all">{msg.message}</p>
+                              <p className="text-[10px] mt-1 opacity-70">
+                                {new Date(msg.created_at).toLocaleString()}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                  </>
+                ) : (
+                  <p>No messages yet. Start the conversation!</p>
+                )}
+              </div>
+
+              {/* Message Input - This part is always shown */}
               <div className="w-full p-4 bg-primary-1">
                 <div className="w-full flex gap-2 justify-between items-center text-primary-2 bg-shade-8 rounded-full px-4">
                   <input
@@ -415,6 +498,7 @@ export const Messages = () => {
               </div>
             </div>
           )}
+
         </div>
       </div>
     </div>
