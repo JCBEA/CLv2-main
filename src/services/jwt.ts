@@ -21,7 +21,11 @@ export const verifyJWT = async (token: string) => {
   try {
     const { payload } = await jwtVerify(token, new TextEncoder().encode(JWT_SECRET));
     return payload; // Returns the payload if verification is successful
-  } catch (error) {
+  } catch (error:any) {
+    if (error.code == 'ERR_JWT_EXPIRED') {
+      console.error('Token expired:', error);
+      throw new Error('Token expired'); // Throw a specific error for expiration
+    }
     console.error('Token verification failed:', error);
     throw new Error('Token verification failed');
   }

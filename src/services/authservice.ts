@@ -48,7 +48,12 @@ export const decryptToken = async (token: string) => {
     const payload = await verifyJWT(token);
     console.log('Decrypted Payload:', payload);
     return payload;
-  } catch (error) {
+  } catch (error:any) {
+    // If the token has expired, remove it from localStorage
+    if (error.message === 'Token expired') {
+      console.log('Token expired, removing from localStorage');
+      localStorage.removeItem('token');
+    }
     console.error('Error decrypting token:', error);
     throw new Error("Failed to decrypt token");
   }
