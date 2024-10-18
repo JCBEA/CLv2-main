@@ -52,6 +52,7 @@ const CollectionDisplay: React.FC<CollectionProps> = ({ collection }) => {
               transition={{ delay: index * 0.1 }}
               className="relative h-64 rounded-lg overflow-hidden shadow-lg cursor-pointer"
               onClick={() => handleImageClick(image)}
+              
             >
               <Image
                 src={image.image_path}
@@ -59,7 +60,7 @@ const CollectionDisplay: React.FC<CollectionProps> = ({ collection }) => {
                 fill
                 style={{ objectFit: 'cover' }}
                 className="transition-transform duration-300 hover:scale-105"
-              />
+              />    
             </motion.div>
           ))}
         </div>

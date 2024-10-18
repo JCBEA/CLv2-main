@@ -14,16 +14,17 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret';
 export interface UserDetail {
   id: string; // Assuming there's an id for user identification
   first_name: string;
-  bday: string;
-  email: string;
+  bday?: string;
+  email?: string;
   creative_field: string;
   address: string;
   mobileNo: string;
-  bio: string;
+  bio?: string;
   instagram: string;
   facebook: string;
   twitter: string;
   portfolioLink: string;
+  profile_pic?:string;
 }
 
 interface UserProfileProps {
@@ -83,7 +84,6 @@ const ProfileDetails: React.FC<{ userDetail: UserDetail }> = ({ userDetail }) =>
           <Icon icon="uit:facebook-f" width="35" height="35" />
           <Icon icon="fluent:mail-28-regular" width="35" height="35" />
         </div>
-        <button onClick={clickLogout} >Logout</button>
       </div>
     </div>
   );

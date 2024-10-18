@@ -7,6 +7,7 @@ import { UserDetail } from "./UserProfile";
 import { supabase } from "@/services/supabaseClient";
 import { getSession } from "@/services/authservice";
 import { jwtVerify } from "jose";
+import Image from 'next/image';
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret';
 interface ProfileModalProps {
     openModal: boolean;
@@ -22,7 +23,6 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
     setFormData
 }) => {
     const [isClosing, setIsClosing] = useState(false);
-
     // Prevent body scroll when modal is open
     useEffect(() => {
         if (openModal) {
@@ -41,49 +41,49 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
-      };
-    
-      const handleSave = async () => {
+    };
+
+    const handleSave = async () => {
         const token = getSession();
-    
+
         // Check if the token exists
         if (!token) {
-          console.error("No token found, user may not be logged in.");
-          return; // Optionally handle unauthorized state here
+            console.error("No token found, user may not be logged in.");
+            return; // Optionally handle unauthorized state here
         }
         try {
-          // Verify the token and handle it appropriately
-          const { payload } = await jwtVerify(token, new TextEncoder().encode(JWT_SECRET));
-    
-          // Log the payload for debugging
-          console.log("Retrieved token payload:", payload.id);
-    
-          const response = await fetch("/api/creatives", {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `${payload.id}`,
-            },
-            body: JSON.stringify({
-              detailsid: payload.id,
-              userDetails: formData,
-            }),
-          });
-    
-          if (!response.ok) {
-            const errorData = await response.json(); // Get the error message
-            console.error("Error response:", errorData);
-            throw new Error(errorData.message);
-          }
-    
-          // Handle success
-          console.log("User details updated successfully");
-          setIsEditing(false); // Exit edit mode
+            // Verify the token and handle it appropriately
+            const { payload } = await jwtVerify(token, new TextEncoder().encode(JWT_SECRET));
+
+            // Log the payload for debugging
+            console.log("Retrieved token payload:", payload.id);
+
+            const response = await fetch("/api/creatives", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `${payload.id}`,
+                },
+                body: JSON.stringify({
+                    detailsid: payload.id,
+                    userDetails: formData,
+                }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json(); // Get the error message
+                console.error("Error response:", errorData);
+                throw new Error(errorData.message);
+            }
+
+            // Handle success
+            console.log("User details updated successfully");
+            setIsEditing(false); // Exit edit mode
         } catch (error) {
-          console.error("Error updating user details:", error);
+            console.error("Error updating user details:", error);
         }
-      };
-    
+    };
+
 
 
 
@@ -108,7 +108,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                     <div className="w-full h-full max-w-[90%] max-h-[90%] md:h-fit flex justify-center items-center x">
                         <motion.div
                             className="bg-primary-1 outline-2 flex flex-col outline-shade-2 outline-none h-full md:p-6 md:pt-10 relative rounded-lg 
-                            shadow-xl w-full md:max-w-screen-xl md:overflow-hidden "
+                                shadow-xl w-full md:max-w-screen-xl md:overflow-hidden "
                             initial={{ scale: 0.9, y: 50, opacity: 0 }}
                             animate={{ scale: 1, y: 0, opacity: 1 }}
                             exit={{ scale: 0.9, y: 50, opacity: 0 }}
@@ -143,9 +143,50 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                                             >
                                                 <div className="h-fit w-fit">
                                                     <div className="w-44 h-44 relative">
-                                                        {/* ${user.profilePic ? userAgent.profilePic : '/images/logo.png'} */}
-                                                        <img className={`w-full h-full rounded-full bg-primary-3`} src="" alt="" />
-                                                        <Icon className="absolute -bottom-0 right-0 bg-secondary-1 rounded-full p-2 cursor-pointer" icon="bxs:camera" width="45" height="45" />
+                                                        {/* Preview the uploaded image */}
+                                                        {formData.profile_pic ? (
+                                                            <Image
+                                                                src={formData.profile_pic}
+                                                                alt={`Image ${formData.profile_pic}`}
+                                                                fill
+                                                                style={{ objectFit: 'cover' }}
+                                                                className="w-full h-full rounded-full"
+                                                            />
+                                                        ) : (
+                                                            <Image
+                                                                src='/images/logo.png'
+                                                                alt='Default profile image'
+                                                                fill
+                                                                style={{ objectFit: 'cover' }}
+                                                                className="w-full h-full rounded-full"
+                                                            />
+                                                        )}
+
+                                                        {/* Hidden file input for image upload */}
+                                                        <input
+                                                            type="file"
+                                                            accept="image/*"
+                                                            className="hidden"
+                                                            onChange={async (e) => {
+                                                                if (e.target.files && e.target.files[0]) {
+                                                                    const file = e.target.files[0];
+                                                                    // Here you can handle the file upload logic
+                                                                    const reader = new FileReader();
+                                                                    reader.onloadend = () => {
+                                                                        setFormData((prev) => ({
+                                                                            ...prev,
+                                                                            profile_pic: reader.result as string, // Preview the uploaded image
+                                                                        }));
+                                                                    };
+                                                                    reader.readAsDataURL(file);
+                                                                }
+                                                            }}
+                                                            id="file-upload"
+                                                        />
+
+                                                        <label htmlFor="file-upload" className="absolute -bottom-0 right-0 bg-secondary-1 rounded-full p-2 cursor-pointer">
+                                                            <Icon icon="bxs:camera" width="45" height="45" />
+                                                        </label>
                                                     </div>
                                                 </div>
                                                 <div className="md:w-[20rem] w-full  flex flex-col gap-2 text-base md:p-0 p-4">
@@ -161,7 +202,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                                                     <div className="w-full flex flex-col gap-1">
                                                         <label className="ml-4" htmlFor="age">Age</label>
                                                         <input
-                                                            type="text"
+                                                            type="date"
                                                             name="bday"
                                                             value={formData.bday}
                                                             onChange={handleInputChange}
