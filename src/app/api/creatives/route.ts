@@ -21,34 +21,57 @@ export async function GET() {
 export async function PUT(req: Request) {
   const authHeader = req.headers.get('Authorization');
   if (!authHeader) {
-      return NextResponse.json({ message: 'No token provided' }, { status: 401 });
+    return NextResponse.json({ message: 'No token provided' }, { status: 401 });
   }
 
   try {
     const payload = authHeader;
-   
-      console.log("Verified token payload:", payload);
+    console.log("Verified token payload:", payload);
 
-      const userId = payload; 
-      const { detailsid, userDetails } = await req.json(); 
+    const userId = payload; // Assuming payload contains the userId
+    const { detailsid, userDetails } = await req.json();
 
-      if (userId != detailsid) {
-          return NextResponse.json({ message: `userID:${userId}  userDetails: ${userDetails} You are not authorized to update these details.` }, { status: 403 });
+    if (userId != detailsid) {
+      return NextResponse.json({ message: `You are not authorized to update these details.` }, { status: 403 });
+    }
+
+    // Update userDetails table
+    const { error: userDetailsError } = await supabase
+      .from('userDetails')
+      .update(userDetails)
+      .eq('detailsid', userId);
+
+    if (userDetailsError) {
+      console.error('Supabase userDetails update error:', userDetailsError);
+      return NextResponse.json({ message: 'Failed to update user details', error: userDetailsError.message }, { status: 500 });
+    }
+    if (userDetails.first_name) {
+      const { error: childCollectionError } = await supabase
+        .from('child_collection')
+        .update({ artist: userDetails.first_name })
+        .eq('childid', userId); 
+
+      if (childCollectionError) {
+        console.error('Supabase child_collection update error:', childCollectionError);
+        return NextResponse.json({ message: 'Failed to update related child collection', error: childCollectionError.message }, { status: 500 });
       }
 
-      const { error } = await supabase
-          .from('userDetails')
-          .update(userDetails)
-          .eq('detailsid', userId);
+      // Update artist in image_collection
+      const { error: imageCollectionError } = await supabase
+        .from('image_collections')
+        .update({ artist: userDetails.first_name }) 
+        .eq('id', userId); 
 
-      if (error) {
-          console.error('Supabase update error:', error);
-          return NextResponse.json({ message: 'Failed to update user details', error: error.message }, { status: 500 });
+      if (imageCollectionError) {
+        console.error('Supabase image_collection update error:', imageCollectionError);
+        return NextResponse.json({ message: 'Failed to update related image collection', error: imageCollectionError.message }, { status: 500 });
       }
+    }
 
-      return NextResponse.json({ message: 'User details updated successfully' }, { status: 200 });
+    return NextResponse.json({ message: 'User details, child collection, and image collection updated successfully' }, { status: 200 });
+
   } catch (error) {
-      console.error('Error in PUT method:', error);
-      return NextResponse.json({ message:'Signature verification failed or error processing the request' }, { status: 500 });
+    console.error('Error in PUT method:', error);
+    return NextResponse.json({ message: 'Signature verification failed or error processing the request' }, { status: 500 });
   }
 }

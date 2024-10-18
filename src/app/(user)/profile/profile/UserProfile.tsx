@@ -106,10 +106,18 @@ const UserDetailDisplay = ({ userDetail }: { userDetail: UserDetail }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState<UserDetail>(userDetail);
 
+ 
+
   // Update form data when userDetail changes
   useEffect(() => {
     setFormData(userDetail);
   }, [userDetail]);
+
+  useEffect(() => {
+    if (formData.first_name) {
+      localStorage.setItem("Fname", formData.first_name);
+    }
+  }, [formData.first_name]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;

@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 export async function PUT(request: Request) {
   const headers = request.headers;
   const userId = headers.get("user-id");
+  const Fname = headers.get("Fname");
 
   // Check if userId is provided
   if (!userId) {
@@ -16,7 +17,7 @@ export async function PUT(request: Request) {
   const title = formData.get("title");
   const desc = formData.get("desc");
   const year = formData.get("year");
-  const artist = formData.get("artist");
+  const artist = Fname
   const imageFile = formData.get("image");
 
   const dataYear = formData.get("year")
@@ -37,7 +38,7 @@ export async function PUT(request: Request) {
   console.log('Title:', title);
   console.log('Description:', desc);
   console.log('Year:', year);
-  console.log('Artist:', artist);
+  console.log('Artist:', Fname);
   console.log('Image File:', imageFile);
 
   // Upload the image to Supabase Storage

@@ -202,6 +202,7 @@ export const logoutUser = () => {
     localStorage.removeItem("messageId");
     localStorage.removeItem("user");
     localStorage.removeItem("messageTo");
+    localStorage.removeItem("Fname");
   }
 };
 

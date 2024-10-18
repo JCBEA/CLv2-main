@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { jwtVerify } from 'jose';
@@ -11,14 +11,22 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret';
 
 export default function PublishGallery() {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [getFname, setFname] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     title: '',
     desc: '',
     year: '',
-    artist: '',
     image: null as File | null,
   });
   const [loading, setLoading] = useState(false); // Add loading state
+
+  const fname = localStorage.getItem("Fname");
+  useEffect(() => {
+    if (fname) {
+     setFname(fname);
+    }
+  }, [fname]);
+
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -55,6 +63,7 @@ export default function PublishGallery() {
 
   const handleUpload = async () => {
     const token = getSession();
+    const Fname = localStorage.getItem("Fname") as string;
     if (!token) return;
 
     setLoading(true); // Set loading to true when upload starts
@@ -68,12 +77,12 @@ export default function PublishGallery() {
       data.append('title', formData.title);
       data.append('desc', formData.desc);
       data.append('year', formData.year);
-      data.append('artist', formData.artist);
 
       const response = await fetch("/api/collections/publish", {
         method: "PUT",
         headers: {
           "user-id": userIdFromToken,
+          "Fname": Fname
         },
         body: data,
       });
@@ -90,7 +99,6 @@ export default function PublishGallery() {
         title: '',
         desc: '',
         year: '',
-        artist: '',
         image: null,
       });
       setPreviewImage(null);
@@ -154,11 +162,6 @@ export default function PublishGallery() {
                 </div>
 
                 <div>
-                  <label htmlFor="artist" className="block text-sm font-medium text-gray-700">Artist</label>
-                  <input type="text" id="artist" name="artist" value={formData.artist} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
-                </div>
-
-                <div>
                   <label htmlFor="desc" className="block text-sm font-medium text-gray-700">Description</label>
                   <textarea id="desc" name="desc" rows={3} value={formData.desc} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
                 </div>
@@ -175,7 +178,7 @@ export default function PublishGallery() {
                       <Image src={previewImage} alt="Preview" width={300} height={200} className="object-cover" />
                       <div className='absolute top-0 left-0 right-0 bottom-0 flex flex-col justify-end p-2 bg-gradient-to-t from-black to-transparent'>
                         <h3 className="text-lg font-bold text-white">{formData.title || "Title"}</h3>
-                        <p className="text-gray-200">by {formData.artist || "Artist"}</p>
+                        <p className="text-gray-200">by {fname}</p>
                       </div>
                     </div>
                     <div className="p-4">
