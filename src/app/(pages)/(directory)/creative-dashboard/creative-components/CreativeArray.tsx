@@ -25,7 +25,7 @@ export const CreativeArray = [
       right: 'right-5',
       left: '',
       translate: '',
-      link: '/creative-services'
+      link: '/services/creative-services'
    },
    {
       id: 2,
@@ -34,7 +34,7 @@ export const CreativeArray = [
       right: '',
       left: '-left-5',
       translate: '',
-      link: '#'
+      link: '/services/digital-interactive-media'
    },
    {
       id: 3,
@@ -43,7 +43,7 @@ export const CreativeArray = [
       right: '-right-0',
       left: '',
       translate: '',
-      link: '#'
+      link: '/services/audiovisual-media'
    },
    {
       id: 4,
@@ -52,7 +52,7 @@ export const CreativeArray = [
       right: '-right-0',
       left: '',
       translate: '',
-      link: '#'
+      link: '/services/design'
    },
    {
       id: 5,
@@ -61,7 +61,7 @@ export const CreativeArray = [
       right: '-right-0',
       left: '',
       translate: '',
-      link: '#'
+      link: '/services/publishing-and-printing-media'
    },
    {
       id: 6,
@@ -70,7 +70,7 @@ export const CreativeArray = [
       right: '',
       left: 'left-1/2',
       translate: '-translate-x-[50%]',
-      link: '#'
+      link: '/services/performing-arts'
    },
    {
       id: 7,
@@ -79,7 +79,7 @@ export const CreativeArray = [
       right: '-right-0',
       left: 'left-1/2',
       translate: '-translate-x-[50%]',
-      link: '#'
+      link: '/services/visual-arts'
    },
    {
       id: 8,
@@ -88,7 +88,7 @@ export const CreativeArray = [
       right: '',
       left: 'left-1/2',
       translate: '-translate-x-[50%]',
-      link: '#'
+      link: '/services/traditional-and-cultural-expressions'
    },
    {
       id: 9,
@@ -97,7 +97,7 @@ export const CreativeArray = [
       right: '',
       left: 'left-1/2',
       translate: '-translate-x-[50%]',
-      link: '#'
+      link: '/services/cultural-sites'
    },
 ];
 

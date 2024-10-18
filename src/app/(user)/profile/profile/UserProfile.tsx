@@ -68,7 +68,7 @@ const ProfileDetails: React.FC<{ userDetail: UserDetail }> = ({ userDetail }) =>
       <div className="-mt-20">
         <div className="w-48 h-48 bg-gray-400 rounded-full overflow-hidden relative">
           <img
-            src={userDetail.profile_pic || "/images/emptyProfile.png"}
+            src={userDetail.profile_pic || "/images/creative-directory/boy.png"}
             alt={`Image of ${userDetail.first_name}`}
             className="w-full h-full object-cover rounded-full" // Ensure it fills the container and keeps the rounded shape
           />

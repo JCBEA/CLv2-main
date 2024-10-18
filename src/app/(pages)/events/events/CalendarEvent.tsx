@@ -62,7 +62,7 @@ export const CalendarEvent: React.FC = () => {
           const { bgColor, textColor } = dateColorMap.get(event.date) || { bgColor: "bg-gray-500", textColor: "text-gray-500" }; // Get colors for the event date
           return (
             <div
-              key={index}
+              key={index + 1}
               className={`event-item text-sm mt-2 ${bgColor} p-2 rounded`}
             >
               <div className="w-full flex flex-col gap-2 justify-center items-center">

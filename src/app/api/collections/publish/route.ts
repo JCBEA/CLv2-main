@@ -3,6 +3,7 @@
 import { supabase } from '@/services/supabaseClient';
 import { NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
+
 export async function PUT(request: Request) {
   const headers = request.headers;
   const userId = headers.get("user-id");
@@ -12,17 +13,15 @@ export async function PUT(request: Request) {
   if (!userId) {
     return NextResponse.json({ error: 'User ID is required.' }, { status: 400 });
   }
-  
+
   const formData = await request.formData();
   const title = formData.get("title");
   const desc = formData.get("desc");
   const year = formData.get("year");
-  const artist = Fname
+  const artist = Fname;
   const imageFile = formData.get("image");
-
-  const dataYear = formData.get("year")
-  const slugid = uuidv4();
-  const slug =`${dataYear}-${slugid}`
+  const slug = `${userId}`;
+  
   // Validate required fields
   if (!title || !desc || !year || !artist || !imageFile) {
     return NextResponse.json({ error: 'All fields are required.' }, { status: 400 });
@@ -64,25 +63,41 @@ export async function PUT(request: Request) {
   const publicURL = data.publicUrl; // Access publicUrl directly
   console.log('Image Path:', publicURL);
 
-  // Insert the record into the database
-  const { data: insertData, error: insertError } = await supabase
-    .from('image_collections') // replace with your actual table name
-    .insert([{ id: userId, title, desc, year, artist,slug, image_path: publicURL }]);
+  // Check if userId already exists in image_collections
+  const { data: existingImageCollection, error: checkError } = await supabase
+    .from('image_collections')
+    .select('*')
+    .eq('id', userId)
+    .single();
 
-  if (insertError) {
-    console.error('Insert Error:', insertError);
-    return NextResponse.json({ error: insertError.message }, { status: 500 });
+  if (checkError && checkError.code !== 'PGRST116') { // Handle error if userId not found
+    console.error('Error checking image collections:', checkError);
+    return NextResponse.json({ error: checkError.message }, { status: 500 });
   }
 
-  const { data: insertData2, error: insertError2 } = await supabase
-    .from('child_collection') // replace with your actual table name
-    .insert([{ childid: userId, title, desc, year, artist,sluger:slug, path: publicURL }]);
+  // Insert into image_collections only if userId does not exist
+  let insertData = null;
+  if (!existingImageCollection) {
+    const { data: insertData1, error: insertError1 } = await supabase
+      .from('image_collections')
+      .insert([{ id: userId, title, desc, year, artist, slug, image_path: publicURL }]);
 
-    if (insertError2) {
-      console.error('Insert Error:', insertError);
-      return NextResponse.json({ error: insertError2.message }, { status: 500 });
+    if (insertError1) {
+      console.error('Insert Error:', insertError1);
+      return NextResponse.json({ error: insertError1.message }, { status: 500 });
     }
-    
-    return NextResponse.json({ message: 'Gallery item published successfully!', data: insertData, data1: insertData2 });
-  
+    insertData = insertData1; // Store data for the response
+  }
+
+  // Insert into child_collection regardless
+  const { data: insertData2, error: insertError2 } = await supabase
+    .from('child_collection')
+    .insert([{ childid: userId, title, desc, year, artist, sluger: slug, path: publicURL }]);
+
+  if (insertError2) {
+    console.error('Insert Error:', insertError2);
+    return NextResponse.json({ error: insertError2.message }, { status: 500 });
+  }
+
+  return NextResponse.json({ message: 'Gallery item published successfully!', data: insertData, data1: insertData2 });
 }

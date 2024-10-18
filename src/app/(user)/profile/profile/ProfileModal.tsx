@@ -171,7 +171,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                                                         <div className="w-44 h-44 relative">
                                                             {/* Preview the uploaded image */}
                                                                 <Image
-                                                                    src={formData.profile_pic || "/images/emptyProfile.png"}
+                                                                    src={formData.profile_pic || "/images/creative-directory/boy.png"}
                                                                     alt={`Image ${formData.profile_pic}`}
                                                                     fill
                                                                     style={{ objectFit: 'cover' }}
