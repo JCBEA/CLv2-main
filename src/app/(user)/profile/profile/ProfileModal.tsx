@@ -36,6 +36,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
     }, [openModal]);
 
 
+    // profile_pic
         const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
             if (e.target.files && e.target.files[0]) {
                 const file = e.target.files[0];
@@ -62,48 +63,54 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
             setFormData((prev) => ({ ...prev, [name]: value }));
         };
 
+
+
+
         const handleSave = async () => {
             const token = getSession();
-
+          
             // Check if the token exists
             if (!token) {
-                console.error("No token found, user may not be logged in.");
-                return; // Optionally handle unauthorized state here
+              console.error("No token found, user may not be logged in.");
+              return; // Optionally handle unauthorized state here
             }
             try {
-                // Verify the token and handle it appropriately
-                const { payload } = await jwtVerify(token, new TextEncoder().encode(JWT_SECRET));
-
-                // Log the payload for debugging
-                console.log("Retrieved token payload:", payload.id);
-
-                const response = await fetch("/api/creatives", {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `${payload.id}`,
-                    },
-                    body: JSON.stringify({
-                        detailsid: payload.id,
-                        userDetails: formData,
-                    }),
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json(); // Get the error message
-                    console.error("Error response:", errorData);
-                    throw new Error(errorData.message);
-                }
-
-                // Handle success
-                console.log("User details updated successfully");
-                setIsEditing(false); // Exit edit mode
+              // Verify the token and handle it appropriately
+              const { payload } = await jwtVerify(token, new TextEncoder().encode(JWT_SECRET));
+          
+              // Log the payload for debugging
+              console.log("Retrieved token payload:", payload.id);
+          
+              const response = await fetch("/api/creatives", {
+                method: "PUT",
+                headers: {
+                  "Content-Type": "application/json",
+                  "Authorization": `${payload.id}`,
+                },
+                body: JSON.stringify({
+                  detailsid: payload.id,
+                  userDetails: formData,
+                }),
+              });
+          
+              if (!response.ok) {
+                const errorData = await response.json(); // Get the error message
+                console.error("Error response:", errorData);
+                throw new Error(errorData.message);
+              }
+          
+              // Assuming your API responds with the updated user details
+              const updatedUserDetail: UserDetail = await response.json(); // Fetch the updated user details
+              setFormData(updatedUserDetail); // Update formData with the new data
+              console.log("User details updated successfully");
+              setIsEditing(false); // Exit edit mode
             } catch (error) {
-                console.error("Error updating user details:", error);
+              console.error("Error updating user details:", error);
             }
-        };
-
-
+          };
+          
+        
+        
 
 
         const handleClose = () => {
@@ -163,23 +170,12 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                                                     <div className="h-fit w-fit">
                                                         <div className="w-44 h-44 relative">
                                                             {/* Preview the uploaded image */}
-                                                            {formData.profile_pic ? (
                                                                 <Image
-                                                                    src={formData.profile_pic}
+                                                                    src={formData.profile_pic || "/images/emptyProfile.png"}
                                                                     alt={`Image ${formData.profile_pic}`}
                                                                     fill
                                                                     style={{ objectFit: 'cover' }}
-                                                                    className="w-full h-full rounded-full"
-                                                                />
-                                                            ) : (
-                                                                <Image
-                                                                    src="/images/logo.png"
-                                                                    alt="Default profile image"
-                                                                    fill
-                                                                    style={{ objectFit: 'cover' }}
-                                                                    className="w-full h-full rounded-full"
-                                                                />
-                                                            )}
+                                                                    className="w-full h-full rounded-full"                                                             />
 
                                                             {/* Hidden file input for image upload */}
                                                             <input

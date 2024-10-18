@@ -1,77 +1,118 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/services/supabaseClient';
-import { jwtVerify } from 'jose';
 
-
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret';
-
-// GET method to retrieve a list of creatives
-export async function GET() {
-  const creatives = [
-    { id: '1', name: 'John Doe', skill: 'Graphic Design', bio: 'Experienced designer based in Legazpi' },
-    { id: '2', name: 'Jane Smith', skill: 'Illustration', bio: 'Freelance illustrator specializing in children\'s books' },
-    { id: '3', name: 'Sean Smith', skill: 'Illustration', bio: 'Freelance illustrator specializing in children\'s books' },
-    // Add more mock creatives as needed
-  ];
-
-  return NextResponse.json(creatives);
-}
-
-// PUT method to update user details based on token
 export async function PUT(req: Request) {
-  const authHeader = req.headers.get('Authorization');
-  if (!authHeader) {
-    return NextResponse.json({ message: 'No token provided' }, { status: 401 });
-  }
+    console.log("PUT request received");
 
-  try {
-    const payload = authHeader;
-    console.log("Verified token payload:", payload);
-
-    const userId = payload; // Assuming payload contains the userId
-    const { detailsid, userDetails } = await req.json();
-
-    if (userId != detailsid) {
-      return NextResponse.json({ message: `You are not authorized to update these details.` }, { status: 403 });
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+        console.log("No Authorization header found");
+        return NextResponse.json({ message: 'No token provided' }, { status: 401 });
     }
 
-    // Update userDetails table
-    const { error: userDetailsError } = await supabase
-      .from('userDetails')
-      .update(userDetails)
-      .eq('detailsid', userId);
+    try {
+        const userId = authHeader;
+        console.log("UserId from Authorization:", userId);
 
-    if (userDetailsError) {
-      console.error('Supabase userDetails update error:', userDetailsError);
-      return NextResponse.json({ message: 'Failed to update user details', error: userDetailsError.message }, { status: 500 });
+        const body = await req.json();
+        console.log("Request body:", body);
+
+        const { detailsid, userDetails, profilePicFile } = body;
+
+        if (!userId) {
+            console.log("Authorization mismatch");
+            return NextResponse.json({ message: `You are not authorized to update these details.` }, { status: 403 });
+        }
+
+        let profilePicUrl = null;
+
+        if (profilePicFile) {
+            console.log("Profile pic file found, attempting upload");
+
+            // Check if profilePicFile is in correct format
+            if (!profilePicFile.startsWith('data:')) {
+                console.error('Invalid image format:', profilePicFile);
+                return NextResponse.json({ message: 'Invalid image format', status: 400 });
+            }
+
+            // Determine file extension based on MIME type
+            const mimeType = profilePicFile.split(';')[0].split(':')[1];
+            const fileExtension = mimeType === 'image/png' ? 'png' : 'jpg'; // Adjust this logic for other formats if needed
+            const fileName = `${userId}-${Date.now()}.${fileExtension}`;
+            console.log("Generated file name:", fileName);
+
+            // Upload to Supabase
+            const { data: storageData, error: storageError } = await supabase
+                .storage
+                .from('profile')
+                .upload(fileName, Buffer.from(profilePicFile.split(',')[1], 'base64'), {
+                    contentType: mimeType,
+                });
+
+            if (storageError) {
+                console.error('Failed to upload profile picture:', storageError);
+                return NextResponse.json({ message: 'Failed to upload profile picture', error: storageError.message }, { status: 500 });
+            }
+
+            console.log("Profile pic uploaded successfully");
+
+            // Retrieve public URL
+            const { data: publicUrlData } = supabase
+                .storage
+                .from('profile')
+                .getPublicUrl(fileName);
+
+            profilePicUrl = publicUrlData.publicUrl;
+            console.log("Profile pic URL:", profilePicUrl);
+        } else {
+            console.log("No profile pic file found in request");
+        }
+
+        // Merge the profilePicUrl into the userDetails object
+        const updatedUserDetails = { ...userDetails, profile_pic: profilePicUrl || userDetails.profile_pic };
+        console.log("Updated user details:", updatedUserDetails);
+
+        // Update user details in Supabase
+        const { data: updatedData, error: userDetailsError } = await supabase
+            .from('userDetails')
+            .update(updatedUserDetails)
+            .eq('detailsid', userId)
+            .select();
+
+        if (userDetailsError) {
+            console.error('Supabase userDetails update error:', userDetailsError);
+            return NextResponse.json({ message: 'Failed to update user details', error: userDetailsError.message }, { status: 500 });
+        }
+
+        console.log("User details updated successfully:", updatedData);
+
+        // Update related collections if first_name exists
+        if (userDetails.first_name) {
+            console.log("Updating related collections");
+
+            const { error: childCollectionError } = await supabase
+                .from('child_collection')
+                .update({ artist: userDetails.first_name })
+                .eq('childid', userId);
+
+            if (childCollectionError) {
+                console.error('Supabase child_collection update error:', childCollectionError);
+            }
+
+            const { error: imageCollectionError } = await supabase
+                .from('image_collections')
+                .update({ artist: userDetails.first_name })
+                .eq('id', userId);
+
+            if (imageCollectionError) {
+                console.error('Supabase image_collection update error:', imageCollectionError);
+            }
+        }
+
+        return NextResponse.json({ message: 'User details and profile picture updated successfully', profilePicUrl, updatedData }, { status: 200 });
+
+    } catch (error: any) {
+        console.error('Error in PUT method:', error);
+        return NextResponse.json({ message: 'Error processing the request', error: error.message }, { status: 500 });
     }
-    if (userDetails.first_name) {
-      const { error: childCollectionError } = await supabase
-        .from('child_collection')
-        .update({ artist: userDetails.first_name })
-        .eq('childid', userId); 
-
-      if (childCollectionError) {
-        console.error('Supabase child_collection update error:', childCollectionError);
-        return NextResponse.json({ message: 'Failed to update related child collection', error: childCollectionError.message }, { status: 500 });
-      }
-
-      // Update artist in image_collection
-      const { error: imageCollectionError } = await supabase
-        .from('image_collections')
-        .update({ artist: userDetails.first_name }) 
-        .eq('id', userId); 
-
-      if (imageCollectionError) {
-        console.error('Supabase image_collection update error:', imageCollectionError);
-        return NextResponse.json({ message: 'Failed to update related image collection', error: imageCollectionError.message }, { status: 500 });
-      }
-    }
-
-    return NextResponse.json({ message: 'User details, child collection, and image collection updated successfully' }, { status: 200 });
-
-  } catch (error) {
-    console.error('Error in PUT method:', error);
-    return NextResponse.json({ message: 'Signature verification failed or error processing the request' }, { status: 500 });
-  }
 }

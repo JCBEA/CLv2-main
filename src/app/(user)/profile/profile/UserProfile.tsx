@@ -9,6 +9,7 @@ import { logoutUser } from "@/services/authservice";
 import { useRouter } from 'next/navigation';
 import { getSession } from "@/services/authservice";
 import { ProfileModal } from "./ProfileModal";
+import Image from 'next/image';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret';
 export interface UserDetail {
@@ -24,7 +25,7 @@ export interface UserDetail {
   facebook: string;
   twitter: string;
   portfolioLink: string;
-  profile_pic?:string;
+  profile_pic?: string;
 }
 
 interface UserProfileProps {
@@ -62,30 +63,27 @@ export const UserProfile: React.FC<UserProfileProps> = ({ userDetail }) => {
 };
 
 const ProfileDetails: React.FC<{ userDetail: UserDetail }> = ({ userDetail }) => {
-  const router = useRouter();
-  const clickLogout = async () => {
-    try {
-      await logoutUser(); // Assuming this is a function that logs out the user
-      router.push('/'); // Redirect to home after logout
-    } catch (error) {
-      console.error('Logout failed', error);
-    }
-
-  }
   return (
-    <div className="w-full md:max-w-[80%] mx-auto flex lg:flex-row flex-col justify-start lg:items-start items-center gap-8 lg:h-36 h-fit text-secondary-1">
-      <div className="-mt-20">
-        <div className="w-48 h-48 bg-gray-400 rounded-full aspect-square"></div>
-      </div>
-      <div className="h-full w-full flex lg:flex-row flex-col lg:justify-start justify-center lg:gap-12 gap-4 items-center lg:mt-4 lg:pb-0 pb-4">
-        <h1 className="text-3xl font-bold">{userDetail.first_name},</h1>
-        <div className="flex flex-row justify-row items-center gap-4">
-          <Icon icon="circum:instagram" width="35" height="35" />
-          <Icon icon="uit:facebook-f" width="35" height="35" />
-          <Icon icon="fluent:mail-28-regular" width="35" height="35" />
-        </div>
-      </div>
+<div className="w-full md:max-w-[80%] mx-auto flex lg:flex-row flex-col justify-start lg:items-start items-center gap-8 lg:h-36 h-fit text-secondary-1">
+  <div className="-mt-20">
+    <div className="w-48 h-48 bg-gray-400 rounded-full overflow-hidden relative"> {/* Make sure to add 'relative' */}
+      <Image
+        src={userDetail.profile_pic || "/images/emptyProfile.png"}
+        alt={`Image of ${userDetail.first_name}`}
+        layout="fill" // Ensures the image fills the parent container
+        objectFit="cover" // Ensures the image covers the entire area
+      />
     </div>
+  </div>
+  <div className="h-full w-full flex lg:flex-row flex-col lg:justify-start justify-center lg:gap-12 gap-4 items-center lg:mt-4 lg:pb-0 pb-4">
+    <h1 className="text-3xl font-bold">{userDetail.first_name},</h1>
+    <div className="flex flex-row justify-row items-center gap-4">
+      <Icon icon="circum:instagram" width="35" height="35" />
+      <Icon icon="uit:facebook-f" width="35" height="35" />
+      <Icon icon="fluent:mail-28-regular" width="35" height="35" />
+    </div>
+  </div>
+</div>
   );
 };
 
@@ -106,7 +104,7 @@ const UserDetailDisplay = ({ userDetail }: { userDetail: UserDetail }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState<UserDetail>(userDetail);
 
- 
+
 
   // Update form data when userDetail changes
   useEffect(() => {
@@ -168,11 +166,11 @@ const UserDetailDisplay = ({ userDetail }: { userDetail: UserDetail }) => {
   const [openModal, setOpenModal] = useState<boolean>(false);
 
   const openProfileModal = () => {
-      setOpenModal(true);
+    setOpenModal(true);
   };
 
   const closeProfileModal = () => {
-      setOpenModal(false);
+    setOpenModal(false);
   };
   return (
     <>
@@ -245,15 +243,15 @@ const UserDetailDisplay = ({ userDetail }: { userDetail: UserDetail }) => {
             onClick={openProfileModal}
           />
 
-         {/* Pass formData to ProfileModal */}
-        {openModal && (
-          <ProfileModal
-            openModal={openModal}
-            setOpenModal={closeProfileModal}
-            formData={formData} // Passing formData as prop
-            setFormData={setFormData} // Passing setFormData to update in modal
-          />
-        )}
+          {/* Pass formData to ProfileModal */}
+          {openModal && (
+            <ProfileModal
+              openModal={openModal}
+              setOpenModal={closeProfileModal}
+              formData={formData} // Passing formData as prop
+              setFormData={setFormData} // Passing setFormData to update in modal
+            />
+          )}
         </div>
       )}
     </>
