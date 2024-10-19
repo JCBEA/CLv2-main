@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { supabase } from '@/services/supabaseClient'; // Adjust the import path as needed
 import CollectionDisplay from './CollectionDisplay'; // Adjust the import path to your component
+import { Icon } from '@iconify/react/dist/iconify.js';
 
 // Define the CollectionProps interface
 interface CollectionProps {
@@ -53,5 +54,9 @@ export default async function ViewCollectionPage({ params }: { params: { slug: s
     notFound();
   }
 
-  return <CollectionDisplay collection={collectionData.collection} />;
+  return (
+    <div className='h-fit w-full py-[15dvh] max-w-[80%] mx-auto border border-black'>
+      <CollectionDisplay collection={collectionData.collection} />
+    </div>
+  )
 }

@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import { Icon } from "@iconify/react/dist/iconify.js";
 
 interface CollectionProps {
   collection: {
@@ -24,8 +25,9 @@ const CollectionDisplay: React.FC<CollectionProps> = ({ collection }) => {
   };
 
   return (
-    <div className="bg-white min-h-screen pt-32">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div className="bg-white min-h-screen w-full relative">
+      <Icon onClick={() => window.history.back()} className='absolute top-0 right-4 cursor-pointer' icon="ion:arrow-back" width="35" height="35" />
+      <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
         <motion.h1
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
