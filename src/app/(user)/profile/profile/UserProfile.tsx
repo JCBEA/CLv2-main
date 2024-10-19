@@ -8,7 +8,7 @@ import { jwtVerify } from 'jose';
 import { logoutUser } from "@/services/authservice";
 import { useRouter } from 'next/navigation';
 import { getSession } from "@/services/authservice";
-import { ProfileModal } from "./ProfileModal";
+import { ProfileModal } from "./(modals)/ProfileModal";
 import Image from 'next/image';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret';

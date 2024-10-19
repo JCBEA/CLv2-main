@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Icon } from '@iconify/react';
+import { CalendarModal } from './(modals)/CalendarModal';
 
 const daysOfWeek = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
 export const Calendar: React.FC = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [isModalOpen, setIsModalOpen] = useState(false); // Modal open state
+  const [selectedDay, setSelectedDay] = useState<Date | null>(null); // Selected day
 
   useEffect(() => {
-    // Set the time to the start of the day to avoid any time zone issues
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     setCurrentDate(today);
@@ -19,6 +21,19 @@ export const Calendar: React.FC = () => {
 
   const nextMonth = () => {
     setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
+  };
+
+  const handleDayClick = (day: number) => {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    const selectedDate = new Date(year, month, day); // Create Date object for the selected day
+    setSelectedDay(selectedDate); // Set the clicked day as selected
+    setIsModalOpen(true); // Open the modal
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false); // Close the modal
+    setSelectedDay(null);  // Reset the selected day
   };
 
   const renderCalendarDays = () => {
@@ -42,7 +57,11 @@ export const Calendar: React.FC = () => {
     // Add cells for the days of the month
     for (let day = 1; day <= daysInMonth; day++) {
       days.push(
-        <div key={day} className="calendar-day border border-gray-700 flex items-start justify-start p-2">
+        <div
+          key={day}
+          className="calendar-day border border-gray-700 flex items-start justify-start p-2 cursor-pointer"
+          onClick={() => handleDayClick(day)}  // Open modal when clicked
+        >
           {day}
         </div>
       );
@@ -53,6 +72,9 @@ export const Calendar: React.FC = () => {
 
   return (
     <div className="w-full md:p-6 bg-shade-1 rounded-b-xl">
+      {/* Pass the selectedDay as a Date object */}
+      <CalendarModal isOpen={isModalOpen} onClose={closeModal} closeHandler={closeModal} selectedDay={selectedDay ?? new Date()} />
+      
       <div className="w-full flex flex-col p-4 rounded-lg">
         <div className="w-fit gap-8 flex justify-between items-center mb-8 mx-auto">
           <button onClick={prevMonth} className="cursor-pointer">
@@ -65,7 +87,8 @@ export const Calendar: React.FC = () => {
             <Icon icon="ph:arrow-left" className="rotate-180" width="35" height="35" />
           </button>
         </div>
-        <div className="w-full h-[70dvh] grid grid-cols-7 auto-rows-fr gap-0 bg-orange-200"> 
+
+        <div className="w-full h-[70dvh] grid grid-cols-7 auto-rows-fr gap-0 bg-orange-200">
           {daysOfWeek.map((day) => (
             <div
               key={day}
