@@ -7,10 +7,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { getSession } from '@/services/authservice';
 import { jwtVerify } from 'jose';
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret';
+
 interface Collection {
   id: string; // or number, depending on your schema
   image_path: string;
-  artist:string;
+  artist: string;
   title: string;
   desc: string;
   slug: string;
@@ -18,15 +19,15 @@ interface Collection {
 
 export default function CollectionsCarousel() {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [collections, setCollections] = useState<Collection[]>([]); // Specify the type here
-
+  const [collections, setCollections] = useState<Collection[]>([]);
+  const [loading, setLoading] = useState(true); // Add loading state
 
   // Fetch image collections when the component mounts
   useEffect(() => {
     const fetchCollections = async () => {
       try {
         const token = getSession();
-        if(!token) return;
+        if (!token) return;
         const { payload } = await jwtVerify(token, new TextEncoder().encode(JWT_SECRET));
         const userId = payload.id as string;
         const response = await fetch('/api/session_collection', {
@@ -44,6 +45,8 @@ export default function CollectionsCarousel() {
         setCollections(data.messages); // Update state with the fetched collections
       } catch (error) {
         console.error('Error fetching collections:', error);
+      } finally {
+        setLoading(false); // Set loading to false after fetching
       }
     };
 
@@ -58,8 +61,32 @@ export default function CollectionsCarousel() {
     setCurrentIndex((prevIndex) => (prevIndex - 1 + collections.length) % collections.length);
   };
 
-  if (collections.length === 0) {
+  if (loading) { // Check loading state
     return <div className="text-center">Loading collections...</div>;
+  }
+
+  if (collections.length === 0) {
+    return (
+      <div className="text-center">
+        No collections found.
+        <motion.div 
+          className="mt-16 text-center"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          <Link href="/g-user/publish">
+            <motion.button
+              whileHover={{ scale: 1.05, boxShadow: "0 10px 20px rgba(0,0,0,0.1)" }}
+              whileTap={{ scale: 0.95 }}
+              className="bg-gray-600 text-white px-8 py-4 rounded-full text-lg font-bold hover:bg-gray-700 transition duration-300 shadow-lg"
+            >
+              ADD MORE COLLECTIONS
+            </motion.button>
+          </Link>
+        </motion.div>
+      </div>
+    );
   }
 
   return (
@@ -92,7 +119,7 @@ export default function CollectionsCarousel() {
               >
                 <div className="w-full md:w-1/2 h-64 md:h-full relative">
                   <Image
-                    src={collections[currentIndex].image_path} // Now it should be typed correctly
+                    src={collections[currentIndex].image_path}
                     alt={collections[currentIndex].title}
                     layout="fill"
                     objectFit="cover"
@@ -147,7 +174,7 @@ export default function CollectionsCarousel() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </button>
-        </div>           
+        </div>
         <motion.div 
           className="mt-16 text-center"
           initial={{ opacity: 0, y: 20 }}

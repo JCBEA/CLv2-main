@@ -76,10 +76,10 @@ export const Form = () => {
             localStorage.setItem("token", user.token); // Example: Store JWT in localStorage
             router.push("/profile");
         }
-    } catch (err) {
+    } catch (err:any) {
         console.error(err);
-        toast.error("Invalid username or password", { position: "bottom-center" });
-        setError("Invalid username or password");
+        toast.error(err.message, { position: "bottom-center" });
+        setError(err.message);
     } finally {
         setLoading(false);
     }

@@ -3,29 +3,50 @@ import { supabase } from '@/services/supabaseClient';
 import bcrypt from 'bcryptjs';
 import { createJWT, verifyJWT } from './jwt'; // Import createJWT and verifyJWT
 import { NextResponse } from 'next/server';
+
 export const loginUser = async (username: string, password: string) => {
   console.log("Attempting login with:", { username, password });
 
-  const { data, error } = await supabase
+  // Step 1: Get user data from the 'users' table
+  const { data: userData, error: userError } = await supabase
     .from("users")
     .select("id, username, password")
     .eq("username", username)
     .single();
 
-  if (error || !data) {
+  if (userError || !userData) {
     console.log("Login failed: User not found");
     throw new Error("Invalid username or password");
   }
 
-  const isPasswordMatch = await bcrypt.compare(password, data.password);
+  // Step 2: Check if the password matches
+  const isPasswordMatch = await bcrypt.compare(password, userData.password);
   if (!isPasswordMatch) {
     console.log("Login failed: Incorrect password");
     throw new Error("Invalid username or password");
   }
 
-  // Create JWT upon successful login
-  const token = await createJWT({ id: data.id, username: data.username });
-  console.log("Login successful:", { id: data.id, username: data.username, token });
+  // Step 3: Check user status from 'userDetails' table
+  const { data: userDetails, error: userDetailsError } = await supabase
+    .from("userDetails")
+    .select("status")
+    .eq("detailsid", userData.id)
+    .single();
+
+  if (userDetailsError || !userDetails) {
+    console.log("Login failed: Unable to fetch user details");
+    throw new Error("User details not found");
+  }
+
+  // Step 4: Check if the user account is approved (status is true)
+  if (!userDetails.status) {
+    console.log("Login failed: Account not approved");
+    throw new Error("Not authenticated, please wait to approve your account");
+  }
+
+  // Step 5: Create JWT upon successful login
+  const token = await createJWT({ id: userData.id, username: userData.username });
+  console.log("Login successful:", { id: userData.id, username: userData.username, token });
 
   // Decrypt and log the token payload
   try {
@@ -35,8 +56,9 @@ export const loginUser = async (username: string, password: string) => {
     console.error('Failed to decrypt token:', error);
   }
 
-  return { id: data.id, username: data.username, token };
+  return { id: userData.id, username: userData.username, token };
 };
+
 
 export const decryptToken = async (token: string) => {
   if (!token) {
@@ -71,7 +93,7 @@ export const signupUser = async (
   instagram: string,
   facebook: string,
   twitter: string,
-  portfolioLink: string
+  portfolioLink: string,
 ) => {
   console.log("Attempting signup with:", { username, email });
 
@@ -81,7 +103,7 @@ export const signupUser = async (
   // Insert the new user into the 'users' table
   const { data: userData, error: userError } = await supabase
     .from("users")
-    .insert([{ username, email, password: hashedPassword }])
+    .insert([{ username, email, password: hashedPassword}])
     .select("id, username")
     .single();
 
@@ -96,7 +118,7 @@ export const signupUser = async (
   const { error: detailsError } = await supabase
     .from("userDetails")
     .insert([{
-      detailsid: userData.id, // Use the ID from the 'users' table as a foreign key
+      detailsid: userData.id, 
       first_name: firstName,
       creative_field: creativeField,
       address: address,
@@ -105,7 +127,8 @@ export const signupUser = async (
       instagram: instagram,
       facebook: facebook,
       twitter: twitter,
-      portfolioLink: portfolioLink
+      portfolioLink: portfolioLink,
+      status:false
     }]);
 
   if (detailsError) {

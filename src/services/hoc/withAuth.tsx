@@ -43,11 +43,15 @@ const withAuth = (WrappedComponent: React.ComponentType<{ userDetail: UserDetail
                         .from("userDetails")
                         .select("*")
                         .eq("detailsid", payload.id)
+                        .eq("status", true)
                         .single();
 
                     if (error || !data) {
                         console.log("User details not found. Redirecting to login.");
-                        router.push('/signup');
+                        if(token){
+                            localStorage.removeItem('token'); 
+                            }
+                        router.push('/signin');
                         return;
                     }
 
