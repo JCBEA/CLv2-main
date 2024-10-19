@@ -1,3 +1,5 @@
+"use client"
+import useAuthRedirect from '@/services/hoc/auth';
 import React from 'react';
 
 interface CollectionProps {
@@ -11,8 +13,10 @@ interface CollectionProps {
 }
 
 const CollectionDisplay: React.FC<CollectionProps> = ({ collection }) => {
+  useAuthRedirect();    //authguard
+  if(collection){
   const { title, description, images, artist, year } = collection;
-
+  
   return (
     <div>
       <h1>{title}</h1>
@@ -27,6 +31,7 @@ const CollectionDisplay: React.FC<CollectionProps> = ({ collection }) => {
       </div>
     </div>
   );
+}
 };
 
 export default CollectionDisplay;

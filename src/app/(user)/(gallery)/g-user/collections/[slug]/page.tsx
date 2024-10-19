@@ -7,11 +7,13 @@ import { Icon } from '@iconify/react/dist/iconify.js';
 interface CollectionProps {
   collection: {
     images: {
+      generatedId:string;
       image_path: string;
       title: string;
       desc: string;
       artist: string;
       year: string;
+      childid:string
     }[];
   };
 }
@@ -26,17 +28,20 @@ async function getCollection(slug: string) {
     console.error('Error fetching collection:', error);
     return null;
   }
+  
 
   if (data && data.length > 0) {
     const collection = data[0];
 
     // Map the images correctly according to the CollectionProps interface
     const images = data.map(item => ({
+      generatedId:item.generatedId,
       image_path: item.path, // Assuming 'path' is the correct field for the image URL
       title: item.title,     // Adjust these fields according to your actual data structure
       desc: item.desc,
       artist: item.artist,
       year: item.year,
+      childid:item.childid
     }));
 
     return {
