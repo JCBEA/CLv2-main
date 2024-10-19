@@ -7,6 +7,7 @@ import { deleteCollectionItem } from "@/services/Collections/deleteCollection";
 import { getSession } from "@/services/authservice";
 import { jwtVerify } from "jose";
 import { useRouter } from "next/navigation";
+import useAuthRedirect from "@/services/hoc/auth";
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret';
 
 interface CollectionProps {
@@ -39,7 +40,7 @@ const CollectionDisplay: React.FC<CollectionProps> = ({ collection }) => {
   const handleImageClick = (image: typeof selectedImage) => {
     setSelectedImage(image);
   };
-
+  useAuthRedirect();    //authguard
 
   
   useEffect(() => {

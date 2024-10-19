@@ -1,4 +1,5 @@
 // src/services/hoc/withAuth.tsx
+"use client"
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation'; 
 import { decryptToken } from '@/services/authservice'; 
