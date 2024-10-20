@@ -1,42 +1,61 @@
+import { getSession } from "@/services/authservice";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { motion } from "framer-motion";
+import { jwtVerify } from "jose";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 
-interface EditCollectionProps {
-  image: string | null; // Pass selected image
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret';
+
+interface FormData {
+  created_at: Date;
   title: string;
-  description: string;
+  desc: string;
   year: number;
-  generatedId: string; // Add generatedId prop
-  userId: string; // Add userId prop
-  onEdit: () => void; // Modify this to not pass updatedData here
-  onCancel: () => void;
+  artist: string;
+  image: File | null; // Keep image property as File
 }
 
+interface EditCollectionProps {
+  created_at: Date;
+  image: string | null;
+  title: string;
+  desc: string;
+  year: number;
+  artist: string;
+  onEdit: (updatedData: Omit<FormData, 'image'> & { image_path: string | null }) => void; // Update type here
+  onCancel: () => void;
+}
 export const EditCollection = ({
+  created_at,
   image,
   title,
-  description,
+  desc,
   year,
-  generatedId,
-  userId,
+  artist,
   onEdit,
   onCancel,
 }: EditCollectionProps) => {
   const [previewImage, setPreviewImage] = useState<string | null>(image);
-  const [formData, setFormData] = useState({
+  const [originalImage, setOriginalImage] = useState<string | null>(image); // Track the original image
+  const [imageFileName, setImageFileName] = useState<string | null>(null);
+  const [formData, setFormData] = useState<FormData>({
+    created_at,
     title,
-    description,
+    desc,
     year,
+    artist,
+    image: null, // Initialize image as null
   });
 
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setPreviewImage(image);
-    setFormData({ title, description, year });
-  }, [image, title, description, year]);
+    setOriginalImage(image); // Set original image
+    setPreviewImage(image);
+    setFormData({ created_at, title, desc, year, image: null, artist }); // Reset image in formData
+  }, [image, title, desc, year]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -44,48 +63,82 @@ export const EditCollection = ({
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const setImagePreview = (file: File) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreviewImage(reader.result as string);
+      setImageFileName(file.name);
+    };
+    reader.readAsDataURL(file);
+    setFormData({ ...formData, image: file }); // Update form data with selected file
+  };
+
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      setPreviewImage(URL.createObjectURL(file));
+      setImagePreview(file);
     }
   };
 
   const handleSubmit = async () => {
     setLoading(true);
+    const token = getSession();
+    if (!token) return;
+  
     try {
-      const response = await fetch(`/api/update-collection/${generatedId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userId,
-          updatedData: {
-            title: formData.title,
-            description: formData.description,
-            year: formData.year,
-            image: previewImage,
-          },
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to update collection");
+      const { payload } = await jwtVerify(token, new TextEncoder().encode(JWT_SECRET));
+      const userIdFromToken = payload.id as string; // Get user ID from the JWT
+  
+      const data = new FormData();
+  
+      // Always append the required fields
+      data.append('title', formData.title);
+      data.append('desc', formData.desc);
+      data.append('year', formData.year.toString());
+      data.append('artist', formData.artist);
+      data.append('created_at', formData.created_at.toString());
+      data.append('imageBefore', originalImage || '');
+      // Append the image only if it exists and is different from the original image
+      if (formData.image) {
+        console.log("Image passing " + formData.image.name);
+        data.append('image', formData.image); // Append new image
+      } else if (previewImage) { // Check if previewImage is not null
+        const response = await fetch(previewImage); // Make sure previewImage is defined
+        const blob = await response.blob();
+        data.append('image', blob, imageFileName || 'image.png'); // Use the filename
+      } else {
+        throw new Error("No image available for upload."); // Handle the case where no image is provided
       }
-
-      // Call onEdit to refresh or update the UI if needed
-      onEdit();
-      alert(data.message);
+  
+      const response = await fetch(`/api/collections/updateCollection`, {
+        method: 'PUT',
+        body: data,
+        headers: {
+          "userId": userIdFromToken,
+        },
+      });
+  
+      const responseData = await response.json();
+  
+      if (!response.ok) {
+        throw new Error(responseData.error || 'Failed to update collection');
+      }
+  
+      onEdit({
+        created_at: formData.created_at,
+        title: formData.title,
+        desc: formData.desc,
+        year: formData.year,
+        artist: formData.artist,
+        image_path: previewImage ? previewImage : originalImage // Keep the original if no new image
+      });
     } catch (error) {
-      console.error("Error updating collection:", error);
-      alert("Error updating collection: " + error);
+      console.error('Error updating collection:', error);
     } finally {
       setLoading(false);
     }
   };
+  
 
   return (
     <motion.div
@@ -193,58 +246,45 @@ export const EditCollection = ({
                 />
               </div>
 
-              <div>
-                <label
-                  htmlFor="description"
-                  className="block text-sm font-medium text-primary-2"
-                >
-                  Description
-                </label>
-                <textarea
-                  id="description"
-                  name="description"
-                  value={formData.description}
-                  onChange={handleChange}
-                  rows={3}
-                  className="mt-1 block w-full border resize-none border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                ></textarea>
+                <div>
+                  <label
+                    htmlFor="desc"
+                    className="block text-sm font-medium text-primary-2"
+                  >
+                    description
+                  </label>
+                  <textarea
+                    id="desc"
+                    name="desc"
+                    value={formData.desc}
+                    onChange={handleChange}
+                    rows={3}
+                    className="mt-1 block w-full border resize-none border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  ></textarea>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Right Column */}
-          <div>
-            <div className="mb-4 flex flex-col gap-4">
-              <h3 className="text-xl font-bold">Publication Preview</h3>
-              {previewImage ? (
-                <div className="bg-white rounded-lg shadow-md overflow-hidden w-[300px] h-[400]">
-                  <div className="overflow-hidden w-[300px] relative">
-                    <Image
-                      src={previewImage}
-                      alt="Preview"
-                      width={300}
-                      height={200}
-                      className="object-cover"
-                    />
-                    <div className="absolute top-0 left-0 right-0 bottom-0 flex flex-col justify-end p-2 bg-gradient-to-t from-black to-transparent">
-                      <h3 className="text-lg font-bold text-white">
-                        {formData.title || "Title"}
-                      </h3>
-                      <p className="text-gray-200">by Author Name</p>
+            {/* Right Column */}
+            <div>
+              <div className="mb-4">
+                {previewImage ? (
+                  <div className="bg-white rounded-lg shadow-md overflow-hidden w-[300px] h-[400]">
+                    <div className='overflow-hidden w-[300px] relative'>
+                      <Image src={previewImage} alt="Preview" width={300} height={200} className="object-cover" />
+                      <div className='absolute top-0 left-0 right-0 bottom-0 flex flex-col justify-end p-2 bg-gradient-to-t from-black to-transparent'>
+                        <h3 className="text-lg font-bold text-white">{formData.title || "Title"}</h3>
+                        <p className="text-gray-200">by {formData.artist}</p>
+                      </div>
+                    </div>
+                    <div className="p-4">
+                      <p className="mt-2 text-gray-800 break-words">{formData.desc || "desc"}</p>
                     </div>
                   </div>
-                  <div className="p-4">
-                    <p className="mt-2 text-gray-800 break-words">
-                      {formData.description || "Description"}
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <p className="text-gray-500">
-                  Upload an image to see the preview.
-                </p>
-              )}
-            </div>
+                ) : (
+                  <p className="text-gray-500">Upload an image to see the preview.</p>
+                )}
+              </div>
 
             <motion.button
               onClick={handleSubmit}
@@ -258,3 +298,4 @@ export const EditCollection = ({
     </motion.div>
   );
 };
+
