@@ -128,8 +128,10 @@ const CollectionDisplay: React.FC<CollectionProps> = ({ collection }) => {
   }) => {
     if (!selectedImage) return;
 
+
     const token = getSession();
     if (!token) return;
+
 
     try {
       const { payload } = await jwtVerify(
@@ -138,9 +140,11 @@ const CollectionDisplay: React.FC<CollectionProps> = ({ collection }) => {
       );
       const userId = payload.id as string;
 
+
       toast.success("Collection updated successfully!", {
         position: "bottom-right",
       });
+
 
       // Ensure image_path is not null, provide a fallback value if needed
       const updatedImages = images.map((img) =>
@@ -154,12 +158,14 @@ const CollectionDisplay: React.FC<CollectionProps> = ({ collection }) => {
       );
       setImages(updatedImages);
 
+
       // Update the selected image with new values
       setSelectedImage({
         ...selectedImage,
         ...updatedData,
         image_path: updatedData.image_path || "/images/default.jpg", // Fallback value
       });
+
 
       // Close the modal after editing
       setEditModalOpen(false);
@@ -203,19 +209,18 @@ const CollectionDisplay: React.FC<CollectionProps> = ({ collection }) => {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: index * 0.1 }}
-              className={`relative h-64 rounded-lg overflow-hidden shadow-lg cursor-pointer ${
-                selectedImage?.generatedId === image.generatedId
+              className={`relative h-64 rounded-lg overflow-hidden shadow-lg cursor-pointer ${selectedImage?.generatedId === image.generatedId
                   ? "border-2 border-sky-500"
                   : ""
-              }`}
+                }`}
               onClick={() => handleImageClick(image)}
             >
               <Image
                 src={image.image_path}
                 alt={`Image ${index + 1}`}
                 fill
-                style={{ objectFit: "cover" }}
-                className="transition-transform duration-300 hover:scale-105"
+                priority // Add this prop if the image is above the fold
+                className="transition-transform duration-300 hover:scale-105 object-cover"
               />
               <motion.div
                 initial={{ opacity: 0 }}
