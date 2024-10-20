@@ -14,15 +14,15 @@ export const Step2 = ({ formData, handleChange, nextStep, prevStep }: any) => {
         placeholder="Select your creative field"
         icon="mdi:palette"
         options={[
-          { value: "Photographer", label: "Photographer" },
-          { value: "Animator", label: "Animator" },
-          { value: "Fashion designer", label: "Fashion designer" },
-          { value: "Illustrator", label: "Illustrator" },
-          { value: "Interior Designer", label: "Interior Designer" },
-          { value: "Web Designer", label: "Web Designer" },
-          { value: "Art Teacher", label: "Art Teacher" },
-          { value: "Curator", label: "Curator" },
-          { value: "Industrial designer", label: "Industrial designer" },
+          { value: "creative-services", label: "Creative Services" },
+          { value: "digital-interactive-media", label: "Digital Interactive Media" },
+          { value: "audiovisual-media", label: "Audiovisual Media" },
+          { value: "design", label: "Design" },
+          { value: "publishing-and-printing-media", label: "Publishing and Printing Media" },
+          { value: "performing-arts", label: "Performing Arts" },
+          { value: "visual-arts", label: "Visual Arts" },
+          { value: "traditional-and-cultural-expressions", label: "Traditional and Cultural Expressions" },
+          { value: "cultural-sites", label: "Cultural Sites" },
         ]}
       />
 
