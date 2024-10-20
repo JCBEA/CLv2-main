@@ -311,8 +311,9 @@ const CollectionDisplay: React.FC<CollectionProps> = ({ collection }) => {
           )}
         </AnimatePresence>
 
-        {/* Edit Modal */}
+        {/* Edit Modal */}    
         {isEditModalOpen && selectedImage && (
+           <div className="fixed top-0 left-0 w-full h-full bg-black/50 z-[1000]">
           <EditCollection
             created_at={selectedImage.created_at}
             artist={selectedImage.artist}
@@ -322,8 +323,11 @@ const CollectionDisplay: React.FC<CollectionProps> = ({ collection }) => {
             year={selectedImage.year}
             onEdit={handleEdit}
             onCancel={() => setEditModalOpen(false)}
+            
           />
+          </div>
         )}
+       
       </div>
       <ToastContainer />
     </div>
