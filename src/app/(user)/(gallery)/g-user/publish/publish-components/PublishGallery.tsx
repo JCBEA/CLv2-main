@@ -94,7 +94,6 @@ export default function PublishGallery() {
 
       const result = await response.json();
       console.log(result); // Handle success (optional)
-      toast.success('Gallery published successfully!');
       setFormData({
         title: '',
         desc: '',
