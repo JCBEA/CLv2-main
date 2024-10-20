@@ -49,7 +49,8 @@ const config: Config = {
 
       },
       boxShadow:{
-        "customShadow": '5px 5px 5px 0px rgba(0, 0, 0, 0.3)'
+        "customShadow": '5px 5px 5px 0px rgba(0, 0, 0, 0.3)',
+        "customShadow2": '5px 5px 5px 0px rgba(0, 0, 0, 0.6)',
       }
 
     },
