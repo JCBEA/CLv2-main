@@ -271,6 +271,7 @@ const CollectionDisplay: React.FC<CollectionProps> = ({ collection }) => {
         </div>
 
         {/* Collection Details */}
+
         {selectedImage && (
           <div className="bg-gray-100 p-6 rounded-lg mb-8">
             <h2 className="text-2xl font-semibold text-gray-900 mb-2">
@@ -287,15 +288,26 @@ const CollectionDisplay: React.FC<CollectionProps> = ({ collection }) => {
 
         {/* Confirmation Modal for Deletion */}
         <AnimatePresence>
-          {isDeleteModalOpen && imageToDelete && (
-            <DeleteCollection
-              isOpen={isDeleteModalOpen}
-              generatedId={imageToDelete.generatedId}
-              imagePath={imageToDelete.image_path}
-              userId={getID!}
-              onCancel={() => setDeleteModalOpen(false)}
-              onDelete={handleDelete}
-            />
+          {isDeleteModalOpen && (
+            <motion.div
+              className="fixed top-0 left-0 w-full h-full bg-black/50 z-[1000]"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              onClick={() => setDeleteModalOpen(false)}
+            >
+              {imageToDelete && (
+                <DeleteCollection
+                  isOpen={isDeleteModalOpen}
+                  generatedId={imageToDelete.generatedId}
+                  imagePath={imageToDelete.image_path}
+                  userId={getID!}
+                  onCancel={() => setDeleteModalOpen(false)}
+                  onDelete={handleDelete}
+                />
+              )}
+            </motion.div>
           )}
         </AnimatePresence>
 
