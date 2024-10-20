@@ -1,5 +1,3 @@
-// File: api/collections/publish.tsx
-
 import { supabase } from '@/services/supabaseClient';
 import { NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
@@ -40,11 +38,14 @@ export async function PUT(request: Request) {
   console.log('Artist:', Fname);
   console.log('Image File:', imageFile);
 
-  // Upload the image to Supabase Storage
+  // Upload the image to Supabase Storage with no-cache control
   const uniqueFileName = `${Date.now()}-${imageFile.name}`;
   const { error: imageUploadError } = await supabase.storage
     .from('Images_File')
-    .upload(uniqueFileName, imageFile);
+    .upload(uniqueFileName, imageFile, {
+      cacheControl: 'no-cache', // Prevent caching at the CDN
+      upsert: false,
+    });
 
   if (imageUploadError) {
     console.error('Image Upload Error:', imageUploadError);
@@ -60,7 +61,7 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: 'Error retrieving image URL.' }, { status: 500 });
   }
 
-  const publicURL = data.publicUrl; // Access publicUrl directly
+  const publicURL = `${data.publicUrl}?v=${Date.now()}`; // Append timestamp for cache busting
   console.log('Image Path:', publicURL);
 
   // Check if userId already exists in image_collections
@@ -99,5 +100,12 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: insertError2.message }, { status: 500 });
   }
 
-  return NextResponse.json({ message: 'Gallery item published successfully!', data: insertData, data1: insertData2 });
+  // Set cache control headers
+  const response = NextResponse.json({ message: 'Gallery item published successfully!', data: insertData, data1: insertData2 });
+  response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  response.headers.set('Expires', '0');
+  response.headers.set('Pragma', 'no-cache');
+  response.headers.set('Surrogate-Control', 'no-store');
+
+  return response;
 }

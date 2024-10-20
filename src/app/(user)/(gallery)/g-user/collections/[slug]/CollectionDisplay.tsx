@@ -1,3 +1,4 @@
+// collectionDisplay
 "use client"; // This tells Next.js that this component is a client-side component
 
 import React, { useEffect, useState } from "react";
@@ -11,13 +12,13 @@ import useAuthRedirect from "@/services/hoc/auth";
 import DeleteCollection from "./(collectionModal)/DeleteCollection";
 import { toast, ToastContainer } from "react-toastify";
 import { EditCollection } from "./(collectionModal)/EditCollection";
-import { editCollectionItem } from "@/services/Collections/editCollection";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret";
 
 interface CollectionProps {
   collection: {
     images: {
+      created_at: Date;
       generatedId: string;
       image_path: string;
       title: string;
@@ -118,47 +119,48 @@ const CollectionDisplay: React.FC<CollectionProps> = ({ collection }) => {
     }
   };
 
-  const [newTitle, setNewTitle] = useState("");
-  const [newDescription, setNewDescription] = useState("");
-  const [newYear, setNewYear] = useState("");
-  const [newImage, setNewImage] = useState("");
-  const handleEdit = async () => {
-    if (!selectedImage) return; // Assuming you're editing the currently selected image
-
+  const handleEdit = async (updatedData: {
+    title: string;
+    desc: string;
+    year: number;
+    image_path: string | null;
+  }) => {
+    if (!selectedImage) return;
+  
     const token = getSession();
     if (!token) return;
-
+  
     try {
       const { payload } = await jwtVerify(
         token,
         new TextEncoder().encode(JWT_SECRET)
       );
       const userId = payload.id as string;
-
-      // Prepare updated data
-      const updatedData = {
-        title: newTitle,
-        description: newDescription,
-        year: parseInt(newYear, 10),
-        image: newImage,
-      };
-
-      // Call the edit function
-      await editCollectionItem(selectedImage.generatedId, userId, updatedData);
-
+  
       toast.success("Collection updated successfully!", {
         position: "bottom-right",
       });
-
-      // Optionally, update the local state to reflect the changes in the UI
+  
+      // Ensure image_path is not null, provide a fallback value if needed
       const updatedImages = images.map((img) =>
         img.generatedId === selectedImage.generatedId
-          ? { ...img, ...updatedData }
+          ? { 
+              ...img, 
+              ...updatedData, 
+              image_path: updatedData.image_path || "/images/default.jpg" // Fallback value
+            }
           : img
       );
       setImages(updatedImages);
-
-      // Close the modal or form after editing
+  
+      // Update the selected image with new values
+      setSelectedImage({
+        ...selectedImage,
+        ...updatedData,
+        image_path: updatedData.image_path || "/images/default.jpg" // Fallback value
+      });
+  
+      // Close the modal after editing
       setEditModalOpen(false);
     } catch (error) {
       console.error("Error editing the collection:", error);
@@ -222,7 +224,7 @@ const CollectionDisplay: React.FC<CollectionProps> = ({ collection }) => {
                 transition={{ duration: 0.3 }}
                 className="absolute top-0 left-0 w-full h-full bg-black flex justify-center items-center gap-8"
               >
-                {image.childid == getID && (
+                {image.childid === getID && (
                   <>
                     <motion.button
                       initial={{ backgroundColor: "#FFD094", color: "#403737" }}
@@ -284,7 +286,6 @@ const CollectionDisplay: React.FC<CollectionProps> = ({ collection }) => {
         )}
 
         {/* Confirmation Modal for Deletion */}
-
         <AnimatePresence>
           {isDeleteModalOpen && imageToDelete && (
             <DeleteCollection
@@ -297,13 +298,15 @@ const CollectionDisplay: React.FC<CollectionProps> = ({ collection }) => {
             />
           )}
         </AnimatePresence>
-        {isEditModalOpen && (
+
+        {/* Edit Modal */}
+        {isEditModalOpen && selectedImage && (
           <EditCollection
-            generatedId={selectedImage.generatedId}
-            userId={getID!}
+            created_at={selectedImage.created_at}
+            artist={selectedImage.artist}
             image={selectedImage.image_path}
             title={selectedImage.title}
-            description={selectedImage.desc}
+            desc={selectedImage.desc}
             year={selectedImage.year}
             onEdit={handleEdit}
             onCancel={() => setEditModalOpen(false)}

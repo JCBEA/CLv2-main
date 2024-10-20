@@ -4,6 +4,7 @@ import React from 'react';
 
 interface CollectionProps {
   collection: {
+    created_at:string;
     title: string;
     description: string;
     images: string[];

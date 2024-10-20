@@ -7,6 +7,7 @@ import { Icon } from '@iconify/react/dist/iconify.js';
 interface CollectionProps {
   collection: {
     images: {
+      created_at:Date;
       generatedId:string;
       image_path: string;
       title: string;
@@ -35,6 +36,7 @@ async function getCollection(slug: string) {
 
     // Map the images correctly according to the CollectionProps interface
     const images = data.map(item => ({
+      created_at:item.created_at,
       generatedId:item.generatedId,
       image_path: item.path, // Assuming 'path' is the correct field for the image URL
       title: item.title,     // Adjust these fields according to your actual data structure
