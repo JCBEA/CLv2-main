@@ -70,7 +70,7 @@ export const Form = () => {
     try {
         const user = await loginUser(username, password);
         console.log("Logged in user:", user);
-        toast.success("Successfully Login!", { position: "bottom-center" });
+        toast.success("Successfully Login!", { position: "bottom-right" });
         if (user) {
             // Store the token in local storage or cookies
             localStorage.setItem("token", user.token); // Example: Store JWT in localStorage
@@ -78,7 +78,7 @@ export const Form = () => {
         }
     } catch (err:any) {
         console.error(err);
-        toast.error(err.message, { position: "bottom-center" });
+        toast.error(err.message, { position: "bottom-right" });
         setError(err.message);
     } finally {
         setLoading(false);

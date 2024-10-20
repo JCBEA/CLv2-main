@@ -18,6 +18,13 @@ export default function PublishGallery() {
     year: '',
     image: null as File | null,
   });
+
+  const validateYear = (year: string) => {
+    const yearPattern = /^[0-9]{4}$/; // RegEx to match 4 digits
+    return yearPattern.test(year);
+  };
+
+
   const [loading, setLoading] = useState(false); // Add loading state
 
   const fname = localStorage.getItem("Fname");
@@ -101,7 +108,7 @@ export default function PublishGallery() {
         image: null,
       });
       setPreviewImage(null);
-      toast.success('Gallery published successfully!');
+      toast.success('Gallery published successfully!', { position: "bottom-right" });
     } catch (error) {
       console.error("Error sending message:", error);
       toast.error('Failed to publish gallery. Please try again.');
@@ -112,6 +119,7 @@ export default function PublishGallery() {
 
   return (
     <div className="bg-gray-100 pt-36 pb-16 px-4 sm:px-6 lg:px-8">
+      <ToastContainer />
       <div className="max-w-7xl mx-auto">
         <h2 className="text-3xl font-extrabold text-gray-900 mb-2">PUBLISH</h2>
         <hr className="border-t border-gray-300 mb-8" />
@@ -156,13 +164,13 @@ export default function PublishGallery() {
                 </div>
 
                 <div>
-                  <label htmlFor="year" className="block text-sm font-medium text-gray-700">Year</label>
-                  <input type="text" id="year" name="year" value={formData.year} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+                  <label htmlFor="year" className="block text-sm font-medium text-gray-700 ">Year</label>
+                  <input type="number" id="year" name="year" value={formData.year} onChange={handleChange} className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
                 </div>
 
                 <div>
                   <label htmlFor="desc" className="block text-sm font-medium text-gray-700">Description</label>
-                  <textarea id="desc" name="desc" rows={3} value={formData.desc} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
+                  <textarea id="desc" name="desc" rows={3} value={formData.desc} onChange={handleChange} className="mt-1 block w-full resize-none border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
                 </div>
               </div>
             </div>
@@ -200,7 +208,6 @@ export default function PublishGallery() {
           </div>
         </div>
       </div>
-      <ToastContainer />
     </div>
   );
 }
