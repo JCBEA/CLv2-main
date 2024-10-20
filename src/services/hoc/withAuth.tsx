@@ -56,7 +56,6 @@ const withAuth = (WrappedComponent: React.ComponentType<{ userDetail: UserDetail
                         return;
                     }
 
-                    console.log("Fetched user details:", data);
                     setUserDetail(data); 
                     setIsAuthenticated(true); 
                 } catch (error) {

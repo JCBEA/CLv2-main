@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Icon } from '@iconify/react';
 import { CalendarModal } from './(modals)/CalendarModal';
+import { ToastContainer } from 'react-toastify';
 
 const daysOfWeek = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
@@ -25,35 +26,41 @@ export const Calendar: React.FC = () => {
 
   const handleDayClick = (day: number) => {
     const year = currentDate.getFullYear();
-    const month = currentDate.getMonth();
-    const selectedDate = new Date(year, month, day); // Create Date object for the selected day
-    setSelectedDay(selectedDate); // Set the clicked day as selected
+    const month = currentDate.getMonth(); // month is 0-indexed
+  
+    // Create a new date and set the UTC time manually to prevent timezone issues
+    const selectedDate = new Date(Date.UTC(year, month, day, 0, 0, 0, 0));
+  
+    console.log(selectedDate); // Debugging
+    setSelectedDay(selectedDate);
     setIsModalOpen(true); // Open the modal
   };
-
+  
+  
+  
   const closeModal = () => {
     setIsModalOpen(false); // Close the modal
     setSelectedDay(null);  // Reset the selected day
   };
-
+  
   const renderCalendarDays = () => {
     const year = currentDate.getFullYear();
-    const month = currentDate.getMonth();
-    const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
-    
-    const daysInMonth = lastDay.getDate();
-    const startingDayIndex = firstDay.getDay();
-    
+    const month = currentDate.getMonth(); // 0-indexed month
+    const firstDay = new Date(year, month, 1); // First day of the month
+    const lastDay = new Date(year, month + 1, 0); // Last day of the month
+  
+    const daysInMonth = lastDay.getDate(); // Number of days in the month
+    const startingDayIndex = firstDay.getDay(); // First day of the month (0 = Sunday)
+  
     const days = [];
-    
+  
     // Add empty cells for days before the 1st of the month
     for (let i = 0; i < startingDayIndex; i++) {
       days.push(
         <div key={`empty-${i}`} className="calendar-day border border-gray-700 flex items-start justify-start p-2" />
       );
     }
-
+  
     // Add cells for the days of the month
     for (let day = 1; day <= daysInMonth; day++) {
       days.push(
@@ -66,9 +73,10 @@ export const Calendar: React.FC = () => {
         </div>
       );
     }
-
+  
     return days;
   };
+  
 
   return (
     <div className="w-full md:p-6 bg-shade-1 rounded-b-xl">
@@ -100,6 +108,7 @@ export const Calendar: React.FC = () => {
           {renderCalendarDays()}
         </div>
       </div>
+      <ToastContainer />
     </div>
   );
 };

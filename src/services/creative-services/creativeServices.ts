@@ -1,4 +1,5 @@
 export interface UserDetail {
+    id: string;
     detailsid:string;
     first_name: string;
     bday?: Date;

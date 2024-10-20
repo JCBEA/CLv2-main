@@ -4,7 +4,7 @@ import { supabase } from '@/services/supabaseClient';
 export async function PUT(req: Request) {
     console.log("PUT request received");
 
-    const authHeader = req.headers.get('Authorization');
+    const authHeader = req.headers.get('');
     if (!authHeader) {
         console.log("No Authorization header found");
         return NextResponse.json({ message: 'No token provided' }, { status: 401 });
