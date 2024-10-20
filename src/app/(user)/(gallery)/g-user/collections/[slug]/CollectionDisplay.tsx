@@ -12,6 +12,7 @@ import useAuthRedirect from "@/services/hoc/auth";
 import DeleteCollection from "./(collectionModal)/DeleteCollection";
 import { toast, ToastContainer } from "react-toastify";
 import { EditCollection } from "./(collectionModal)/EditCollection";
+import { Icon } from "@iconify/react/dist/iconify.js";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret";
 
@@ -126,40 +127,40 @@ const CollectionDisplay: React.FC<CollectionProps> = ({ collection }) => {
     image_path: string | null;
   }) => {
     if (!selectedImage) return;
-  
+
     const token = getSession();
     if (!token) return;
-  
+
     try {
       const { payload } = await jwtVerify(
         token,
         new TextEncoder().encode(JWT_SECRET)
       );
       const userId = payload.id as string;
-  
+
       toast.success("Collection updated successfully!", {
         position: "bottom-right",
       });
-  
+
       // Ensure image_path is not null, provide a fallback value if needed
       const updatedImages = images.map((img) =>
         img.generatedId === selectedImage.generatedId
-          ? { 
-              ...img, 
-              ...updatedData, 
-              image_path: updatedData.image_path || "/images/default.jpg" // Fallback value
+          ? {
+              ...img,
+              ...updatedData,
+              image_path: updatedData.image_path || "/images/default.jpg", // Fallback value
             }
           : img
       );
       setImages(updatedImages);
-  
+
       // Update the selected image with new values
       setSelectedImage({
         ...selectedImage,
         ...updatedData,
-        image_path: updatedData.image_path || "/images/default.jpg" // Fallback value
+        image_path: updatedData.image_path || "/images/default.jpg", // Fallback value
       });
-  
+
       // Close the modal after editing
       setEditModalOpen(false);
     } catch (error) {
@@ -171,8 +172,9 @@ const CollectionDisplay: React.FC<CollectionProps> = ({ collection }) => {
   };
 
   return (
-    <div className="bg-white min-h-screen relative">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div className="bg-white min-h-screen relative lg:max-w-screen-xl w-full max-w-[95%] mx-auto">
+      <Icon onClick={() => window.history.back()} className="absolute top-2 right-2 cursor-pointer z-50" icon="ion:arrow-back" width="35" height="35" />
+      <div className="w-full h-full">
         {selectedImage && (
           <>
             <motion.h1
@@ -310,24 +312,30 @@ const CollectionDisplay: React.FC<CollectionProps> = ({ collection }) => {
             </motion.div>
           )}
         </AnimatePresence>
-
-        {/* Edit Modal */}    
-        {isEditModalOpen && selectedImage && (
-           <div className="fixed top-0 left-0 w-full h-full bg-black/50 z-[1000]">
-          <EditCollection
-            created_at={selectedImage.created_at}
-            artist={selectedImage.artist}
-            image={selectedImage.image_path}
-            title={selectedImage.title}
-            desc={selectedImage.desc}
-            year={selectedImage.year}
-            onEdit={handleEdit}
-            onCancel={() => setEditModalOpen(false)}
-            
-          />
-          </div>
-        )}
-       
+        <AnimatePresence>
+          {/* Edit Modal */}
+          {isEditModalOpen && selectedImage && (
+            <motion.div
+              className="fixed top-0 left-0 w-full h-full bg-black/50 z-[1000] flex justify-center items-center"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              onClick={() => setDeleteModalOpen(false)}
+            >
+              <EditCollection
+                created_at={selectedImage.created_at}
+                artist={selectedImage.artist}
+                image={selectedImage.image_path}
+                title={selectedImage.title}
+                desc={selectedImage.desc}
+                year={selectedImage.year}
+                onEdit={handleEdit}
+                onCancel={() => setEditModalOpen(false)}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
       <ToastContainer />
     </div>

@@ -52,7 +52,7 @@ export const CalendarModal = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.5 }}
-          className="w-full h-dvh fixed z-[1000] inset-0 bg-secondary-2/50 text-primary-2 flex justify-center items-center"
+          className="w-full h-dvh fixed z-[1000] inset-0 bg-secondary-2/50 text-secondary-2 flex justify-center items-center"
           onClick={handleClose}
         >
           <div className="w-full xl:max-w-screen-md lg:max-w-[80%] max-w-[90%] lg:px-8 mx-auto h-fit py-[12dvh]">
@@ -82,7 +82,7 @@ const Content = ({
       onClick={(e) => e.stopPropagation()}
     >
       <div className="w-full h-fit p-4 bg-shade-2 relative">
-        <h1 className="uppercase font-semibold text-3xl lg:block hidden">
+        <h1 className="uppercase font-semibold text-3xl">
           Schedule
         </h1>
         <Icon
@@ -169,7 +169,7 @@ const FormInput = ({ selectedDay }: { selectedDay: Date }) => {
   
 
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-full text-secondary-2">
       <form
         className="w-full h-full flex flex-col gap-4"
         onSubmit={handleSubmit}
@@ -242,7 +242,7 @@ const FormInput = ({ selectedDay }: { selectedDay: Date }) => {
 
         <button
           type="submit"
-          className="w-full h-12 bg-primary-2 text-white rounded-lg"
+          className="w-full h-12 bg-shade-2 text-secondary-2 rounded-lg"
         >
           Submit
         </button>

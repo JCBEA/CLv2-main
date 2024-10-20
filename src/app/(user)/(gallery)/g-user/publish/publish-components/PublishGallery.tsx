@@ -1,21 +1,22 @@
-'use client';
+"use client";
 
-import React, { useEffect, useState } from 'react';
-import Image from 'next/image';
-import { motion } from 'framer-motion';
-import { jwtVerify } from 'jose';
-import { getSession } from '@/services/authservice';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret';
+import React, { useEffect, useState } from "react";
+import Image from "next/image";
+import { motion } from "framer-motion";
+import { jwtVerify } from "jose";
+import { getSession } from "@/services/authservice";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { Icon } from "@iconify/react/dist/iconify.js";
+const JWT_SECRET = process.env.JWT_SECRET || "your-secret";
 
 export default function PublishGallery() {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [getFname, setFname] = useState<string | null>(null);
   const [formData, setFormData] = useState({
-    title: '',
-    desc: '',
-    year: '',
+    title: "",
+    desc: "",
+    year: "",
     image: null as File | null,
   });
 
@@ -24,16 +25,14 @@ export default function PublishGallery() {
     return yearPattern.test(year);
   };
 
-
   const [loading, setLoading] = useState(false); // Add loading state
 
   const fname = localStorage.getItem("Fname");
   useEffect(() => {
     if (fname) {
-     setFname(fname);
+      setFname(fname);
     }
   }, [fname]);
-
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -63,7 +62,11 @@ export default function PublishGallery() {
     setFormData({ ...formData, image: file }); // Update form data with selected file
   };
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    event: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
     const { name, value } = event.target;
     setFormData({ ...formData, [name]: value });
   };
@@ -76,20 +79,23 @@ export default function PublishGallery() {
     setLoading(true); // Set loading to true when upload starts
 
     try {
-      const { payload } = await jwtVerify(token, new TextEncoder().encode(JWT_SECRET));
+      const { payload } = await jwtVerify(
+        token,
+        new TextEncoder().encode(JWT_SECRET)
+      );
       const userIdFromToken = payload.id as string;
 
       const data = new FormData();
-      data.append('image', formData.image as File);
-      data.append('title', formData.title);
-      data.append('desc', formData.desc);
-      data.append('year', formData.year);
+      data.append("image", formData.image as File);
+      data.append("title", formData.title);
+      data.append("desc", formData.desc);
+      data.append("year", formData.year);
 
       const response = await fetch("/api/collections/publish", {
         method: "PUT",
         headers: {
           "user-id": userIdFromToken,
-          "Fname": Fname
+          Fname: Fname,
         },
         body: data,
       });
@@ -102,16 +108,18 @@ export default function PublishGallery() {
       const result = await response.json();
       console.log(result); // Handle success (optional)
       setFormData({
-        title: '',
-        desc: '',
-        year: '',
+        title: "",
+        desc: "",
+        year: "",
         image: null,
       });
       setPreviewImage(null);
-      toast.success('Gallery published successfully!', { position: "bottom-right" });
+      toast.success("Gallery published successfully!", {
+        position: "bottom-right",
+      });
     } catch (error) {
       console.error("Error sending message:", error);
-      toast.error('Failed to publish gallery. Please try again.');
+      toast.error("Failed to publish gallery. Please try again.");
     } finally {
       setLoading(false); // Reset loading state
     }
@@ -121,7 +129,16 @@ export default function PublishGallery() {
     <div className="bg-gray-100 pt-36 pb-16 px-4 sm:px-6 lg:px-8">
       <ToastContainer />
       <div className="max-w-7xl mx-auto">
-        <h2 className="text-3xl font-extrabold text-gray-900 mb-2">PUBLISH</h2>
+        <div className="flex w-full justify-between items-center">
+          <h1 className="text-2xl font-bold mb-6">PUBLISH</h1>
+          <Icon
+            onClick={() => window.history.back()}
+            className="cursor-pointer"
+            icon="ion:arrow-back"
+            width="35"
+            height="35"
+          />
+        </div>
         <hr className="border-t border-gray-300 mb-8" />
 
         <div className="bg-white p-6 rounded-lg shadow-lg">
@@ -144,13 +161,25 @@ export default function PublishGallery() {
                   />
                   <label htmlFor="file-input" className="cursor-pointer">
                     {previewImage ? (
-                      <Image src={previewImage} alt="Preview" width={500} height={200} className="rounded-lg" />
+                      <Image
+                        src={previewImage}
+                        alt="Preview"
+                        width={500}
+                        height={200}
+                        className="rounded-lg"
+                      />
                     ) : (
                       <>
-                        <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
-                          <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                        <p className="mt-1">Drag and drop files here or click to upload</p>
+                        <Icon
+                          className="mx-auto h-12 w-12 text-gray-400"
+                          icon="stash:image-plus-light"
+                          width="25"
+                          height="25"
+                        />
+
+                        <p className="mt-1">
+                          Drag and drop files here or click to upload
+                        </p>
                       </>
                     )}
                   </label>
@@ -159,18 +188,54 @@ export default function PublishGallery() {
 
               <div className="space-y-4">
                 <div>
-                  <label htmlFor="title" className="block text-sm font-medium text-gray-700">Title</label>
-                  <input type="text" id="title" name="title" value={formData.title} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+                  <label
+                    htmlFor="title"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Title
+                  </label>
+                  <input
+                    type="text"
+                    id="title"
+                    name="title"
+                    value={formData.title}
+                    onChange={handleChange}
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  />
                 </div>
 
                 <div>
-                  <label htmlFor="year" className="block text-sm font-medium text-gray-700 ">Year</label>
-                  <input type="number" id="year" name="year" value={formData.year} onChange={handleChange} className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+                  <label
+                    htmlFor="year"
+                    className="block text-sm font-medium text-gray-700 "
+                  >
+                    Year
+                  </label>
+                  <input
+                    type="number"
+                    id="year"
+                    name="year"
+                    value={formData.year}
+                    onChange={handleChange}
+                    className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  />
                 </div>
 
                 <div>
-                  <label htmlFor="desc" className="block text-sm font-medium text-gray-700">Description</label>
-                  <textarea id="desc" name="desc" rows={3} value={formData.desc} onChange={handleChange} className="mt-1 block w-full resize-none border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
+                  <label
+                    htmlFor="desc"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Description
+                  </label>
+                  <textarea
+                    id="desc"
+                    name="desc"
+                    rows={3}
+                    value={formData.desc}
+                    onChange={handleChange}
+                    className="mt-1 block w-full resize-none border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  ></textarea>
                 </div>
               </div>
             </div>
@@ -178,31 +243,48 @@ export default function PublishGallery() {
             {/* Right Column */}
             <div>
               <div className="mb-4">
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Publication preview</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">
+                  Publication preview
+                </h3>
                 {previewImage ? (
                   <div className="bg-white rounded-lg shadow-md overflow-hidden w-[300px] h-[400]">
-                    <div className='overflow-hidden w-[300px] relative'>
-                      <Image src={previewImage} alt="Preview" width={300} height={200} className="object-cover" />
-                      <div className='absolute top-0 left-0 right-0 bottom-0 flex flex-col justify-end p-2 bg-gradient-to-t from-black to-transparent'>
-                        <h3 className="text-lg font-bold text-white">{formData.title || "Title"}</h3>
+                    <div className="overflow-hidden w-[300px] relative">
+                      <Image
+                        src={previewImage}
+                        alt="Preview"
+                        width={300}
+                        height={200}
+                        className="object-cover"
+                      />
+                      <div className="absolute top-0 left-0 right-0 bottom-0 flex flex-col justify-end p-2 bg-gradient-to-t from-black to-transparent">
+                        <h3 className="text-lg font-bold text-white">
+                          {formData.title || "Title"}
+                        </h3>
                         <p className="text-gray-200">by {fname}</p>
                       </div>
                     </div>
                     <div className="p-4">
-                      <p className="mt-2 text-gray-800 break-words">{formData.desc || "Description"}</p>
+                      <p className="mt-2 text-gray-800 break-words">
+                        {formData.desc || "Description"}
+                      </p>
                     </div>
                   </div>
                 ) : (
-                  <p className="text-gray-500">Upload an image to see the preview.</p>
+                  <p className="text-gray-500">
+                    Upload an image to see the preview.
+                  </p>
                 )}
               </div>
 
               <motion.button
                 onClick={handleUpload}
                 disabled={loading} // Disable button during loading
-                className={`w-full py-3 mt-4 rounded-md text-white ${loading ? 'bg-gray-500' : 'bg-orange-500 hover:bg-orange-600'}`}
+                className={`w-full py-3 mt-4 rounded-md text-white ${
+                  loading ? "bg-gray-500" : "bg-orange-500 hover:bg-orange-600"
+                }`}
               >
-                {loading ? 'Publishing...' : 'Publish'} {/* Change button text based on loading state */}
+                {loading ? "Publishing..." : "Publish"}{" "}
+                {/* Change button text based on loading state */}
               </motion.button>
             </div>
           </div>
