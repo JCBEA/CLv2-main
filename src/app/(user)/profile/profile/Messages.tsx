@@ -193,6 +193,7 @@ export const Messages = () => {
         },
         body: JSON.stringify(messageData),
       });
+      console.log("Message Data: " + messageData.message , messageData.forId , messageData.first_name)
 
       if (!response.ok) {
         throw new Error("Failed to send message");
