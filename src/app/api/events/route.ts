@@ -39,7 +39,27 @@ export async function PUT(req: Request) {
   }
 }
 
-
 export async function GET(req: Request) {
-  
+  const userId = req.headers.get('User-ID'); // Extract user ID from custom header
+
+  if (!userId) {
+    return NextResponse.json({ message: 'User ID or Authorization header is missing' }, { status: 401 });
+  }
+
+  try {
+    // Fetch all events for the user from Supabase
+    const { data, error } = await supabase
+      .from('creative_events')
+      .select('*')
+      .eq('user_id', userId); // Filter by user_id
+
+    if (error) {
+      return NextResponse.json({ message: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json(data, { status: 200 }); // Return the fetched data
+  } catch (error) {
+    console.error('Error fetching events:', error);
+    return NextResponse.json({ message: 'Failed to fetch events' }, { status: 500 });
+  }
 }
