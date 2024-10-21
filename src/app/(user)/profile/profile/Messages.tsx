@@ -15,6 +15,16 @@ interface Message {
   created_at: string;
   message: string;
   for: string;
+  session:string;
+}
+
+interface chatMessages {
+  id: string;
+  first_name: string;
+  created_at: string;
+  message: string;
+  for: string;
+  session:string;
 }
 
 interface UserDetail {
@@ -26,7 +36,7 @@ export const Messages = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [chatMessages, setChatMessages] = useState<Message[]>([]);
+  const [chatMessages, setChatMessages] = useState<chatMessages[]>([]);
   const [input, setInput] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const [allUsers, setAllUsers] = useState([]);
@@ -171,6 +181,7 @@ export const Messages = () => {
   }, [refreshKey]);
 
 
+  const session = `${messageId}-${userId}`
   const handleSendMessage = async () => {
     const token = getSession();
     if (!newMessage || !token) return;
@@ -182,7 +193,8 @@ export const Messages = () => {
       const messageData = {
         message: newMessage,
         forId: messageId,
-        first_name: getUser
+        first_name: getUser,
+        session:session
       };
 
       const response = await fetch("/api/chat", {
@@ -193,7 +205,7 @@ export const Messages = () => {
         },
         body: JSON.stringify(messageData),
       });
-      console.log("Message Data: " + messageData.message , messageData.forId , messageData.first_name)
+      console.log("Message Data: " + messageData.message, messageData.forId, messageData.first_name)
 
       if (!response.ok) {
         throw new Error("Failed to send message");
@@ -298,7 +310,7 @@ export const Messages = () => {
     }
   }, [chatMessages, messageId]);// Run effect whenever chatMessages changes
 
-  
+
 
   const filteredMessages = messages.filter((message) => message.id !== userId);
 
@@ -311,6 +323,7 @@ export const Messages = () => {
 
 
   const latestMessagesArray = Object.values(latestMessages);
+
   return (
     <div className="w-full md:px-6 md:py-4 bg-shade-1 rounded-b-xl">
       <div className="w-full flex flex-col gap-6 p-4 rounded-lg">
@@ -390,7 +403,7 @@ export const Messages = () => {
             <div className="w-full h-full border border-primary-3 rounded-r-xl flex flex-col overflow-hidden">
               <div className="h-fit min-h-16 p-2 bg-primary-1 border-b-2 border-primary-3 w-full flex justify-between items-center">
                 <div className="h-fit w-fit">
-                  {chatMessages.length > 0 && getFirstName ? (
+                  {chatMessages.length >= 0 && getFirstName ? (
                     <div className="flex items-center gap-2 p-1">
                       <div className="w-10 h-10 rounded-full bg-primary-2 text-secondary-1 flex items-center justify-center">
                         <span className="text-lg font-semibold">
@@ -407,6 +420,7 @@ export const Messages = () => {
                       <p className="text-lg font-bold">Select a user to chat with</p>
                     </div>
                   )}
+
                 </div>
 
                 {isMobile && (

@@ -18,9 +18,10 @@ interface UserDetail {
   password: string;
   name: string;
   creativeField: string;
+  bday: string;
   address: string;
-  mobileNo: string;
   bio: string;
+  mobileNo: string;
   instagram: string;
   facebook: string;
   twitter: string;
@@ -93,6 +94,7 @@ const MultiStepForm = () => {
     password: "",
     name: "",
     creativeField: "",
+    bday:"",
     address: "",
     mobileNo: "",
     bio: "",
@@ -130,7 +132,7 @@ const MultiStepForm = () => {
       case 1:
         return formData.username && formData.email && formData.password;
       case 2:
-        return formData.name && formData.creativeField;
+        return formData.name && formData.creativeField && formData.bday;
       case 3:
         return formData.address && formData.mobileNo && formData.bio;
       case 4:
@@ -155,6 +157,7 @@ const MultiStepForm = () => {
         formData.password,
         formData.name,
         formData.creativeField,
+        formData.bday,
         formData.address,
         formData.mobileNo,
         formData.bio,
@@ -179,6 +182,7 @@ const MultiStepForm = () => {
       password: "",
       name: "",
       creativeField: "",
+      bday: "",
       address: "",
       mobileNo: "",
       bio: "",

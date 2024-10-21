@@ -26,6 +26,15 @@ export const Step2 = ({ formData, handleChange, nextStep, prevStep }: any) => {
         ]}
       />
 
+      {/* Birthday Input */}
+      <Input
+        name="bday"
+        value={formData.bday}
+        onChange={handleChange}
+        type="date"
+        placeholder="Birthday"
+        icon="mdi:date-range"
+      />
 
       {/* Address Input */}
       <Input
@@ -53,7 +62,8 @@ export const Step2 = ({ formData, handleChange, nextStep, prevStep }: any) => {
         onChange={handleChange}
         placeholder="Bio"
         icon="mdi:note-outline"
-      ></TextArea>
+      />
     </div>
   );
 };
+

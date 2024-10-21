@@ -53,7 +53,7 @@ export async function PUT(req: Request) {
   try {
     // Extract the body from the request
     const body = await req.json();
-    const { message, forId, first_name } = body; // Assuming 'forId' is passed as recipient/thread ID
+    const { message, forId, first_name, session } = body; // Assuming 'forId' is passed as recipient/thread ID
 
     if (!message || !forId) {
       return NextResponse.json({ message: 'Message or recipient is missing' }, { status: 400 });
@@ -68,6 +68,7 @@ export async function PUT(req: Request) {
           first_name: first_name, 
           message: message, 
           for: forId,
+          session:session,
           created_at: new Date().toISOString(),
         }
       ]);
