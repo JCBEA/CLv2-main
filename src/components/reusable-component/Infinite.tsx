@@ -20,11 +20,9 @@ const InfiniteImages = () => {
   const scrollSpeed = 20000; 
 
   useEffect(() => {
-
     if (containerRef.current) {
       const containerWidth = containerRef.current.offsetWidth;
       setWidth(containerWidth);
-
 
       const totalImageWidth = imageWidth * infinitImages.length;
       const sets = Math.ceil(containerWidth / totalImageWidth) + 1;
@@ -70,3 +68,5 @@ const infinitImages = [
   "/images/infinite/logo.png",
   "/images/infinite/quanby.png",
 ];
+
+export default Infinite;
