@@ -78,14 +78,15 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
       // Log the payload for debugging
       console.log("Retrieved token payload:", payload.id);
 
+      const userId = payload.id as string;
       const response = await fetch("/api/creatives", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${payload.id}`,
+          Authorization: `Bearer ${userId}`,
         },
         body: JSON.stringify({
-          detailsid: payload.id,
+          detailsid: userId,
           userDetails: formData,
         }),
       });
@@ -376,6 +377,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                     }}
                     whileTap={{ scale: 0.95 }}
                     className="w-44 py-2.5 font-semibold bg-shade-2 rounded-full"
+                    type="submit"
                     onClick={handleSave}
                     disabled={isEditing}
                   >
