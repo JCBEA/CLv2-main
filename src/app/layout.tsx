@@ -7,7 +7,9 @@ import { usePathname } from 'next/navigation';
 import { AuthProvider } from '@/context/authcontext';
 import './globals.css';
 import 'react-toastify/dist/ReactToastify.css';
-import LottieAnimation from '@/components/animations/_lottieloader';
+import dynamic from 'next/dynamic';
+
+const LottieAnimation = dynamic(() => import('@/components/animations/_lottieloader'), { ssr: false });
 
 export default function RootLayout({
   children,
