@@ -9,7 +9,6 @@ import './globals.css';
 import 'react-toastify/dist/ReactToastify.css';
 import dynamic from 'next/dynamic';
 
-// Dynamically import LottieAnimation with ssr: false to ensure it only runs on the client side
 const LottieAnimation = dynamic(() => import('@/components/animations/_lottieloader'), { ssr: false });
 
 export default function RootLayout({
@@ -18,6 +17,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const [mounted, setMounted] = useState(false);
+  const [contentLoaded, setContentLoaded] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isLogoutInProgress, setIsLogoutInProgress] = useState(false);
   const pathname = usePathname();
@@ -53,13 +53,13 @@ export default function RootLayout({
       }, 2000);
 
       const handleContentLoaded = () => {
-        setIsLoading(false);
+        setContentLoaded(true);
       };
 
       window.addEventListener('contentLoaded', handleContentLoaded);
 
       if (pathname !== '/') {
-        setIsLoading(false);
+        setContentLoaded(true);
       }
 
       return () => {
@@ -74,6 +74,7 @@ export default function RootLayout({
     if (isLogoutInProgress) {
       setIsLogoutInProgress(false);
       setIsLoading(true);
+      setContentLoaded(false);
       
       const resetTimer = setTimeout(() => {
         setIsLoading(false);
@@ -98,7 +99,7 @@ export default function RootLayout({
     <html lang="en">
       <body className="flex flex-col min-h-screen">
         <AuthProvider>
-          {!isLogoutInProgress && (
+          {contentLoaded && !isLogoutInProgress && (
             <Header
               linkName="/signin"
               roundedCustom="lg:rounded-bl-3xl"
@@ -109,7 +110,7 @@ export default function RootLayout({
           <main className="flex-grow">
             {children}
           </main>
-          {!isLogoutInProgress && <Footer />}
+          {contentLoaded && !isLogoutInProgress && <Footer />}
         </AuthProvider>
       </body>
     </html>
