@@ -38,7 +38,6 @@ const withAuth = (WrappedComponent: React.ComponentType<{ userDetail: UserDetail
 
                 try {
                     const payload = await decryptToken(token); 
-                    console.log("Decrypted Payload:", payload);
 
                     const { data, error } = await supabase
                         .from("userDetails")

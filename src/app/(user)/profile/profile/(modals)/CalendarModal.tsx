@@ -8,19 +8,20 @@ import { useState, useEffect } from "react";
 import { toast, ToastContainer } from "react-toastify";
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret";
 
-interface CalendarModalProps {
+export interface CalendarModalProps {
   isOpen: boolean;
   onClose: () => void;
   closeHandler: () => void;
   selectedDay: Date;
+  event: FormInput | null;
 }
-interface FormProps {
-  eventTitle: string;
+export interface FormInput {
+  event_title: string;
+  event_location: string;
   startDate: Date;
-  startTime: string;
-  endTime: string;
-  location: string;
-  eventAbout: string;
+  start_time: string;
+  end_time: string;
+  description: string;
 }
 
 export const CalendarModal = ({
@@ -28,6 +29,7 @@ export const CalendarModal = ({
   onClose,
   selectedDay,
   closeHandler,
+  event ,
 }: CalendarModalProps) => {
   const [isClosing, setIsClosing] = useState(false);
 
@@ -53,11 +55,11 @@ export const CalendarModal = ({
           exit={{ opacity: 0 }}
           transition={{ duration: 0.5 }}
           className="w-full h-dvh fixed z-[1000] inset-0 bg-secondary-2/50 text-secondary-2 flex justify-center items-center"
-          onClick={handleClose}
+          onClick={closeHandler}
         >
           <div className="w-full xl:max-w-screen-md lg:max-w-[80%] max-w-[90%] lg:px-8 mx-auto h-fit py-[12dvh]">
-            {/* Pass the selectedDay prop to Content */}
-            <Content closeHandler={closeHandler} selectedDay={selectedDay} />
+            {/* Pass the selectedDay and event to Content */}
+            <Content closeHandler={closeHandler} selectedDay={selectedDay} event={event} />
           </div>
         </motion.div>
       )}
@@ -68,9 +70,11 @@ export const CalendarModal = ({
 const Content = ({
   closeHandler,
   selectedDay,
+  event,
 }: {
   closeHandler: () => void;
   selectedDay: Date;
+  event: FormInput | null;
 }) => {
   return (
     <motion.div
@@ -102,21 +106,32 @@ const Content = ({
         className="p-4"
       >
         {/* Pass the selectedDay to FormInput */}
-        <FormInput selectedDay={selectedDay} />
+        <FormInput selectedDay={selectedDay} event={event} />
       </motion.div>
     </motion.div>
   );
 };
 
-const FormInput = ({ selectedDay }: { selectedDay: Date }) => {
+const FormInput = ({ selectedDay, event }: { selectedDay: Date; event: FormInput | null }) => {
   // Format selectedDay to YYYY-MM-DD format for inputs
   const formatDate = (date: Date) => date.toISOString().split("T")[0];
 
-  const [event_title, setTitle] = useState("");
-  const [event_location, setLocation] = useState("");
-  const [startTime, setStartTime] = useState("");
-  const [endTime, setEndTime] = useState("");
-  const [description, setDescription] = useState("");
+const [eventTitle, setTitle] = useState(event?.event_title || ""); // Use event data or empty string
+  const [eventLocation, setLocation] = useState(event?.event_location || "");
+  const [startDate, setStartDate] = useState(formatDate(selectedDay));
+  const [startTime, setStartTime] = useState(event?.start_time || "");
+  const [endTime, setEndTime] = useState(event?.end_time || "");
+  const [description, setDescription] = useState(event?.description || "");
+
+  useEffect(() => {
+    if (event) {
+      setTitle(event.event_title || "");
+      setLocation(event.event_location || "");
+      setStartTime(event.start_time || "");
+      setEndTime(event.end_time || "");
+      setDescription(event.description || "");
+    }
+  }, [event]); // Update when event data changes
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -144,8 +159,8 @@ const FormInput = ({ selectedDay }: { selectedDay: Date }) => {
           "Authorization": `Bearer ${token}`, // Send the actual JWT token for verification
         },
         body: JSON.stringify({
-          event_title,
-          event_location,
+          eventTitle,
+          location,
           start_time: startTime, // Send only time value
           end_time: endTime, // Send only time value
           selected_date: formatDate(selectedDay), // Send only the date
@@ -166,6 +181,8 @@ const FormInput = ({ selectedDay }: { selectedDay: Date }) => {
       console.error("An error occurred while inserting the event:", error);
     }
   };
+
+  
   
 
   return (
@@ -182,14 +199,14 @@ const FormInput = ({ selectedDay }: { selectedDay: Date }) => {
             <input
               type="text"
               placeholder="Title"
-              value={event_title}
+              value={eventTitle}
               onChange={(e) => setTitle(e.target.value)}
               className="w-full h-12 border border-quaternary-1 outline-none focus:outline-shade-2 focus:ring-shade-3 focus:ring-1 rounded-lg p-4 text-primary-2"
             />
             <input
               type="text"
               placeholder="Location"
-              value={event_location}
+              value={eventLocation}
               onChange={(e) => setLocation(e.target.value)}
               className="w-full h-12 border border-quaternary-1 outline-none focus:outline-shade-2 focus:ring-shade-3 focus:ring-1 rounded-lg p-4 text-primary-2"
             />

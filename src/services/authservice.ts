@@ -50,7 +50,6 @@ export const loginUser = async (username: string, password: string) => {
   // Decrypt and log the token payload
   try {
     const decryptedPayload = await verifyJWT(token); // Use the verifyJWT function to get the payload
-    console.log('Decrypted Payload after Login:', decryptedPayload);
   } catch (error) {
     console.error('Failed to decrypt token:', error);
   }
@@ -67,7 +66,6 @@ export const decryptToken = async (token: string) => {
   try {
     // Use the correct secret for verification
     const payload = await verifyJWT(token);
-    console.log('Decrypted Payload:', payload);
     return payload;
   } catch (error:any) {
     // If the token has expired, remove it from localStorage
@@ -148,7 +146,6 @@ export const signupUser = async (
   // Decrypt and log the token payload
   try {
     const decryptedPayload = await verifyJWT(token);
-    console.log("Decrypted Payload after Signup:", decryptedPayload);
   } catch (error) {
     console.error("Failed to decrypt token:", error);
   }
