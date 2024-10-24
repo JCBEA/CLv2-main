@@ -46,10 +46,10 @@ const MenuItem = ({ name, link }: MenuItemProps) => {
 export const Header = ({
   backgroundColor = "bg-primary-1",
   textColor = "text-primary-2",
-  buttonName = "Join Mukna",
+  buttonName = "Log in",
   paddingLeftCustom = "pl-14",
   roundedCustom = "rounded-bl-3xl",
-  linkName = "",
+  linkName = "/signin",
 }: HeaderProps) => {
   const headerRef = useRef<HTMLDivElement | null>(null);
   const gsapAnimationRef = useRef<gsap.core.Timeline | null>(null);
