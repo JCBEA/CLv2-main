@@ -140,7 +140,7 @@ const UserDetailDisplay = ({ userDetail }: { userDetail: UserDetail }) => {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": userId,
+          "Authorization": `Bearer ${userId}`, // Pass the token in the Authorization headeruserId,
         },
         body: JSON.stringify({
           detailsid: payload.id,
