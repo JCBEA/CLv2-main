@@ -135,12 +135,12 @@ const UserDetailDisplay = ({ userDetail }: { userDetail: UserDetail }) => {
 
       // Log the payload for debugging
       console.log("Retrieved token payload:", payload.id);
-
+      const userId = payload.id as string;
       const response = await fetch("/api/creatives", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `${payload.id}`,
+          "Authorization": userId,
         },
         body: JSON.stringify({
           detailsid: payload.id,
