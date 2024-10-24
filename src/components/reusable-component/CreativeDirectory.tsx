@@ -27,7 +27,7 @@ export const CreativeDirectory: React.FC<CreativeDirectoryProps> = ({
   return (
     <div className={`w-full lg:h-[70dvh] h-fit p-6 bg-shade-1 ${roundedEdges}`}>
       <div className={`w-full h-full flex lg:flex-row flex-col ${borderColor}`}>
-        <div className={`w-full h-full flex flex-col p-6 md:justify-center justify-evenly md:items-start items-center lg:pl-16 px-2 ${textGap}`}>
+        <div className={`-mt-1.5 w-full h-full flex flex-col p-6 md:justify-center justify-evenly md:items-start items-center lg:pl-16 px-2 ${textGap}`}>
           <div className="w-full flex flex-col justify-start lg:items-start items-center gap-6">
             <h1 className={`xl:text-6xl lg:text-5xl md:text-4xl text-5xl lg:text-left text-center ${textBold} ${textColor} ${textFont} ${trackingWide} ${textSize}`}>
               Creative Directory

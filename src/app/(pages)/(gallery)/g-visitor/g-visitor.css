@@ -1,4 +1,10 @@
-/* General styles for large screens */
+/* Base styles */
+img {
+  width: 100%;
+  margin-bottom: 1em;
+}
+
+/* Layout components */
 .individual-works-section {
   display: flex;
   flex-direction: column;
@@ -13,6 +19,7 @@
   padding: 2rem 1rem;
 }
 
+/* Typography */
 .individual-works-header {
   font-size: 2.5rem;
   font-weight: 800;
@@ -32,20 +39,7 @@
   margin-bottom: 2rem;
 }
 
-/* .individual-works-gallery {
-  display: flex;
-  gap: 1rem;
-  max-width: 1024px;
-  width: 100%;
-  flex-wrap: wrap;
-  justify-content: center;
-} */
-
-img {
-  width: 100%;
-  margin-bottom: 1em;
-}
-
+/* Grid layouts */
 .list {
   columns: 380px;
 }
@@ -66,38 +60,132 @@ img {
   display: block;
 }
 
-@media (max-width: 768px) {
-  .g-carousel {
-    width: 270px;
-  }
-  .g-carousel-button {
-    width: 180px;
-    height: 60px;
-    font-size: 20px;
-  }
+/* Carousel specific styles */
+.g-carousel {
+  margin-right: 30px;
+  width: auto;
+}
 
+.g-carousel-button {
+  font-size: 120%;
+  transition: all 0.3s ease;
+  width: 40%;
+}
+
+/* Slider styles */
+.slick-slider {
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  user-select: none;
+  touch-action: pan-y;
+}
+
+.slick-list {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+.slick-track {
+  position: relative;
+  left: 0;
+  top: 0;
+  display: flex;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.slick-slide {
+  float: left;
+  height: 100%;
+  min-height: 1px;
+  display: block;
+}
+
+.slick-slide > div {
+  padding: 0 10px;
+}
+
+/* Navigation arrows */
+.custom-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 20;
+  cursor: pointer;
+}
+
+/* Tablet Breakpoint */
+@media (max-width: 768px) {
   .individual-works-section {
-    display: flex;
-    flex-direction: column;
     padding: 2rem;
   }
 
   .individual-works-header {
     font-size: 2rem;
-    font-weight: 800;
-    color: #57534e; /* stone-700 */
-    letter-spacing: 2px;
-    margin-bottom: 1rem;
-    align-items: center;
-    text-align: center;
   }
 
   .individual-works-description {
-    align-items: center;
-    text-align: center;
     font-size: 0.5rem;
-    font-weight: 600;
-    color: #78716c; /* stone-600 */
-    margin-bottom: 2rem7;
+  }
+
+  .g-carousel {
+    width: auto;
+  }
+
+  .g-carousel-button {
+    width: 180px;
+    height: 60px;
+    font-size: 20px;
+    right: -25px;
+  }
+
+  .slick-slide > div {
+    padding: 0 5px;
+  }
+}
+
+/* Mobile Breakpoint */
+@media (max-width: 640px) {
+  .slider-container {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .slick-slide,
+  .slick-list {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Arrow positioning */
+  button.slick-prev,
+  button.slick-next {
+    z-index: 20;
+  }
+
+  button.slick-prev {
+    left: 4px !important;
+  }
+
+  button.slick-next {
+    right: 4px !important;
+  }
+
+  .g-carousel {
+    width: 100% !important;
+    margin: 0 auto !important;
+  }
+
+  /* Mobile button adjustments */
+  .g-carousel-button {
+    width: auto;
+    height: auto;
+    font-size: 16px;
+    padding: 0.5rem 1rem;
+    right: 10px;
   }
 }

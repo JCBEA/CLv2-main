@@ -3,7 +3,6 @@ import { supabase } from '@/services/supabaseClient';
 import bcrypt from 'bcryptjs';
 import { createJWT, verifyJWT } from './jwt'; // Import createJWT and verifyJWT
 import { NextResponse } from 'next/server';
-
 export const loginUser = async (username: string, password: string) => {
   console.log("Attempting login with:", { username, password });
 
@@ -87,6 +86,7 @@ export const signupUser = async (
   password: string,
   firstName: string,
   creativeField: string,
+  bday:string,
   address: string,
   mobileNo: string,
   bio: string,
@@ -99,11 +99,11 @@ export const signupUser = async (
 
   // Hash the password before storing it
   const hashedPassword = await bcrypt.hash(password, 10);
-
+  const generatedId = Math.floor(10000 + Math.random() * 90000);
   // Insert the new user into the 'users' table
   const { data: userData, error: userError } = await supabase
     .from("users")
-    .insert([{ username, email, password: hashedPassword}])
+    .insert([{id:generatedId, username, email, password: hashedPassword}])
     .select("id, username")
     .single();
 
@@ -121,10 +121,13 @@ export const signupUser = async (
       detailsid: userData.id, 
       first_name: firstName,
       creative_field: creativeField,
+      bday: bday,
       address: address,
       mobileNo: mobileNo,
       bio: bio,
+      email: email,
       instagram: instagram,
+      profile_pic:null,
       facebook: facebook,
       twitter: twitter,
       portfolioLink: portfolioLink,
