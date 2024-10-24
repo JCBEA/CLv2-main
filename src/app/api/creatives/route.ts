@@ -11,7 +11,7 @@ export async function PUT(req: Request) {
     }
 
     try {
-        const userId = authHeader;
+        const userId = authHeader.split(' ')[1]; // Assuming "Bearer <token>"
         console.log("UserId from Authorization:", userId);
 
         const body = await req.json();
@@ -19,20 +19,18 @@ export async function PUT(req: Request) {
 
         const { detailsid, userDetails } = body;
 
-        if (!userId) {
+        if (!userId || userId !== detailsid) {
             console.log("Authorization mismatch");
             return NextResponse.json({ message: 'You are not authorized to update these details.' }, { status: 403 });
         }
 
-        // Merge the userDetails object without profile picture URL
-        const updatedUserDetails = { ...userDetails }; // No need to handle profile_pic
+        const updatedUserDetails = { ...userDetails };
         console.log("Updated user details:", updatedUserDetails);
 
-        // Update user details in Supabase
         const { data: updatedData, error: userDetailsError } = await supabase
             .from('userDetails')
             .update(updatedUserDetails)
-            .eq('detailsid', userId)
+            .eq('detailsid', detailsid)
             .select();
 
         if (userDetailsError) {
@@ -42,14 +40,11 @@ export async function PUT(req: Request) {
 
         console.log("User details updated successfully:", updatedData);
 
-        // Update related collections if first_name exists
         if (userDetails.first_name) {
-            console.log("Updating related collections");
-
             const { error: childCollectionError } = await supabase
                 .from('child_collection')
                 .update({ artist: userDetails.first_name })
-                .eq('childid', userId);
+                .eq('childid', detailsid);
 
             if (childCollectionError) {
                 console.error('Supabase child_collection update error:', childCollectionError);
@@ -58,7 +53,7 @@ export async function PUT(req: Request) {
             const { error: imageCollectionError } = await supabase
                 .from('image_collections')
                 .update({ artist: userDetails.first_name })
-                .eq('id', userId);
+                .eq('id', detailsid);
 
             if (imageCollectionError) {
                 console.error('Supabase image_collection update error:', imageCollectionError);

@@ -123,7 +123,7 @@ export const Calendar: React.FC = () => {
     // Add empty cells for days before the 1st of the month
     for (let i = 0; i < startingDayIndex; i++) {
       days.push(
-        <div key={`empty-${i}`} className="calendar-day border border-gray-700 flex items-start justify-start p-2" />
+        <div key={`empty-${i}`} className="border border-gray-700 flex items-start justify-start p-2 " />
       );
     }
 
@@ -142,7 +142,7 @@ export const Calendar: React.FC = () => {
       days.push(
         <div
           key={day}
-          className="calendar-day border border-gray-700 flex flex-col items-start justify-start p-2 cursor-pointer"
+          className="border border-gray-700 flex flex-col items-start justify-start p-2 cursor-pointer hover:bg-gray-500 transition-colors"
           onClick={() => handleDayClick(day)} // Open modal when clicked
         >
           {day}

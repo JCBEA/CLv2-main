@@ -82,7 +82,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `${payload.id}`,
+          Authorization: `Bearer ${payload.id}`,
         },
         body: JSON.stringify({
           detailsid: payload.id,
