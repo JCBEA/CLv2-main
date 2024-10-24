@@ -7,7 +7,10 @@ import { usePathname } from 'next/navigation';
 import { AuthProvider } from '@/context/authcontext';
 import './globals.css';
 import 'react-toastify/dist/ReactToastify.css';
-import LottieAnimation from '@/components/animations/_lottieloader';
+import dynamic from 'next/dynamic';
+
+// Dynamically import LottieAnimation with ssr: false to ensure it only runs on the client side
+const LottieAnimation = dynamic(() => import('@/components/animations/_lottieloader'), { ssr: false });
 
 export default function RootLayout({
   children,
@@ -15,7 +18,6 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const [mounted, setMounted] = useState(false);
-  const [contentLoaded, setContentLoaded] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isLogoutInProgress, setIsLogoutInProgress] = useState(false);
   const pathname = usePathname();
@@ -51,13 +53,13 @@ export default function RootLayout({
       }, 2000);
 
       const handleContentLoaded = () => {
-        setContentLoaded(true);
+        setIsLoading(false);
       };
 
       window.addEventListener('contentLoaded', handleContentLoaded);
 
       if (pathname !== '/') {
-        setContentLoaded(true);
+        setIsLoading(false);
       }
 
       return () => {
@@ -72,7 +74,6 @@ export default function RootLayout({
     if (isLogoutInProgress) {
       setIsLogoutInProgress(false);
       setIsLoading(true);
-      setContentLoaded(false);
       
       const resetTimer = setTimeout(() => {
         setIsLoading(false);
@@ -97,7 +98,7 @@ export default function RootLayout({
     <html lang="en">
       <body className="flex flex-col min-h-screen">
         <AuthProvider>
-          {contentLoaded && !isLogoutInProgress && (
+          {!isLogoutInProgress && (
             <Header
               linkName="/signin"
               roundedCustom="lg:rounded-bl-3xl"
@@ -108,7 +109,7 @@ export default function RootLayout({
           <main className="flex-grow">
             {children}
           </main>
-          {contentLoaded && !isLogoutInProgress && <Footer />}
+          {!isLogoutInProgress && <Footer />}
         </AuthProvider>
       </body>
     </html>
