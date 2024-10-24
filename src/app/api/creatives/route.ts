@@ -4,33 +4,33 @@ import { supabase } from '@/services/supabaseClient';
 export async function PUT(req: Request) {
     console.log("PUT request received");
 
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
+    const userId = req.headers.get('Authorization')?.split(' ')[1];
+    if (!userId) {
         console.log("No Authorization header found");
         return NextResponse.json({ message: 'No token provided' }, { status: 401 });
     }
 
     try {
-        const userId = authHeader.split(' ')[1]; // Assuming "Bearer <token>"
         console.log("UserId from Authorization:", userId);
-
         const body = await req.json();
         console.log("Request body:", body);
 
         const { detailsid, userDetails } = body;
 
-        if (!userId || userId !== detailsid) {
+        if (!userId) {
             console.log("Authorization mismatch");
             return NextResponse.json({ message: 'You are not authorized to update these details.' }, { status: 403 });
         }
 
-        const updatedUserDetails = { ...userDetails };
+        // Merge the userDetails object without profile picture URL
+        const updatedUserDetails = { ...userDetails }; // No need to handle profile_pic
         console.log("Updated user details:", updatedUserDetails);
 
+        // Update user details in Supabase
         const { data: updatedData, error: userDetailsError } = await supabase
             .from('userDetails')
             .update(updatedUserDetails)
-            .eq('detailsid', detailsid)
+            .eq('detailsid', userId)
             .select();
 
         if (userDetailsError) {
@@ -40,23 +40,36 @@ export async function PUT(req: Request) {
 
         console.log("User details updated successfully:", updatedData);
 
+        // Update related collections if first_name exists
         if (userDetails.first_name) {
+            console.log("Updating related collections");
+
             const { error: childCollectionError } = await supabase
                 .from('child_collection')
                 .update({ artist: userDetails.first_name })
-                .eq('childid', detailsid);
+                .eq('childid', userId);
 
             if (childCollectionError) {
                 console.error('Supabase child_collection update error:', childCollectionError);
             }
 
+            
+
             const { error: imageCollectionError } = await supabase
                 .from('image_collections')
                 .update({ artist: userDetails.first_name })
-                .eq('id', detailsid);
+                .eq('id', userId);
+
+                const { error: messageError } = await supabase
+                .from('messages')
+                .update({ first_name: userDetails.first_name })
+                .eq('id', userId);    
 
             if (imageCollectionError) {
                 console.error('Supabase image_collection update error:', imageCollectionError);
+                if (messageError) {
+                    console.error('Supabase message update error:', messageError);
+                }
             }
         }
 
