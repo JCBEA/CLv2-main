@@ -132,6 +132,7 @@ const [eventTitle, setTitle] = useState(event?.event_title || ""); // Use event 
       setDescription(event.description || "");
     }
   }, [event]); // Update when event data changes
+  
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();

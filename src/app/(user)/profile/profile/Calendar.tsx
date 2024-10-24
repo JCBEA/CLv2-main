@@ -98,18 +98,6 @@ export const Calendar: React.FC = () => {
     );
   };
 
-  const handleDayClick = (day: number) => {
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth(); // month is 0-indexed
-
-    // Create a new date and set the UTC time manually to prevent timezone issues
-    const selectedDate = new Date(Date.UTC(year, month, day, 0, 0, 0, 0));
-
-    console.log(selectedDate); // Debugging
-    setSelectedDay(selectedDate);
-    setIsModalOpen(true); // Open the modal
-  };
-
   const closeModal = () => {
     setIsModalOpen(false); // Close the modal
     setSelectedDay(null); // Reset the selected day
@@ -124,10 +112,20 @@ export const Calendar: React.FC = () => {
     });
   };
 
+  const handleDayClick = (day: number) => {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth(); // month is 0-indexed
+    const selectedDate = new Date(Date.UTC(year, month, day, 0, 0, 0, 0));
+
+    setSelectedDay(selectedDate); // Set the selected day
+    setSelectedEvent(null); // Clear any selected event
+    setIsModalOpen(true); // Open the modal for day
+  };
 
   const openModalWithEvent = (event: Event) => {
     setSelectedEvent(event); // Set the selected event
-    setIsModalOpen(true); // Open the modal
+    setSelectedDay(null); // Clear the selected day
+    setIsModalOpen(true); // Open the modal for event
   };
 
   const renderCalendarDays = () => {
@@ -167,17 +165,14 @@ export const Calendar: React.FC = () => {
         <div
           key={day}
           className="border border-gray-700 flex flex-col items-start justify-start p-2 cursor-pointer group hover:bg-shade-2 transition-colors"
-          onClick={() => handleDayClick(day)} // Open modal when clicked
+          onClick={() => handleDayClick(day)} // Open modal when clicked on the day
         >
           {day}
           {/* Render events if there are any for this day */}
           {dayEvents.length > 0 && (
             <div className="mt-1 text-xs text-secondary-2 flex flex-col gap-2">
               {dayEvents.map((event) => {
-                // Assuming the event date is in `event.selected_date`
                 const eventDate = new Date(event.selected_date);
-
-                // Create a full Date object by combining the date with the time string
                 const [startHour, startMinute, startSecond] =
                   event.start_time.split(":");
                 const [endHour, endMinute, endSecond] =
@@ -198,13 +193,7 @@ export const Calendar: React.FC = () => {
                   parseInt(endSecond)
                 );
 
-                // Check if the dates are valid
-                if (isNaN(startTime.getTime()) || isNaN(endTime.getTime())) {
-                  console.error("Invalid date for event:", event);
-                  return <div key={event.id}>Invalid Date</div>;
-                }
-
-                // Format times to 12-hour format without seconds
+                // Format times to 12-hour format
                 const formattedStartTime = startTime.toLocaleTimeString(
                   "en-US",
                   {
@@ -223,23 +212,15 @@ export const Calendar: React.FC = () => {
                   <div
                     key={event.id}
                     className="bg-shade-4 p-2 rounded-lg text-shade-9 hover:bg-shade-3 hover:text-secondary-1 transition-colors cursor-pointer"
-                    onClick={() => {
-                      setSelectedEvent(event); // Set the clicked event data
-                      setIsModalOpen(true); // Open the modal
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent day click
+                      openModalWithEvent(event); // Open modal with event details
                     }}
                   >
-                    <p
-                      className={`${
-                        event.event_title.length > 10 ? "line-clamp-1" : ""
-                      }`}
-                    >
-                      {event.event_title}
+                    <p>{event.event_title}</p>
+                    <p>
+                      {formattedStartTime} - {formattedEndTime}
                     </p>
-                    <div>
-                      <p>
-                        {formattedStartTime} - {formattedEndTime}
-                      </p>
-                    </div>
                   </div>
                 );
               })}
@@ -259,8 +240,8 @@ export const Calendar: React.FC = () => {
         isOpen={isModalOpen}
         onClose={closeModal}
         closeHandler={closeModal}
-        selectedDay={selectedDay ?? new Date()}
-        event={selectedEvent as FormInput | null}
+        selectedDay={selectedDay ?? new Date()} // Display day if selected
+        event={selectedEvent as FormInput | null} // Display event if selected, or null
       />
 
       <div className="w-full flex flex-col p-4 rounded-lg">
