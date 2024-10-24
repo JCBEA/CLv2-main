@@ -164,7 +164,7 @@ export const Calendar: React.FC = () => {
       days.push(
         <div
           key={day}
-          className="border border-gray-700 flex flex-col items-start justify-start p-2 cursor-pointer group hover:bg-shade-2 transition-colors"
+          className="border min-h-[8rem] border-gray-700 flex flex-col items-start justify-start p-2 cursor-pointer group hover:bg-shade-2 transition-colors"
           onClick={() => handleDayClick(day)} // Open modal when clicked on the day
         >
           {day}

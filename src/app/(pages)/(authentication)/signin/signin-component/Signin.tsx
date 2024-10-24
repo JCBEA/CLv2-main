@@ -136,10 +136,14 @@ export const Form = () => {
         </motion.button>
       </div>
       <div className="w-full flex flex-col justify-center items-center">
-        <p>Don't have an account?</p>
+        <p>Not a member?</p>
+        <motion.div
+        whileHover={{ scale: 1.05, color: "#0070f3" }}
+        whileTap={{ scale: 0.95 }}>
         <Link href={"/signup"} className="uppercase font-medium cursor-pointer">
-          Sign up
+          Apply now!
         </Link>
+        </motion.div>
       </div>
       <ToastContainer/>
     </form>
