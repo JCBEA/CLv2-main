@@ -163,7 +163,7 @@ export const EditCollection = ({
       <h2 className="text-3xl font-extrabold mb-2">EDIT COLLECTION</h2>
       <hr className="border-t border-gray-300 mb-8" />
 
-      <div className="p-4 rounded-lg h-fit overflow-y-auto">
+      <div className="p-4 rounded-lg h-fit overflow-y-auto custom-scrollbar">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Left Column */}
           <div>
