@@ -1,16 +1,19 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from "react";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { usePathname } from 'next/navigation';
-import { AuthProvider } from '@/context/authcontext';
-import 'react-toastify/dist/ReactToastify.css';
-import dynamic from 'next/dynamic';
+import { usePathname } from "next/navigation";
+import { AuthProvider } from "@/context/authcontext";
+import "react-toastify/dist/ReactToastify.css";
+import dynamic from "next/dynamic";
 
-const LottieAnimation = dynamic(() => import('@/components/animations/_lottieloader'), { ssr: false });
+const LottieAnimation = dynamic(
+  () => import("@/components/animations/_lottieloader"),
+  { ssr: false }
+);
 
-export default function RootLayout({
+export default function LoadLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -28,17 +31,17 @@ export default function RootLayout({
   }, []);
 
   useEffect(() => {
-    window.addEventListener('logoutStart', handleLogoutStart);
-    
+    window.addEventListener("logoutStart", handleLogoutStart);
+
     return () => {
-      window.removeEventListener('logoutStart', handleLogoutStart);
+      window.removeEventListener("logoutStart", handleLogoutStart);
     };
   }, [handleLogoutStart]);
 
   // Initial mount effect
   useEffect(() => {
     setMounted(true);
-    
+
     return () => {
       setMounted(false);
     };
@@ -55,15 +58,15 @@ export default function RootLayout({
         setContentLoaded(true);
       };
 
-      window.addEventListener('contentLoaded', handleContentLoaded);
+      window.addEventListener("contentLoaded", handleContentLoaded);
 
-      if (pathname !== '/') {
+      if (pathname !== "/") {
         setContentLoaded(true);
       }
 
       return () => {
         clearTimeout(loadTimer);
-        window.removeEventListener('contentLoaded', handleContentLoaded);
+        window.removeEventListener("contentLoaded", handleContentLoaded);
       };
     }
   }, [pathname, isLogoutInProgress]);
@@ -74,7 +77,7 @@ export default function RootLayout({
       setIsLogoutInProgress(false);
       setIsLoading(true);
       setContentLoaded(false);
-      
+
       const resetTimer = setTimeout(() => {
         setIsLoading(false);
       }, 2000);
@@ -86,24 +89,18 @@ export default function RootLayout({
   // Show loading animation
   if (!mounted || isLoading || isLogoutInProgress) {
     return (
-      <html lang="en">
-        <body>
-          <LottieAnimation />
-        </body>
-      </html>
+      <main>
+        <LottieAnimation />
+      </main>
     );
   }
 
   return (
-    <html lang="en">
-      <body className="flex flex-col min-h-screen">
-        <AuthProvider>
-          <main className="flex-grow">
-            {children}
-          </main>
-          {contentLoaded && !isLogoutInProgress}
-        </AuthProvider>
-      </body>
-    </html>
+    <main className="w-full flex flex-col min-h-screen">
+      <AuthProvider>
+        <main className="flex-grow">{children}</main>
+        {contentLoaded && !isLogoutInProgress}
+      </AuthProvider>
+    </main>
   );
 }
