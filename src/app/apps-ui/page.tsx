@@ -250,12 +250,12 @@ export default function Loader({ setContentLoaded }: HomeProps) {
 
       <div
         ref={websiteContentRef}
-        className="website-content w-full min-h-screen pb-[10dvh]"
+        className="website-content w-full min-h-screen pb-[10dvh] relative"
       >
         {showContent && (
           
           <motion.div
-            className="w-full md:max-w-[80%] max-w-[90%] h-full min-h-[30dvh] mx-auto flex flex-col gap-8 justify-center pt-[49dvh] items-center z-20 relative"
+            className="w-full md:max-w-[80%] max-w-[90%] h-full min-h-[30dvh] mx-auto flex flex-col gap-8 justify-center pt-[49dvh] items-center z-20"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
@@ -267,7 +267,7 @@ export default function Loader({ setContentLoaded }: HomeProps) {
               paddingLeftCustom="lg:pl-14"
               buttonName="Log in"
             />
-            <div className="w-full h-[879px] absolute inset-0 bg-black bg-opacity-10 z-10"></div>
+            <div className="w-full h-[879px] absolute inset-0 bg-black bg-opacity-20 z-10"></div>
 
             <motion.div
               className="z-50 w-full h-full flex flex-col lg:justify-start lg:items-start justify-center items-center gap-4"
