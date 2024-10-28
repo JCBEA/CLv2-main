@@ -3,7 +3,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import Image from "next/image";
-
 import { Events } from "./(pages)/landing-page/landing-page/EventsCarousel";
 import { GallerySection } from "./(pages)/landing-page/landing-page/GallerySection";
 import { Malikhain } from "./(pages)/landing-page/landing-page/Malikhain";
@@ -22,7 +21,7 @@ const heroImages = [
   "/intro/img4.jpg",
   "/intro/img5.jpg",
   "/intro/img6.jpg",
-  "/images/pofcon/hero.jpg",
+  "/intro/img7.jpg",
 ];
 
 const containerVariants = {
@@ -251,6 +250,7 @@ export default function Loader({ setContentLoaded }: HomeProps) {
         ref={websiteContentRef}
         className="website-content w-full min-h-screen pb-[10dvh]"
       >
+        <div className="w-full h-[879px] absolute inset-0 bg-black bg-opacity-10 z-10"></div>
         {showContent && (
           <motion.div
             className="w-full md:max-w-[80%] max-w-[90%] h-full min-h-[30dvh] mx-auto flex flex-col gap-8 justify-center pt-[49dvh] items-center z-20 relative"
@@ -259,7 +259,6 @@ export default function Loader({ setContentLoaded }: HomeProps) {
             animate="visible"
             onAnimationComplete={() => setContentFullyLoaded(true)}
           >
-            <div className="w-full h-[879px] absolute inset-0 bg-black bg-opacity-10 z-10"></div>
 
             <motion.div
               className="z-50 w-full h-full flex flex-col lg:justify-start lg:items-start justify-center items-center gap-4"
