@@ -4,7 +4,7 @@ import { jwtVerify } from 'jose';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret';
 
-export async function PUT(req: Request) {
+export async function POST(req: Request) {
   const userId = req.headers.get('User-ID'); // Extract user ID from custom header
 
   if (!userId) {
@@ -43,7 +43,10 @@ export async function GET(req: Request) {
   const userId = req.headers.get('User-ID'); // Extract user ID from custom header
 
   if (!userId) {
-    return NextResponse.json({ message: 'User ID or Authorization header is missing' }, { status: 401 });
+    return NextResponse.json(
+      { message: 'User ID header is missing' },
+      { status: 401 }
+    );
   }
 
   try {
@@ -54,12 +57,71 @@ export async function GET(req: Request) {
       .eq('user_id', userId); // Filter by user_id
 
     if (error) {
-      return NextResponse.json({ message: error.message }, { status: 500 });
+      return NextResponse.json(
+        { message: `Error fetching events: ${error.message}` },
+        { status: 500 }
+      );
+    }
+
+    if (!data || data.length === 0) {
+      return NextResponse.json(
+        { message: 'No events found for the user.' },
+        { status: 204 } // No Content
+      );
     }
 
     return NextResponse.json(data, { status: 200 }); // Return the fetched data
   } catch (error) {
     console.error('Error fetching events:', error);
-    return NextResponse.json({ message: 'Failed to fetch events' }, { status: 500 });
+    return NextResponse.json(
+      { message: 'Failed to fetch events' },
+      { status: 500 }
+    );
   }
 }
+
+
+
+
+export async function UPDATE(req: Request) {
+  const userId = req.headers.get('User-ID');
+
+  if (!userId) {
+    console.log('User ID is missing');
+    return NextResponse.json({ message: 'User ID is missing' }, { status: 401 });
+  }
+
+  try {
+    const { id, event_title, event_location, start_time, end_time, selected_date, description } = await req.json();
+
+    if (!id || !event_title || !event_location) {
+      console.log('Missing required fields:', { id, event_title, event_location });
+      return NextResponse.json({ message: 'Missing required fields: id, event_title, or event_location' }, { status: 400 });
+    }
+
+    const { error } = await supabase
+      .from('creative_events')
+      .update({
+        event_title,
+        event_location,
+        start_time,
+        end_time,
+        selected_date,
+        description,
+      })
+      .eq('id', id);
+
+    if (error) {
+      console.log('Error updating event:', error.message);
+      return NextResponse.json({ message: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ message: 'Event updated successfully' }, { status: 200 });
+  } catch (error) {
+    console.error('Error updating event:', error);
+    return NextResponse.json({ message: 'Failed to update event' }, { status: 500 });
+  }
+}
+
+
+

@@ -49,7 +49,7 @@ export const Header = ({
   buttonName = "Log in",
   paddingLeftCustom = "pl-14",
   roundedCustom = "rounded-bl-3xl",
-  linkName = "/signin",
+  linkName = "/apps-ui/signin",
 }: HeaderProps) => {
   const headerRef = useRef<HTMLDivElement | null>(null);
   const gsapAnimationRef = useRef<gsap.core.Timeline | null>(null);
@@ -66,19 +66,19 @@ export const Header = ({
 
       if (session) {
         setMenuItems([
-          { name: "Directory", link: "/creative-dashboard" },
-          { name: "Gallery", link: "/g-user" },
-          { name: "FAQ", link: "/faqs" },
-          { name: "Events", link: "/events" },
-          { name: "Profile", link: "/profile" },
+          { name: "Directory", link: "/apps-ui/creative-dashboard" },
+          { name: "Gallery", link: "/apps-ui//g-user" },
+          { name: "FAQ", link: "/apps-ui//faqs" },
+          { name: "Events", link: "/apps-ui//events" },
+          { name: "Profile", link: "/apps-ui//profile" },
         ]);
       } else {
         setMenuItems([
-          { name: "Home", link: "/pofcon-landing-page" },
-          { name: "Directory", link: "/creative-dashboard" },
-          { name: "Gallery", link: "/g-visitor" },
-          { name: "FAQ", link: "/faqs" },
-          { name: "Events", link: "/events" },
+          { name: "Home", link: "/apps-ui//pofcon-landing-page" },
+          { name: "Directory", link: "/apps-ui//creative-dashboard" },
+          { name: "Gallery", link: "/apps-ui//g-visitor" },
+          { name: "FAQ", link: "/apps-ui//faqs" },
+          { name: "Events", link: "/apps-ui//events" },
         ]);
       }
     } catch (error) {
@@ -142,7 +142,7 @@ export const Header = ({
       await new Promise(resolve => setTimeout(resolve, 100));
 
       // Navigate using replace
-      router.replace('/signin');
+      router.replace('/apps-ui/signin');
     } catch (error) {
       console.error('Logout failed:', error);
       setIsLoggingOut(false);
