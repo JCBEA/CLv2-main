@@ -35,7 +35,7 @@ const itemVariants = {
 export const PofconHeroPage: React.FC<PofconHeroPageProps> = ({ setShowPofconModal }) => {
   return (
     <motion.div
-      className="w-full h-[50vh] md:h-[105vh] pb-[10dvh] bg-[url('/images/pofcon/hero.jpg')] bg-no-repeat relative"
+      className="w-full h-[50vh] md:h-[105vh] pb-[10dvh] bg-[url('/intro/img7.jpg')] bg-no-repeat relative"
       style={{
         backgroundPosition: '47.5% 53.5%', // Shift the image slightly to the right
         backgroundSize: '118.5%',
@@ -43,6 +43,7 @@ export const PofconHeroPage: React.FC<PofconHeroPageProps> = ({ setShowPofconMod
       initial="hidden"
       animate="visible"
       variants={containerVariants}
+      
     >
       <div className="w-full h-full absolute inset-0 bg-black bg-opacity-10 z-10"></div>
 
