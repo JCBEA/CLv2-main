@@ -83,7 +83,7 @@ export async function GET(req: Request) {
 
 
 
-export async function UPDATE(req: Request) {
+export async function PUT(req: Request) {
   const userId = req.headers.get('User-ID');
 
   if (!userId) {
@@ -109,7 +109,8 @@ export async function UPDATE(req: Request) {
         selected_date,
         description,
       })
-      .eq('id', id);
+      .eq('id', id)
+      .eq('user_id', userId);
 
     if (error) {
       console.log('Error updating event:', error.message);

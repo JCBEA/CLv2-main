@@ -33,20 +33,44 @@ export const Calendar: React.FC = () => {
       .on(
         "postgres_changes",
         {
-          event: "*",
+          event: "*", // Listen to all types of changes (INSERT, UPDATE, DELETE)
           schema: "public",
           table: "creative_events",
         },
         (payload: any) => {
-          setEvents((prev) => [...prev, payload.new]);
+          const newEvent = payload.new;
+          const eventId = newEvent.id; // Adjust this based on your unique event identifier
+  
+          switch (payload.eventType) {
+            case 'INSERT':
+              // Add new event if it doesn't already exist
+              setEvents((prev) => [...prev, newEvent]);
+              break;
+  
+            case 'UPDATE':
+              // Update existing event
+              setEvents((prev) =>
+                prev.map((event) => (event.id === eventId ? newEvent : event))
+              );
+              break;
+  
+            case 'DELETE':
+              // Remove deleted event
+              setEvents((prev) => prev.filter((event) => event.id !== eventId));
+              break;
+  
+            default:
+              break;
+          }
         }
       )
       .subscribe();
-
+  
     return () => {
       supabase.removeChannel(subscription);
     };
   }, []);
+  
 
   useEffect(() => {
     const fetchEvents = async () => {

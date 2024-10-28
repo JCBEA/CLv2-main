@@ -125,7 +125,6 @@ const FormInput = ({
   // Format selectedDay to YYYY-MM-DD format for inputs
   const formatDate = (date: Date) => date.toISOString().split("T")[0];
   const [selectedDate, setSelectedDate] = useState(formatDate(selectedDay)); // Initialize with the selected day's date
-
   const [eventTitle, setTitle] = useState(event?.event_title || ""); // Use event data or empty string
   const [eventLocation, setLocation] = useState(event?.event_location || "");
   const [startDate, setStartDate] = useState(formatDate(selectedDay));
@@ -142,27 +141,30 @@ const FormInput = ({
       setDescription(event.description || "");
 
       // Set the selected date from the event
-      const eventDate = new Date(event.selected_date); // Assuming event.selected_date is in a correct format
-      setSelectedDate(formatDate(eventDate)); // Format and set the selected date
+      const eventDate = new Date(event.selected_date);
+      setSelectedDate(formatDate(eventDate));
     }
+    
   }, [event]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+  
     const token = getSession();
     if (!token) {
       toast.error("No token found, please log in.");
       return;
     }
-
+  
     const { payload } = await jwtVerify(
       token,
       new TextEncoder().encode(JWT_SECRET)
     );
     const userId = payload.id as string;
-
+  
+    // Add event ID to request body if updating an existing event
     const requestBody = {
+      id: event?.id, // Include event ID for updates
       event_title: eventTitle,
       event_location: eventLocation,
       start_time: startTime,
@@ -171,44 +173,56 @@ const FormInput = ({
       description,
     };
 
+    const updateBody = {
+      id: event?.id, // Include event ID for updates
+      event_title: eventTitle,
+      event_location: eventLocation,
+      start_time: startTime,
+      end_time: endTime,
+      selected_date: selectedDate,
+      description,
+    };
+  
     try {
       let response;
-      if (event) {
-        response = await fetch(`/api/events/${event.id}`, {
-          method: "PUT",
+      if(event){
+        const method = "PUT";
+       response = await fetch(`/api/events`, {
+          method,
           headers: {
             "Content-Type": "application/json",
             "User-ID": userId,
-            Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify(requestBody),
+          body: JSON.stringify(updateBody),
         });
-      } else {
-        response = await fetch("/api/events", {
-          method: "POST",
+      } else{
+        const method = "POST";
+         response = await fetch(`/api/events`, {
+          method,
           headers: {
             "Content-Type": "application/json",
             "User-ID": userId,
-            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify(requestBody),
         });
-      }
 
+      } 
       if (!response.ok) {
-        const errorText = await response.text(); // Get the response body as text
-        console.error("Error response:", errorText); // Log the error text
+        const errorText = await response.text();
+        console.error("Error response:", errorText);
         throw new Error("Network response was not ok");
       }
-
+  
       const data = await response.json();
       toast.success("Event processed successfully", {
         position: "bottom-right",
       });
     } catch (error) {
       console.error("An error occurred while processing the event:", error);
+      toast.error("Failed to process event. Please try again.");
     }
   };
+  
 
   return (
     <div className="w-full h-full text-secondary-2">
@@ -287,7 +301,7 @@ const FormInput = ({
           type="submit"
           className="w-full h-12 bg-shade-2 text-secondary-2 rounded-lg"
         >
-          Submit
+           {event ? 'Update' : 'Submit'}
         </button>
       </form>
     </div>
