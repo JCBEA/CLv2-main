@@ -21,7 +21,7 @@ const heroImages = [
   '/intro/img4.jpg',
   '/intro/img5.jpg',
   '/intro/img6.jpg',
-  '/images/pofcon/hero.jpg',
+  '/intro/img7.jpg',
 ];
 
 const containerVariants = {
@@ -233,6 +233,7 @@ export default function Loader({ setContentLoaded }: HomeProps) {
       </section>
 
       <div ref={websiteContentRef} className="website-content w-full min-h-screen pb-[10dvh]">
+        <div className="h-[879px] absolute inset-0 bg-black bg-opacity-10 z-10"></div>
       
       
       {showContent && (
@@ -243,7 +244,6 @@ export default function Loader({ setContentLoaded }: HomeProps) {
   animate="visible"
   onAnimationComplete={() => setContentFullyLoaded(true)}
 >
-        <div className="w-full h-[879px] absolute inset-0 bg-black bg-opacity-10 z-10"></div>
 
    <motion.div className="z-50 w-full h-full flex flex-col lg:justify-start lg:items-start justify-center items-center gap-4" variants={itemVariants}>
      <motion.h1 className="font-bold lg:text-6xl text-5xl text-left text-secondary-1" variants={itemVariants}>
