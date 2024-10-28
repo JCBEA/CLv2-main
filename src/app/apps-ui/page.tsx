@@ -13,6 +13,8 @@ import { Subscribe } from "@/components/reusable-component/Subscribe";
 import { PofconModal } from "@/components/reusable-component/PofconModal";
 import { Logo } from "@/components/reusable-component/Logo";
 import { motion } from "framer-motion";
+import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
 
 const heroImages = [
   "/intro/img1.jpg",
@@ -29,7 +31,7 @@ const containerVariants = {
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.2,
+      staggerChildren: 0.3,
       delayChildren: 0.3,
     },
   },
@@ -147,8 +149,8 @@ export default function Loader({ setContentLoaded }: HomeProps) {
 
   return (
     <main
-      className={`gege overflow-x-hidden ${
-        !contentFullyLoaded ? "no-scroll" : ""
+      className={`gege overflow-x-hidden   ${
+        !contentFullyLoaded ? "no-scroll " : ""
       }`}
     >
       <section ref={heroRef} className="hero">
@@ -169,7 +171,7 @@ export default function Loader({ setContentLoaded }: HomeProps) {
             className="counter"
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
+            transition={{ duration: 0.5, }}
           >
             <div className="digit-1" ref={digit1Ref}>
               <motion.div
@@ -251,6 +253,7 @@ export default function Loader({ setContentLoaded }: HomeProps) {
         className="website-content w-full min-h-screen pb-[10dvh]"
       >
         {showContent && (
+          
           <motion.div
             className="w-full md:max-w-[80%] max-w-[90%] h-full min-h-[30dvh] mx-auto flex flex-col gap-8 justify-center pt-[49dvh] items-center z-20 relative"
             variants={containerVariants}
@@ -258,6 +261,12 @@ export default function Loader({ setContentLoaded }: HomeProps) {
             animate="visible"
             onAnimationComplete={() => setContentFullyLoaded(true)}
           >
+            <Header
+              linkName="/apps-ui/signin"
+              roundedCustom="lg:rounded-bl-3xl"
+              paddingLeftCustom="lg:pl-14"
+              buttonName="Log in"
+            />
             <div className="w-full h-[879px] absolute inset-0 bg-black bg-opacity-10 z-10"></div>
 
             <motion.div
@@ -309,7 +318,7 @@ export default function Loader({ setContentLoaded }: HomeProps) {
                   </motion.div>
                   <motion.img
                     className="w-full lg:h-full block lg:hidden"
-                    src={"images/landing-page/laptop.png"}
+                    src={"../images/landing-page/laptop.png"}
                     alt="Laptop"
                     variants={itemVariants}
                   />
@@ -343,7 +352,7 @@ export default function Loader({ setContentLoaded }: HomeProps) {
                   <div className="w-full mt-1.5 h-full flex justify-center items-center">
                     <motion.img
                       className="w-full"
-                      src={"images/landing-page/laptop.png"}
+                      src={"../images/landing-page/laptop.png"}
                       alt="Laptop"
                       variants={itemVariants}
                       initial={{ opacity: 0, scale: 0.8 }}
@@ -365,6 +374,7 @@ export default function Loader({ setContentLoaded }: HomeProps) {
       <Transcribed />
       <Infinite />
       <Subscribe />
+      <Footer />
 
       {showPofconModal && (
         <PofconModal setShowPofconModal={setShowPofconModal} />

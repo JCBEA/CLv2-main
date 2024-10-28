@@ -98,14 +98,6 @@ export default function RootLayout({
     <html lang="en">
       <body className="flex flex-col min-h-screen">
         <AuthProvider>
-          {contentLoaded && !isLogoutInProgress && (
-            <Header
-              linkName="/signin"
-              roundedCustom="lg:rounded-bl-3xl"
-              paddingLeftCustom="lg:pl-14"
-              buttonName="Log in"
-            />
-          )}
           <main className="flex-grow">
             {children}
           </main>

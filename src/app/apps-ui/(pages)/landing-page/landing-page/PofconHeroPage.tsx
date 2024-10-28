@@ -1,9 +1,8 @@
 "use client";
 
-
 import { CreativeDirectory } from "@/components/reusable-component/CreativeDirectory";
 import { Logo } from "@/components/reusable-component/Logo";
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
 
 interface PofconHeroPageProps {
   setShowPofconModal: React.Dispatch<React.SetStateAction<boolean>>;
@@ -26,27 +25,28 @@ const itemVariants = {
     y: 0,
     opacity: 1,
     transition: {
-      type: 'spring',
+      type: "spring",
       stiffness: 100,
     },
   },
 };
 
-export const PofconHeroPage: React.FC<PofconHeroPageProps> = ({ setShowPofconModal }) => {
+export const PofconHeroPage: React.FC<PofconHeroPageProps> = ({
+  setShowPofconModal,
+}) => {
   return (
     <motion.div
-      className="w-full h-[50vh] md:h-[105vh] pb-[10dvh] bg-[url('/intro/img7.jpg')] bg-no-repeat relative"
+      className="w-full h-fit md:h-[105vh] pb-[10dvh]  relative"
       style={{
-        backgroundPosition: '47.5% 53.5%', // Shift the image slightly to the right
-        backgroundSize: '118.5%',
+        backgroundPosition: "47.5% 53.5%", // Shift the image slightly to the right
+        backgroundSize: "118.5%",
       }}
       initial="hidden"
       animate="visible"
       variants={containerVariants}
-      
     >
-      <div className="w-full h-full absolute inset-0 bg-black bg-opacity-10 z-10"></div>
-
+      <div className="w-full h-full absolute inset-0 bg-[url('/intro/img7.jpg')] bg-cover bg-no-repeat bg-black bg-opacity-10 z-10"></div>
+      <div className="w-full h-full absolute inset-0 bg-black bg-opacity-20 z-20"></div>
       <motion.div
         className="w-full md:max-w-[80%] max-w-[90%] min-h-[30dvh] mx-auto flex flex-col gap-8 justify-center pt-[20.4vh] items-center z-20 relative"
         variants={itemVariants}
@@ -71,11 +71,11 @@ export const PofconHeroPage: React.FC<PofconHeroPageProps> = ({ setShowPofconMod
             />
           </motion.div>
         </motion.div>
-        
+
         <motion.div variants={itemVariants}>
-          <CreativeDirectory 
-            textColor="text-primary-2" 
-            textFont="title" 
+          <CreativeDirectory
+            textColor="text-primary-2"
+            textFont="title"
             borderColor="border-primary-2 border-2"
             trackingWide="tracking-widest"
             roundedEdges="rounded-none"
