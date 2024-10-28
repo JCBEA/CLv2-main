@@ -15,7 +15,7 @@ export const Subscribe = () => {
   return (
     <div className="w-full md:h-[35dvh] h-fit md:py-0 py-12 bg-primary-2 text-secondary-1">
       <div className="w-full h-full flex md:flex-row flex-col-reverse gap-4 justify-between items-center md:justify-between md:max-w-[80%] max-w-[90%] mx-auto">
-        <SubscribeInsigts />
+        <SubscribeInsights />
         <div className="w-full h-full flex md:justify-end justify-center items-center py-10">
           <Logo
             width="auto"
@@ -31,7 +31,7 @@ export const Subscribe = () => {
 };
 
 // para maging resuable sya sa ibang components
-export const SubscribeInsigts: React.FC<SubscribeProps> = ({
+export const SubscribeInsights: React.FC<SubscribeProps> = ({
   bgColor = "bg-primary-2",
   textColor = "text-secondary-1",
   placeHolder = "Sign up your email",

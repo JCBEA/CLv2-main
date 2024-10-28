@@ -110,7 +110,7 @@ export default function RootLayout({
           <main className="flex-grow">
             {children}
           </main>
-          {contentLoaded && !isLogoutInProgress && <Footer />}
+          {contentLoaded && !isLogoutInProgress}
         </AuthProvider>
       </body>
     </html>

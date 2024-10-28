@@ -5,7 +5,6 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import Link from 'next/link';
 import { fetchArtworks, Artwork } from '@/services/Collections/fetchArtworks';
 
 const ArtworkDetailPage: React.FC = () => {

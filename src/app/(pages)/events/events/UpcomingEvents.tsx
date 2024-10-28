@@ -68,7 +68,7 @@ export const UpcomingEvents = () => {
     // Initial check
     handleResize();
     window.addEventListener("resize", handleResize);
-    
+
     // Cleanup event listener on unmount
     return () => {
       window.removeEventListener("resize", handleResize);
@@ -77,29 +77,65 @@ export const UpcomingEvents = () => {
 
   return (
     <div className="w-full h-fit min-h-dvh max-w-[90%] mx-auto py-[15dvh] flex flex-col gap-6">
-      <div className="w-full">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.6 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        viewport={{
+          margin: '20px',
+          once: false,
+        }}
+        transition={{ duration: 1 }}
+        className="w-full"
+      >
         <h1 className="font-extrabold lg:text-6xl md:text-5xl text-4xl text-primary-3 uppercase text-center">
           upcoming events
         </h1>
-      </div>
+      </motion.div>
       {/* Calendar showing the current date or month year */}
-      <div className="w-full h-fit flex justify-center items-center text-center pb-12">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.6 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        viewport={{
+          margin: "50px",
+          once: false,
+        }}
+        transition={{ duration: 1 }}
+        className="w-full h-fit flex justify-center items-center text-center pb-12"
+      >
         <div className="w-fit flex gap-6 justify-center items-center">
           {/* Previous Month Arrow */}
-          <Icon icon="ph:arrow-left" width="35" height="35" onClick={goToPreviousMonth} className="cursor-pointer" />
+          <Icon
+            icon="ph:arrow-left"
+            width="35"
+            height="35"
+            onClick={goToPreviousMonth}
+            className="cursor-pointer"
+          />
           {/* Month and Year */}
-          <h1 className="font-bold md:text-4xl text-2xl uppercase">{currentMonthYear}</h1>
+          <h1 className="font-bold md:text-4xl text-2xl uppercase">
+            {currentMonthYear}
+          </h1>
           {/* Next Month Arrow */}
-          <Icon icon="ph:arrow-right" width="35" height="35" onClick={goToNextMonth} className="cursor-pointer" />
+          <Icon
+            icon="ph:arrow-right"
+            width="35"
+            height="35"
+            onClick={goToNextMonth}
+            className="cursor-pointer"
+          />
         </div>
-      </div>
+      </motion.div>
       {/* Event Grid */}
       <EventGrid currentDate={currentDate} list={list} setList={setList} />
     </div>
   );
 };
 
-const EventGrid: React.FC<{ currentDate: Date; list: boolean; setList: React.Dispatch<React.SetStateAction<boolean>> }> = ({ currentDate, list, setList }) => {
+const EventGrid: React.FC<{
+  currentDate: Date;
+  list: boolean;
+  setList: React.Dispatch<React.SetStateAction<boolean>>;
+}> = ({ currentDate, list, setList }) => {
   // Filter events based on the current month and year
   const filteredEvents = EventDetails.filter((event) => {
     const eventDate = new Date(event.date);
@@ -119,10 +155,13 @@ const EventGrid: React.FC<{ currentDate: Date; list: boolean; setList: React.Dis
 
   return (
     <div className="w-full h-fit flex flex-col gap-12 relative">
-      <ListButton list={list} setList={setList} />
-      {sortedDates.map((date, groupIndex) => (
+      <div className="w-full flex justify-end items-center">
+        <ListButton list={list} setList={setList} />
+      </div>
+      {/* ini su container kang mga cards na tigfetch */}
+      {sortedDates.length > 0 ? sortedDates.map((date, groupIndex) => (
         <div key={date}>
-          {/* Date heading */}
+          {/* ini su event Date heading ex. 01 - Monday */}
           <h1 className="font-bold text-4xl uppercase pb-8 md:text-left text-center">
             {(() => {
               const dateObject = new Date(date);
@@ -141,6 +180,7 @@ const EventGrid: React.FC<{ currentDate: Date; list: boolean; setList: React.Dis
                 : "grid xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-12" // For grid view
             }`}
           >
+            {/* ini su mga event cards na tigfetch */}
             {groupedEvents[date].map((event) => (
               <EventCard
                 event={event}
@@ -150,9 +190,17 @@ const EventGrid: React.FC<{ currentDate: Date; list: boolean; setList: React.Dis
               />
             ))}
           </div>
-          <div className={`w-full h-[1px] bg-primary-1 mt-12 ${list ? "hidden" : ""}`}></div>
+          <div
+            className={`w-full h-[1px] bg-primary-1 mt-12 ${
+              list ? "hidden" : ""
+            }`}
+          ></div>
         </div>
-      ))}
+      )) : (
+        <p className="text-center text-2xl font-semibold mt-12">No events available</p>
+      )
+    }
+
     </div>
   );
 };
@@ -167,10 +215,18 @@ const EventCard: React.FC<{
 
   return (
     <motion.div
-      whileHover={list ? { backgroundColor: "transparent" } : { scale: 1.05, backgroundColor: "transparent" }}
+      whileHover={
+        list
+          ? { backgroundColor: "transparent" }
+          : { scale: 1.05, backgroundColor: "transparent" }
+      }
       className={`w-full ${
-        list ? "flex flex-row gap-6 justify-start items-center" : "max-w-xs mx-auto flex flex-col gap-4"
-      }  ${colorClasses.bgColor} border-2 ${colorClasses.border} duration-500 p-4 text-base group`}
+        list
+          ? "flex flex-row gap-6 justify-start items-center"
+          : "max-w-xs mx-auto flex flex-col gap-4"
+      }  ${colorClasses.bgColor} border-2 ${
+        colorClasses.border
+      } duration-500 p-4 text-base group`}
     >
       <div className={`${list ? "h-24 w-full max-w-44" : "h-48 w-full"}`}>
         <img
@@ -179,7 +235,11 @@ const EventCard: React.FC<{
           alt={event.title}
         />
       </div>
-      <div className={`w-full flex gap-4 ${list ? "flex-col-reverse" : "flex-col"}`}>
+      <div
+        className={`w-full flex gap-4 ${
+          list ? "flex-col-reverse" : "flex-col"
+        }`}
+      >
         <div className="w-full flex justify-between items-center">
           <div className="w-fit flex flex-col leading-3">
             <p className={`font-bold duration-500 ${colorClasses.textColor}`}>
@@ -189,7 +249,9 @@ const EventCard: React.FC<{
           </div>
           <motion.div whileTap={{ scale: 0.95 }} whileHover={{ scale: 1.05 }}>
             <Icon
-              className={`rotate-180 -mt-4 cursor-pointer duration-300 ${colorClasses.textColor} ${list ? "hidden" : "block"}`}
+              className={`rotate-180 -mt-4 cursor-pointer duration-300 ${
+                colorClasses.textColor
+              } ${list ? "hidden" : "block"}`}
               icon="ph:arrow-left-bold"
               width="25"
               height="25"
@@ -197,7 +259,11 @@ const EventCard: React.FC<{
           </motion.div>
         </div>
         <div className="w-full">
-          <h1 className={`w-full text-xl font-semibold title duration-300 ${colorClasses.textColor} ${list ? "max-w-full" : "max-w-56"}`}>
+          <h1
+            className={`w-full text-xl font-semibold title duration-300 ${
+              colorClasses.textColor
+            } ${list ? "max-w-full" : "max-w-56"}`}
+          >
             {event.title}
           </h1>
         </div>
@@ -228,7 +294,7 @@ const EventRegisterButton = ({ colorClasses, list }: any) => {
 const ListButton: React.FC<ButtonProp> = ({ list, setList }) => {
   return (
     <motion.button
-      className="w-44 absolute top-0 right-4 py-1 bg-secondary-1 border-2 border-secondary-2 text-secondary-2 font-medium transition-colors duration-500 ease-in-out md:block hidden"
+      className="w-44 py-1 bg-secondary-1 border-2 border-secondary-2 text-secondary-2 font-medium transition-colors duration-500 ease-in-out md:block hidden"
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
       onClick={() => setList((prev) => !prev)} // Toggle the view when button is clicked
