@@ -1,17 +1,16 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback } from 'react';
 import { Header } from "@/components/layout/Header";
-import { usePathname } from "next/navigation";
-import { AuthProvider } from "@/context/authcontext";
-import dynamic from "next/dynamic";
+import { Footer } from "@/components/layout/Footer";
+import { usePathname } from 'next/navigation';
+import { AuthProvider } from '@/context/authcontext';
+import 'react-toastify/dist/ReactToastify.css';
+import dynamic from 'next/dynamic';
 
-const LottieAnimation = dynamic(
-  () => import("@/components/animations/_lottieloader"),
-  { ssr: false }
-);
+const LottieAnimation = dynamic(() => import('@/components/animations/_lottieloader'), { ssr: false });
 
-export default function AppsLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -29,17 +28,17 @@ export default function AppsLayout({
   }, []);
 
   useEffect(() => {
-    window.addEventListener("logoutStart", handleLogoutStart);
-
+    window.addEventListener('logoutStart', handleLogoutStart);
+    
     return () => {
-      window.removeEventListener("logoutStart", handleLogoutStart);
+      window.removeEventListener('logoutStart', handleLogoutStart);
     };
   }, [handleLogoutStart]);
 
   // Initial mount effect
   useEffect(() => {
     setMounted(true);
-
+    
     return () => {
       setMounted(false);
     };
@@ -56,15 +55,15 @@ export default function AppsLayout({
         setContentLoaded(true);
       };
 
-      window.addEventListener("contentLoaded", handleContentLoaded);
+      window.addEventListener('contentLoaded', handleContentLoaded);
 
-      if (pathname !== "/") {
+      if (pathname !== '/') {
         setContentLoaded(true);
       }
 
       return () => {
         clearTimeout(loadTimer);
-        window.removeEventListener("contentLoaded", handleContentLoaded);
+        window.removeEventListener('contentLoaded', handleContentLoaded);
       };
     }
   }, [pathname, isLogoutInProgress]);
@@ -75,7 +74,7 @@ export default function AppsLayout({
       setIsLogoutInProgress(false);
       setIsLoading(true);
       setContentLoaded(false);
-
+      
       const resetTimer = setTimeout(() => {
         setIsLoading(false);
       }, 2000);
@@ -87,26 +86,32 @@ export default function AppsLayout({
   // Show loading animation
   if (!mounted || isLoading || isLogoutInProgress) {
     return (
-      <main>
-        <LottieAnimation />
-      </main>
+      <html lang="en">
+        <body>
+          <LottieAnimation />
+        </body>
+      </html>
     );
   }
 
   return (
-    <main className="flex flex-col min-h-screen w-full">
-      <AuthProvider>
-        {contentLoaded && !isLogoutInProgress && (
-          <Header
-            linkName="/apps-ui/signin"
-            roundedCustom="lg:rounded-bl-3xl"
-            paddingLeftCustom="lg:pl-14"
-            buttonName="Log in"
-          />
-        )}
-        <main className="flex-grow w-full">{children}</main>
-        {contentLoaded && !isLogoutInProgress}
-      </AuthProvider>
-    </main>
+    <html lang="en">
+      <body className="flex flex-col min-h-screen">
+        <AuthProvider>
+          {contentLoaded && !isLogoutInProgress && (
+            <Header
+              linkName="/signin"
+              roundedCustom="lg:rounded-bl-3xl"
+              paddingLeftCustom="lg:pl-14"
+              buttonName="Log in"
+            />
+          )}
+          <main className="flex-grow">
+            {children}
+          </main>
+          {contentLoaded && !isLogoutInProgress}
+        </AuthProvider>
+      </body>
+    </html>
   );
 }
