@@ -66,6 +66,7 @@ export const Header = ({
 
       if (session) {
         setMenuItems([
+          { name: "Home", link: "/apps-ui/pofcon-landing-page" },
           { name: "Directory", link: "/apps-ui/creative-dashboard" },
           { name: "Gallery", link: "/apps-ui/g-user" },
           { name: "FAQ", link: "/apps-ui/faqs" },
