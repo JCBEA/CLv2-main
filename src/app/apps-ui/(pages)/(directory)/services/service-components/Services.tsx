@@ -10,6 +10,9 @@ import { useParams } from "next/navigation";
 import { getSession } from "@/services/authservice";
 import { jwtVerify } from "jose";
 import Link from "next/link";
+import { div } from "framer-motion/client";
+import { ToastContainer, toast } from 'react-toastify'; // Import ToastContainer and toast
+import 'react-toastify/dist/ReactToastify.css'; 
 export const Services = () => {
   const [serviceArray, setServiceArray] = useState<UserDetail[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -42,6 +45,7 @@ export const Services = () => {
 
   return (
     <div className="w-full h-fit pb-[15dvh]">
+      <ToastContainer />
       <div className="w-full flex flex-col">
         <div className="w-full max-w-[90%] mx-auto grid lg:grid-cols-3 grid-cols-1 gap-x-14 gap-y-14 py-[15dvh]">
           {/* Render cards here */}
@@ -137,9 +141,8 @@ export const CreativeCards: React.FC<UserDetail> = ({
             </div>
             <div className="w-full flex flex-col sm:flex-row justify-between items-center sm:items-start gap-2 sm:gap-0">
               <p
-                className={`text-xs font-semibold text-center sm:text-left ${
-                  bio.length > 20 ? "line-clamp-1" : ""
-                }`}
+                className={`text-xs font-semibold text-center sm:text-left ${bio.length > 20 ? "line-clamp-1" : ""
+                  }`}
               >
                 {age}, {address}
               </p>
@@ -160,9 +163,8 @@ export const CreativeCards: React.FC<UserDetail> = ({
         <div className="w-full min-h-32 flex flex-col pt-4">
           <div className="w-full h-full max-w-[87%] mx-auto flex flex-col gap-6 justify-center items-center">
             <p
-              className={`text-center text-xs font-semibold ${
-                bio.length > 100 ? "line-clamp-6" : ""
-              }`}
+              className={`text-center text-xs font-semibold ${bio.length > 100 ? "line-clamp-6" : ""
+                }`}
             >
               {bio}
             </p>
@@ -196,20 +198,51 @@ const CreativeButton: React.FC<{ detailsid: string }> = ({ detailsid }) => {
 
     fetchUserDetails();
   }, []);
-  const galleryLink = gettSession
-    ? `/g-user/collections/${detailsid}`
-    : `/g-visitor/artwork/${detailsid}`;
+
+
+
+  const handleGalleryClick = async () => {
+
+    // Check if userId matches detailsid
+    const response = await fetch(`/api/directoryServices`, {
+      method: 'GET',
+      headers: {
+        'User-ID': detailsid,
+      },
+    });
+
+
+    console.log(detailsid)
+
+
+    const data = await response.json();
+    if (data.exists) {
+      if (gettSession) {
+        // Redirect to the gallery if the user exists
+        window.location.href = `/apps-ui/g-user/collections/${detailsid}`;
+      } else {
+        // Redirect to visitor's artwork if the user doesn't exist
+        window.location.href = `/apps-ui/g-visitor/artwork/${detailsid}`;
+      }
+    }else{
+      toast.error("No uploaded works yet!", {
+        position: "bottom-center",
+      });
+    }
+  };
+
+
   return (
-    <Link href={galleryLink} passHref>
       <motion.div
         whileTap={{ scale: 0.95 }}
         whileHover={{ scale: 1.05 }}
         className="w-full h-fit flex flex-row-reverse gap-2 justify-center items-center text-primary-2"
       >
-        <button className="py-2 bg-primary-1 rounded-full uppercase w-56 font-bold text-base">
+        <button className="py-2 bg-primary-1 rounded-full uppercase w-56 font-bold text-base"
+          onClick={handleGalleryClick}
+        >
           view gallery
         </button>
       </motion.div>
-    </Link>
   );
 };

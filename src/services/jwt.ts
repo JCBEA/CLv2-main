@@ -13,7 +13,7 @@ export const createJWT = async (payload: TokenPayload) => {
   return await new SignJWT(payload)
     .setProtectedHeader({ alg: 'HS256' }) // Set the signing algorithm
     .setIssuedAt() // Set the issued time
-    .setExpirationTime('5h') // Token expiration time
+    .setExpirationTime('1y') // Token expiration time
     .sign(new TextEncoder().encode(JWT_SECRET));
 };
 
