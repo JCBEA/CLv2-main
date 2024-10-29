@@ -32,7 +32,7 @@ const withAuth = (WrappedComponent: React.ComponentType<{ userDetail: UserDetail
             const checkAuthentication = async () => {
                 if (!token) {
                     console.log("No token found. Redirecting to login.");
-                    router.push('/signup');
+                    router.push('/apps-ui/signup');
                     return;
                 }
 
@@ -59,7 +59,7 @@ const withAuth = (WrappedComponent: React.ComponentType<{ userDetail: UserDetail
                     setIsAuthenticated(true); 
                 } catch (error) {
                     console.error("Token verification or data fetching failed:", error);
-                    router.push('/signup');
+                    router.push('/apps-ui/signup');
                 } finally {
                     setLoading(false); 
                 }

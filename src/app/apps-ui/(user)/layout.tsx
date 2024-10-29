@@ -13,7 +13,7 @@ export default function DashboardLayout({ children }: LayoutProps) {
       <Header
         backgroundColor="bg-secondary-1"
         textColor="text-secondary-2"
-        linkName="/profile"
+        linkName="/apps-ui/profile"
         paddingLeftCustom="pl-0"
         roundedCustom="rounded-bl-none"
       />

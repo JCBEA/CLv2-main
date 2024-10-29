@@ -259,7 +259,7 @@ const MultiStepForm = () => {
 
       <div className="w-full flex flex-col justify-center items-center mt-2">
         <p>Already have an account?</p>
-        <Link href="/signin" className="uppercase font-medium cursor-pointer">
+        <Link href="/apps-ui/signin" className="uppercase font-medium cursor-pointer">
           Login
         </Link>
       </div>

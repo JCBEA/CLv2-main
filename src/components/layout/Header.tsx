@@ -67,18 +67,18 @@ export const Header = ({
       if (session) {
         setMenuItems([
           { name: "Directory", link: "/apps-ui/creative-dashboard" },
-          { name: "Gallery", link: "/apps-ui//g-user" },
-          { name: "FAQ", link: "/apps-ui//faqs" },
-          { name: "Events", link: "/apps-ui//events" },
-          { name: "Profile", link: "/apps-ui//profile" },
+          { name: "Gallery", link: "/apps-ui/g-user" },
+          { name: "FAQ", link: "/apps-ui/faqs" },
+          { name: "Events", link: "/apps-ui/events" },
+          { name: "Profile", link: "/apps-ui/profile" },
         ]);
       } else {
         setMenuItems([
-          { name: "Home", link: "/apps-ui//pofcon-landing-page" },
-          { name: "Directory", link: "/apps-ui//creative-dashboard" },
-          { name: "Gallery", link: "/apps-ui//g-visitor" },
-          { name: "FAQ", link: "/apps-ui//faqs" },
-          { name: "Events", link: "/apps-ui//events" },
+          { name: "Home", link: "/apps-ui/pofcon-landing-page" },
+          { name: "Directory", link: "/apps-ui/creative-dashboard" },
+          { name: "Gallery", link: "/apps-ui/g-visitor" },
+          { name: "FAQ", link: "/apps-ui/faqs" },
+          { name: "Events", link: "/apps-ui/events" },
         ]);
       }
     } catch (error) {
