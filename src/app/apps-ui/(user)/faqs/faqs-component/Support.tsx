@@ -1,6 +1,8 @@
 "use client"
 
 import { Icon } from "@iconify/react/dist/iconify.js"
+import { useState } from "react"
+import { useRouter } from "next/navigation"
 
 export const Support = () => {
     return (
@@ -38,12 +40,24 @@ const RightSide = () => {
 }
 
 const SearchInput = () => {
+    const router = useRouter()
+    const [searchQuery, setSearchQuery] = useState("")
+
+    const handleSubmit = () => {
+        if (searchQuery.trim()) {
+            router.push(`/apps-ui/faqs/search?q=${encodeURIComponent(searchQuery)}`)
+        }
+    }
+
     return (
         <div className="w-full xl:max-w-md lg:max-w-xs max-w-[90%] h-fit relative text-secondary-1 rounded-2xl mt-8">
             <input
                 className="placeholder:text-secondary-1 text-lg font-medium rounded-full bg-quaternary-1 ring-none outline-none w-full py-3 px-14"
                 type="text"
                 placeholder="Search"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleSubmit()}
             />
             <Icon
                 className="absolute top-1/2 -translate-y-1/2 left-4 text-secondary-1"
@@ -51,11 +65,13 @@ const SearchInput = () => {
                 width="23"
                 height="23"
             />
-            <Icon // submit button for search
-                onClick={() => console.log("submit")}
-                className=" cursor-pointer -mt-1 absolute top-[55%] -translate-y-1/2 right-4  text-secondary-1"
-                 icon="iconamoon:send-thin" width="28" height="28" />
+            <Icon
+                onClick={handleSubmit}
+                className="cursor-pointer -mt-1 absolute top-[55%] -translate-y-1/2 right-4 text-secondary-1"
+                icon="iconamoon:send-thin"
+                width="28"
+                height="28"
+            />
         </div>
     );
 };
-
