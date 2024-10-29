@@ -3,6 +3,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Icon } from "@iconify/react/dist/iconify.js";
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 const pageVariants = {
   initial: { opacity: 0, y: 20 },
@@ -71,8 +73,19 @@ const TitleDetails = () => {
 }
 
 const SearchInput = () => {
+    const router = useRouter();
+    const [searchQuery, setSearchQuery] = useState('');
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (searchQuery.trim()) {
+            router.push(`/apps-ui/creative-dashboard/search?q=${encodeURIComponent(searchQuery)}`);
+        }
+    };
+
     return (
-        <motion.div 
+        <motion.form 
+            onSubmit={handleSubmit}
             className="w-full lg:max-w-xl max-w-sm h-fit relative text-primary-2 rounded-full"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -83,6 +96,8 @@ const SearchInput = () => {
                 outline-none w-full py-2.5 px-14"
                 type="text"
                 placeholder="Search"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
             />
             <Icon
                 className="absolute top-1/2 -translate-y-1/2 left-4 text-primary-2"
@@ -90,13 +105,15 @@ const SearchInput = () => {
                 width="23"
                 height="23"
             />
-            <Icon
-                className="cursor-pointer -mt-1 absolute top-[55%] -translate-y-1/2 right-4 text-primary-2"
-                icon="iconamoon:send-thin" 
-                width="28" 
-                height="28" 
-            />
-        </motion.div>
+            <button type="submit">
+                <Icon
+                    className="cursor-pointer -mt-1 absolute top-[55%] -translate-y-1/2 right-4 text-primary-2"
+                    icon="iconamoon:send-thin" 
+                    width="28" 
+                    height="28" 
+                />
+            </button>
+        </motion.form>
     );
 };
 
