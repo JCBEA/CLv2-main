@@ -1,35 +1,34 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Icon } from "@iconify/react/dist/iconify.js";
 import Link from 'next/link';
-import { CreativeArray, CreativeLegazpiUsers } from '../creative-components/CreativeArray';
+import { CreativeArray, CreativeService } from '../creative-components/CreativeArray';
 
+// Define the page variants for animations
 const pageVariants = {
-    initial: { opacity: 0, y: 20 },
-    animate: { opacity: 1, y: 0 },
-    exit: { opacity: 0, y: -20 }
+    initial: { opacity: 0 },
+    animate: { opacity: 1 },
+    exit: { opacity: 0 },
 };
 
-const pageTransition = {
-    type: "tween",
-    ease: "anticipate",
-    duration: 0.6
-};
+// Define the CreativeUser interface
+interface CreativeUser {
+    detailsid: number; // Adjust according to your data structure
+    first_name: string;
+    bio: string;
+    imageBg: string;
+    profile_pic: string;
+    bday: string;   
+}
 
-const staggerChildren = {
-    animate: {
-        transition: {
-            staggerChildren: 0.2
-        }
-    }
-};
-
-const childVariants = {
-    initial: { opacity: 0, y: 20 },
-    animate: { opacity: 1, y: 0 }
+const calculateAge = (birthday: string): number => {
+    const birthDate = new Date(birthday);
+    const ageDiff = Date.now() - birthDate.getTime();
+    const ageDate = new Date(ageDiff);
+    return Math.abs(ageDate.getUTCFullYear() - 1970); // Calculate age
 };
 
 const SearchResultsPage = () => {
@@ -37,15 +36,50 @@ const SearchResultsPage = () => {
     const query = searchParams.get('q');
     const router = useRouter();
     const [searchQuery, setSearchQuery] = useState(query || '');
-    
-    // Filter both categories and users based on search query
+    const [filteredUsers, setFilteredUsers] = useState<CreativeUser[]>([]);
+    const [isInView, setIsInView] = useState(false);
+    const ref = useRef<HTMLDivElement | null>(null);
+
+    useEffect(() => {
+        const fetchUsers = async () => {
+            try {
+                const users = await CreativeService.fetchCreativeUsers(); // Fetch users from the service
+                setFilteredUsers(users); // Set the fetched users to state
+            } catch (error) {
+                console.error('Failed to fetch users:', error);
+            }
+        };
+
+        fetchUsers(); // Call the fetch function
+    }, []);
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(([entry]) => {
+            setIsInView(entry.isIntersecting);
+        }, {
+            threshold: 0.1, // Adjust the threshold as needed
+        });
+
+        if (ref.current) {
+            observer.observe(ref.current);
+        }
+
+        return () => {
+            if (ref.current) {
+                observer.unobserve(ref.current);
+            }
+        };
+    }, [ref]);
+
+    // Filter categories based on search query
     const filteredCategories = CreativeArray.filter(category =>
         category.title.toLowerCase().includes((query || '').toLowerCase())
     );
-    
-    const filteredUsers = CreativeLegazpiUsers.filter(user =>
-        user.name.toLowerCase().includes((query || '').toLowerCase()) ||
-        user.description.toLowerCase().includes((query || '').toLowerCase())
+
+    // Filter users based on search query
+    const filteredUsersList = filteredUsers.filter(user =>
+        user.first_name.toLowerCase().includes((query || '').toLowerCase()) ||
+        user.bio.toLowerCase().includes((query || '').toLowerCase())
     );
 
     const handleNewSearch = (e: React.FormEvent) => {
@@ -62,31 +96,22 @@ const SearchResultsPage = () => {
             animate="animate"
             exit="exit"
             variants={pageVariants}
-            transition={pageTransition}
+            transition={{ duration: 0.5 }} // Optional transition properties
         >
             <div className="w-full lg:max-w-[70%] md:max-w-[80%] max-w-[90%] mx-auto">
-                <motion.div 
-                    className="w-full flex flex-col gap-8"
-                    variants={staggerChildren}
-                >
+                <motion.div className="w-full flex flex-col gap-8">
                     {/* Header with Back Button */}
-                    <motion.div 
-                        className="flex items-center gap-4"
-                        variants={childVariants}
-                    >
+                    <motion.div className="flex items-center gap-4">
                         <Link href="/" className="text-primary-2 hover:opacity-80 transition-opacity">
                             <Icon icon="eva:arrow-back-fill" width="24" height="24" />
                         </Link>
-                        <h1 className="text-3xl font-semibold">
-                            Search Results
-                        </h1>
+                        <h1 className="text-3xl font-semibold">Search Results</h1>
                     </motion.div>
 
                     {/* Search Bar */}
                     <motion.form 
                         onSubmit={handleNewSearch}
                         className="w-full max-w-2xl relative"
-                        variants={childVariants}
                     >
                         <input
                             className="placeholder:text-primary-2 text-lg font-medium rounded-full bg-quaternary-2 ring-none 
@@ -113,7 +138,7 @@ const SearchResultsPage = () => {
                     </motion.form>
 
                     {/* Search Query Display */}
-                    <motion.div variants={childVariants}>
+                    <motion.div>
                         <p className="text-lg opacity-80">
                             Showing results for "<span className="font-semibold">{query}</span>"
                         </p>
@@ -121,17 +146,13 @@ const SearchResultsPage = () => {
 
                     {/* Categories Results */}
                     {filteredCategories.length > 0 && (
-                        <motion.div variants={childVariants}>
+                        <motion.div>
                             <h2 className="text-2xl font-semibold mb-4">Categories</h2>
-                            <motion.div 
-                                className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-6"
-                                variants={staggerChildren}
-                            >
+                            <motion.div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-6">
                                 {filteredCategories.map((category) => (
                                     <Link href={category.link} key={category.id}>
                                         <motion.div
                                             className="bg-quaternary-2 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow"
-                                            variants={childVariants}
                                         >
                                             <img
                                                 src={category.src}
@@ -149,49 +170,50 @@ const SearchResultsPage = () => {
                     )}
 
                     {/* Artists/Users Results */}
-                    {filteredUsers.length > 0 && (
-                        <motion.div variants={childVariants} className="mt-8">
+                    {filteredUsersList.length > 0 && (
+                        <motion.div className="mt-8">
                             <h2 className="text-2xl font-semibold mb-4">Artists</h2>
-                            <motion.div 
-                                className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-6"
-                                variants={staggerChildren}
-                            >
-                                {filteredUsers.map((user) => (
+                            <motion.div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-6">
+                                {filteredUsersList.map((user) => (
                                     <motion.div
-                                        key={user.id}
-                                        className="bg-quaternary-2 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow"
-                                        variants={childVariants}
+                                        key={user.detailsid}
+                                        ref={ref} // Attach the ref here
+                                        initial={{ opacity: 0, y: 50 }}
+                                        animate={!isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
+                                        transition={{ duration: 0.5, ease: "easeOut" }}
+                                        whileHover={{ scale: 1.02 }}
+                                        className="w-full border border-gray-400 rounded-xl p-4 bg-secondary-1 shadow-customShadow"
                                     >
-                                        <div className="relative h-48">
-                                            <img
-                                                src={user.imageBg}
-                                                alt="background"
-                                                className="w-full h-full object-cover absolute"
-                                            />
-                                            <img
-                                                src={user.imageSrc}
-                                                alt={user.name}
-                                                className="w-full h-full object-contain relative z-10"
-                                            />
-                                        </div>
-                                        <div className="p-6">
-                                            <h3 className="text-xl font-semibold mb-2">{user.name}</h3>
-                                            <p className="text-sm opacity-80 line-clamp-3">{user.description}</p>
+                                        <div className="flex flex-col">
+                                            <div className="w-full h-52 relative">
+                                                <img 
+                                                    className="w-full h-full object-cover" 
+                                                    src={user.imageBg || "../../images/landing-page/eabab.png"} 
+                                                    alt={user.first_name} 
+
+                                                />
+                                            </div>
+                                            <div className="w-full h-full max-h-28 -mt-12 flex justify-center items-center">
+                                                {/* <motion.span whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                                                    <Icon className="cursor-pointer" icon="jam:heart" width="35" height="35" />
+                                                </motion.span> */}
+                                                <img 
+                                                    className="h-32 w-32 z-50 rounded-full object-cover" 
+                                                    src={user.profile_pic || "../../images/creative-directory/boy.png"} 
+                                                    alt={user.first_name}
+                                                />
+                                                <div className="w-4"></div>
+                                            </div>
+                                            <div className="w-full min-h-32 max-h-fit mt-6">
+                                                <div className="w-full h-full max-w-[87%] mx-auto flex flex-col gap-2 justify-center items-center">
+                                                    <h6 className="text-center text-2xl font-bold">{user.first_name}, {calculateAge(user.bday)}</h6>
+                                                    <p className={`text-center text-xs font-semibold ${user.bio.length > 100 ? "line-clamp-6" : ""}`}>{user.bio}</p>
+                                                </div>
+                                            </div>
                                         </div>
                                     </motion.div>
                                 ))}
                             </motion.div>
-                        </motion.div>
-                    )}
-
-                    {/* No Results State */}
-                    {filteredCategories.length === 0 && filteredUsers.length === 0 && (
-                        <motion.div 
-                            className="text-center py-12"
-                            variants={childVariants}
-                        >
-                            <p className="text-xl mb-2">No results found for "{query}"</p>
-                            <p className="opacity-80">Try searching with different keywords</p>
                         </motion.div>
                     )}
                 </motion.div>

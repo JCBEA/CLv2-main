@@ -8,14 +8,15 @@ interface CardProps {
    link: string
 }
 
-interface CreativeArrayProps {
-   name: string,
-   bDay: string,
-   description: string,
-   imageSrc: string,
-   imageBg: string,
-   link?: string
+export interface CreativeUser {
+   detailsid: number;
+   first_name: string;
+   bday: string;
+   bio: string;
+   profile_pic: string;
+   imageBg: string;
 }
+
 
 export const CreativeArray = [
    {
@@ -102,53 +103,17 @@ export const CreativeArray = [
 ];
 
 
-export const CreativeLegazpiUsers = [
-   {
-      id: 1,
-      name: 'Sean Palacay',
-      bDay: '2001-12-24', //yyyy/mm/dd
-      description: 'Am from Legazpi City a Bikolano Visual Artist,born on September 21,1958 years old now ,a widow with 2 kids I lost my wife last November 7 2019 presently residing at #365 Purple 5 Gogon Legazpi City they fondly called me BENNY as AKA...I belong to Artist Group BROTSA.',
-      imageSrc: '/images/creative-directory/boy.png',
-      imageBg: '/images/landing-page/eabab.png'
-   },
-   {
-      id: 2,
-      name: 'Ainah Saba',
-      bDay: '2001-12-24', //yyyy/mm/dd
-      description: 'Am from Legazpi City a Bikolano Visual Artist,born on September 21,1958 years old now ,a widow with 2 kids I lost my wife last November 7 2019 presently residing at #365 Purple 5 Gogon Legazpi City they fondly called me BENNY as AKA...I belong to Artist Group BROTSA.',
-      imageSrc: '/images/creative-directory/boy.png',
-      imageBg: '/images/landing-page/eabab.png'
-   },
-   {
-      id: 3,
-      name: 'Alro John Mercado',
-      bDay: '2001-12-24', //yyyy/mm/dd
-      description: 'Am from Legazpi City a Bikolano Visual Artist,born on September 21,1958 years old now ,a widow with 2 kids I lost my wife last November 7 2019 presently residing at #365 Purple 5 Gogon Legazpi City they fondly called me BENNY as AKA...I belong to Artist Group BROTSA.',
-      imageSrc: '/images/creative-directory/boy.png',
-      imageBg: '/images/landing-page/eabab.png'
-   },
-   {
-      id: 4,
-      name: 'JC Bea',
-      bDay: '2001-12-24', //yyyy/mm/dd
-      description: 'Am from Legazpi City a Bikolano Visual Artist,born on September 21,1958 years old now ,a widow with 2 kids I lost my wife last November 7 2019 presently residing at #365 Purple 5 Gogon Legazpi City they fondly called me BENNY as AKA...I belong to Artist Group BROTSA.',
-      imageSrc: '/images/creative-directory/boy.png',
-      imageBg: '/images/landing-page/eabab.png'
-   },
-   {
-      id: 5,
-      name: 'Scott Andrew',
-      bDay: '2001-12-24', //yyyy/mm/dd
-      description: 'Am from Legazpi City a Bikolano Visual Artist,born on September 21,1958 years old now ,a widow with 2 kids I lost my wife last November 7 2019 presently residing at #365 Purple 5 Gogon Legazpi City they fondly called me BENNY as AKA...I belong to Artist Group BROTSA.',
-      imageSrc: '/images/creative-directory/boy.png',
-      imageBg: '/images/landing-page/eabab.png'
-   },
-   {
-      id: 6,
-      name: 'Jude Paje Saberola',
-      bDay: '2001-12-24', //yyyy/mm/dd
-      description: 'Am from Legazpi City a Bikolano Visual Artist,born on September 21,1958 years old now ,a widow with 2 kids I lost my wife last November 7 2019 presently residing at #365 Purple 5 Gogon Legazpi City they fondly called me BENNY as AKA...I belong to Artist Group BROTSA.',
-      imageSrc: '/images/creative-directory/boy.png',
-      imageBg: '/images/landing-page/eabab.png'
+export const CreativeService = {
+   async fetchCreativeUsers(): Promise<CreativeUser[]> {
+       try {
+           const response = await fetch('/api/fetchUsers');
+           if (!response.ok) {
+               throw new Error("Failed to fetch creative users");
+           }
+           return await response.json();
+       } catch (error) {
+           console.error("Error fetching creative users:", error);
+           return [];
+       }
    }
-]
+};
