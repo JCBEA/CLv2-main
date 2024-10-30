@@ -23,22 +23,31 @@ export const CalendarEvent: React.FC = () => {
   const [dateColorMap, setDateColorMap] = useState<Map<string, { bgColor: string; textColor: string }>>(new Map());
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch("/api/events");
-        if (!response.ok) throw new Error("Error fetching events");
-
-        const events = await response.json();
-        setData(events);
-        assignColorsToDates(events);
-      } catch (error) {
-        console.error("Error fetching events:", error);
-      }
-    };
     fetchData();
   }, []);
 
-  const assignColorsToDates = (events: { date: string }[]) => {
+  // Pang format ki time to 12 hours...AM and PM
+  const formatTime = (time: string) => {
+    const [hours, minutes] = time.split(":").map(Number);
+    const period = hours >= 12 ? "PM" : "AM";
+    const formattedHours = hours % 12 || 12; // Convert "0" or "12" to "12" for 12-hour format
+    return `${formattedHours}:${minutes.toString().padStart(2, "0")} ${period}`;
+  };
+
+  const fetchData = async () => {
+    try {
+      const response = await fetch("/api/admin-events");
+      if (!response.ok) throw new Error("Error fetching events");
+
+      const events = await response.json();
+      setData(events);
+      assignColorsToDates(events);
+    } catch (error) {
+      console.error("Error fetching events:", error);
+    }
+  };
+
+  const assignColorsToDates = (events: AdminEvent[]) => {
     const colorMap = new Map<string, { bgColor: string; textColor: string }>();
     let colorIndex = 0;
     events.forEach((event) => {
@@ -61,7 +70,7 @@ export const CalendarEvent: React.FC = () => {
 
   const renderEventsForDay = (day: number) => {
     const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
-    const formattedDate = date.toISOString().slice(0, 10);
+    const formattedDate = date.toISOString().split('T')[0]; // Format: YYYY-MM-DD
 
     const eventsForDay = data.filter((event) => event.date === formattedDate);
 
@@ -70,7 +79,7 @@ export const CalendarEvent: React.FC = () => {
     }
 
     return (
-      <div className="events mt-1">
+      <div className="w-full events mt-1">
         {eventsForDay.map((event, index) => {
           const { bgColor, textColor } = dateColorMap.get(event.date) || { bgColor: "bg-gray-500", textColor: "text-gray-500" };
           return (
@@ -81,15 +90,15 @@ export const CalendarEvent: React.FC = () => {
               <div className="w-full flex flex-col gap-2 justify-center items-center">
                 <div className="w-full flex justify-center items-center gap-2 h-16 aspect-square">
                   <img
-                    className="w-full h-full object-cover"
-                    src={event.image}
+                    className="w-full max-w-[7rem] h-full object-cover"
+                    src={event.image || "../images/events/cover.png"}
                     alt={event.title}
                   />
                   <p className={`text-xs font-semibold ${textColor}`}>
-                    {event.start_time} to {event.end_time}
+                  {formatTime(event.start_time)} to {formatTime(event.end_time)}
                   </p>
                 </div>
-                <p className={`text-sm font-medium ${textColor}`}>
+                <p className={`text-sm w-full font-medium capitalize ${textColor}`}>
                   {event.title}
                 </p>
               </div>
