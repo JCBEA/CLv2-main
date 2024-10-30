@@ -4,14 +4,15 @@ import { motion } from "framer-motion";
 import React, { useEffect, useState } from "react";
 import { Calendar } from "./Calendar";
 import { Messages } from "./Messages";
-import { jwtVerify } from 'jose';
+import { jwtVerify } from "jose";
 import { logoutUser } from "@/services/authservice";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 import { getSession } from "@/services/authservice";
 import { ProfileModal } from "./(modals)/ProfileModal";
-import Image from 'next/image';
+import Image from "next/image";
+import Link from "next/link";
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret';
+const JWT_SECRET = process.env.JWT_SECRET || "your-secret";
 export interface UserDetail {
   id: string; // Assuming there's an id for user identification
   first_name: string;
@@ -44,7 +45,9 @@ export const UserProfile: React.FC<UserProfileProps> = ({ userDetail }) => {
     <div className="min-h-dvh w-full text-primary-2">
       <div className="w-full xl:max-w-[65%] lg:max-w-[80%] max-w-[90%] lg:px-8 mx-auto h-fit py-[12dvh]">
         <div className="w-full h-full flex flex-col">
-          <h1 className="uppercase font-semibold text-3xl lg:block hidden">Creative profile</h1>
+          <h1 className="uppercase font-semibold text-3xl lg:block hidden">
+            Creative profile
+          </h1>
           <div className="w-full h-full mt-28">
             <div className="w-full h-fit bg-primary-3 rounded-xl shadow-lg relative">
               <ProfileDetails userDetail={userDetail} />
@@ -53,7 +56,6 @@ export const UserProfile: React.FC<UserProfileProps> = ({ userDetail }) => {
 
               {/* Conditional rendering based on the open state */}
               {open ? <Messages /> : <Calendar />}
-
             </div>
           </div>
         </div>
@@ -62,7 +64,9 @@ export const UserProfile: React.FC<UserProfileProps> = ({ userDetail }) => {
   );
 };
 
-const ProfileDetails: React.FC<{ userDetail: UserDetail }> = ({ userDetail }) => {
+const ProfileDetails: React.FC<{ userDetail: UserDetail }> = ({
+  userDetail,
+}) => {
   return (
     <div className="w-full md:max-w-[80%] mx-auto flex lg:flex-row flex-col justify-start lg:items-start items-center gap-8 lg:h-36 h-fit text-secondary-1">
       <div className="-mt-20">
@@ -90,7 +94,8 @@ const OtherDetails: React.FC<{ userDetail: UserDetail }> = ({ userDetail }) => {
   return (
     <div className="w-full h-fit py-12 bg-shade-8">
       <div className="w-full md:max-w-[80%] max-w-[90%] mx-auto flex flex-col gap-1.5">
-        <UserDetailDisplay userDetail={userDetail} /> {/* Use the updated component */}
+        <UserDetailDisplay userDetail={userDetail} />{" "}
+        {/* Use the updated component */}
         <div className="pt-8 w-full flex justify-center items-center">
           <Button />
         </div>
@@ -103,8 +108,6 @@ const UserDetailDisplay = ({ userDetail }: { userDetail: UserDetail }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState<UserDetail>(userDetail);
 
-
-
   // Update form data when userDetail changes
   useEffect(() => {
     setFormData(userDetail);
@@ -116,7 +119,9 @@ const UserDetailDisplay = ({ userDetail }: { userDetail: UserDetail }) => {
     }
   }, [formData.first_name]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -131,7 +136,10 @@ const UserDetailDisplay = ({ userDetail }: { userDetail: UserDetail }) => {
     }
     try {
       // Verify the token and handle it appropriately
-      const { payload } = await jwtVerify(token, new TextEncoder().encode(JWT_SECRET));
+      const { payload } = await jwtVerify(
+        token,
+        new TextEncoder().encode(JWT_SECRET)
+      );
 
       // Log the payload for debugging
       console.log("Retrieved token payload:", payload.id);
@@ -140,7 +148,7 @@ const UserDetailDisplay = ({ userDetail }: { userDetail: UserDetail }) => {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${userId}`, // Pass the token in the Authorization headeruserId,
+          Authorization: `Bearer ${userId}`, // Pass the token in the Authorization headeruserId,
         },
         body: JSON.stringify({
           detailsid: payload.id,
@@ -187,7 +195,9 @@ const UserDetailDisplay = ({ userDetail }: { userDetail: UserDetail }) => {
             />
           </div>
           <div>
-            <small className="font-bold opacity-80 capitalize">Contact Number</small>
+            <small className="font-bold opacity-80 capitalize">
+              Contact Number
+            </small>
             <input
               type="text"
               name="mobileNo"
@@ -206,7 +216,9 @@ const UserDetailDisplay = ({ userDetail }: { userDetail: UserDetail }) => {
             />
           </div>
           <div>
-            <small className="font-bold opacity-80 capitalize">Creative Field</small>
+            <small className="font-bold opacity-80 capitalize">
+              Creative Field
+            </small>
             <input
               type="text"
               name="creative_field"
@@ -215,10 +227,16 @@ const UserDetailDisplay = ({ userDetail }: { userDetail: UserDetail }) => {
               className="font-bold"
             />
           </div>
-          <button onClick={handleSave} className="bg-shade-1 text-secondary-1 uppercase py-2 px-4 rounded-lg font-semibold">
+          <button
+            onClick={handleSave}
+            className="bg-shade-1 text-secondary-1 uppercase py-2 px-4 rounded-lg font-semibold"
+          >
             Save Changes
           </button>
-          <button onClick={() => setIsEditing(false)} className="ml-2 bg-red-500 text-white py-2 px-4 rounded-lg font-semibold">
+          <button
+            onClick={() => setIsEditing(false)}
+            className="ml-2 bg-red-500 text-white py-2 px-4 rounded-lg font-semibold"
+          >
             Cancel
           </button>
         </div>
@@ -227,11 +245,15 @@ const UserDetailDisplay = ({ userDetail }: { userDetail: UserDetail }) => {
           {/* Display user details */}
           <small className="font-bold opacity-80 capitalize">Location</small>
           <p className="font-bold">{formData.address}</p>
-          <small className="font-bold opacity-80 capitalize">Contact Number</small>
+          <small className="font-bold opacity-80 capitalize">
+            Contact Number
+          </small>
           <p className="font-bold">{formData.mobileNo}</p>
           <small className="font-bold opacity-80 capitalize">About me</small>
           <p className="font-bold">{formData.bio}</p>
-          <small className="font-bold opacity-80 capitalize">Creative Field</small>
+          <small className="font-bold opacity-80 capitalize">
+            Creative Field
+          </small>
           <p className="font-bold">{formData.creative_field}</p>
           {/* Edith */}
           <Icon
@@ -257,16 +279,17 @@ const UserDetailDisplay = ({ userDetail }: { userDetail: UserDetail }) => {
   );
 };
 
-
 const Button = () => {
   return (
-    <motion.button
-      className="bg-shade-1 text-secondary-1 uppercase py-3 w-full md:max-w-xs text-xl rounded-lg font-semibold"
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
-    >
-      Add Your Work
-    </motion.button>
+    <Link className="w-full flex justify-center items-center" href={"/apps-ui/g-user/publish"}>
+      <motion.button
+        className="bg-shade-1 text-secondary-1 uppercase py-3 w-full md:max-w-xs text-xl rounded-lg font-semibold"
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+      >
+        Add Your Work
+      </motion.button>
+    </Link>
   );
 };
 
@@ -275,16 +298,18 @@ const ProfileButton: React.FC<ProfileButtonProps> = ({ open, setOpen }) => {
     <div className="w-full h-fit flex bg-shade-8">
       <button
         onClick={() => setOpen(false)}
-        className={`w-full py-4 font-bold text-lg uppercase flex justify-center items-center gap-2 ${!open ? "bg-shade-1" : "bg-shade-8"
-          } rounded-tr-lg overflow-hidden`}
+        className={`w-full py-4 font-bold text-lg uppercase flex justify-center items-center gap-2 ${
+          !open ? "bg-shade-1" : "bg-shade-8"
+        } rounded-tr-lg overflow-hidden`}
       >
         <Icon icon="ph:calendar-dots-thin" width="35" height="35" />
         Schedule
       </button>
       <button
         onClick={() => setOpen(true)}
-        className={`w-full py-4 font-bold text-lg uppercase flex justify-center items-center gap-2 ${open ? "bg-shade-1" : "bg-shade-8"
-          } rounded-tl-lg overflow-hidden`}
+        className={`w-full py-4 font-bold text-lg uppercase flex justify-center items-center gap-2 ${
+          open ? "bg-shade-1" : "bg-shade-8"
+        } rounded-tl-lg overflow-hidden`}
       >
         <Icon icon="ph:message-circle-dots" width="35" height="35" />
         Messages
