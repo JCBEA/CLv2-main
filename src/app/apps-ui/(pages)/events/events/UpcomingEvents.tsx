@@ -17,7 +17,7 @@ interface AdminEvent {
   start_time: string;
   end_time: string;
   desc: string;
-  image: string;
+  image_path: string;
   created_at: string;
   status: boolean;
 }
@@ -204,7 +204,7 @@ const EventCard: React.FC<{
       <div className={`${list ? "h-24 w-full max-w-44" : "h-48 w-full"}`}>
         <img
           className={`object-cover ${list ? "w-44 h-24" : "h-48 w-full"}`}
-          src={event.image || "../images/events/cover.png"}
+          src={event.image_path || "../images/events/cover.png"}
           alt={event.title}
         />
       </div>
