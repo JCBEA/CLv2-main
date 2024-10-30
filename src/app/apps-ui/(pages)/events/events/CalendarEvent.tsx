@@ -10,7 +10,7 @@ interface AdminEvent {
   start_time: string;
   end_time: string;
   desc: string;
-  image: string;
+  image_path: string;
   created_at: string;
   status: boolean;
 }
@@ -91,7 +91,7 @@ export const CalendarEvent: React.FC = () => {
                 <div className="w-full flex justify-center items-center gap-2 h-16 aspect-square">
                   <img
                     className="w-full max-w-[7rem] h-full object-cover"
-                    src={event.image || "../images/events/cover.png"}
+                    src={event.image_path || "../images/events/cover.png"}
                     alt={event.title}
                   />
                   <p className={`text-xs font-semibold ${textColor}`}>
