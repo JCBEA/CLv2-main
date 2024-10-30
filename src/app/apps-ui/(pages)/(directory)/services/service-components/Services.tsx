@@ -10,9 +10,10 @@ import { useParams } from "next/navigation";
 import { getSession } from "@/services/authservice";
 import { jwtVerify } from "jose";
 import Link from "next/link";
-import { div } from "framer-motion/client";
 import { ToastContainer, toast } from 'react-toastify'; // Import ToastContainer and toast
-import 'react-toastify/dist/ReactToastify.css'; 
+import 'react-toastify/dist/ReactToastify.css';
+import { supabase } from "@/services/supabaseClient";
+
 export const Services = () => {
   const [serviceArray, setServiceArray] = useState<UserDetail[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -33,7 +34,9 @@ export const Services = () => {
     };
 
     loadUserDetails();
-  }, []);
+  }, [dynamic]);
+
+  
 
   if (loading) {
     return <div>Loading...</div>;
@@ -49,9 +52,10 @@ export const Services = () => {
       <div className="w-full flex flex-col">
         <div className="w-full max-w-[90%] mx-auto grid lg:grid-cols-3 grid-cols-1 gap-x-14 gap-y-14 py-[15dvh]">
           {/* Render cards here */}
-          {serviceArray.map((user, id) => (
+          {serviceArray.map((user) => (
             <CreativeCards
               key={user.detailsid}
+              detailsid={user.detailsid}
               first_name={user.first_name}
               bday={user.bday}
               bio={user.bio}
@@ -60,7 +64,6 @@ export const Services = () => {
               instagram={user.instagram}
               email={user.email}
               address={user.address}
-              detailsid={user.detailsid}
               twitter={user.twitter}
               id={""}
             />
@@ -94,12 +97,175 @@ export const CreativeCards: React.FC<UserDetail> = ({
   bday,
   bio = "",
   profile_pic,
-  facebook,
-  instagram,
-  email,
   address,
 }) => {
   const age = calculateAge(bday || "");
+  const [liked, setLiked] = useState<boolean>(false);
+
+useEffect(() => {
+    const fetchLikes = async (userId: any) => {
+        const { data, error } = await supabase
+            .from('usersLikes')
+            .select('users')
+            .eq('galleryLiked', detailsid); // Adjust based on your table schema
+
+        if (error) {
+            console.error('Error fetching likes:', error);
+            return;
+        }
+
+        if (data && data.length > 0) {
+            const userLikes = data[0].users; // Assuming users is an array
+            setLiked(userLikes.includes(userId));
+        }
+    };
+
+    const checkUserLikes = async () => {
+        const token = getSession(); // Adjust this based on your session management
+        let userId = null;
+
+        if (token) {
+            try {
+                const { payload } = await jwtVerify(
+                    token,
+                    new TextEncoder().encode(process.env.JWT_SECRET || "your-secret")
+                );
+
+                userId = payload.id; // Adjust based on your JWT structure
+
+                // Fetch likes only if userId is valid
+                if (userId) {
+                    await fetchLikes(userId);
+                }
+            } catch (error) {
+                console.error('Error verifying token:', error);
+            }
+        } else {
+            // Handle guest users
+            const guestsString = localStorage.getItem("guest");
+            let guests: string[] = []; // Initialize guests as an empty array
+
+            // Check if guestsString is not null and is a valid JSON
+            if (guestsString) {
+                try {
+                    const parsedGuests = JSON.parse(guestsString);
+                    if (Array.isArray(parsedGuests)) {
+                        guests = parsedGuests;
+                    } else {
+                        console.error("Parsed guests is not an array:", parsedGuests);
+                    }
+                } catch (error) {
+                    console.error("Error parsing guests:", error);
+                }
+            }
+
+            // Check if detailsid exists in the array
+            setLiked(guests.includes(detailsid)); // Set liked state based on localStorage
+        }
+    };
+
+    checkUserLikes();
+
+    const subscription = supabase
+        .channel('fetchlikes')
+        .on(
+            'postgres_changes',
+            {
+                event: '*',
+                schema: 'public',
+                table: 'usersLikes',
+            },
+            (payload: any) => {
+                checkUserLikes();
+            }
+        )
+        .subscribe();
+
+    return () => {
+        supabase.removeChannel(subscription);
+    };
+}, [detailsid]);
+
+const handleLike = async (detailsid: string) => {
+    const token = getSession();
+    let userId = null;
+
+    if (token) {
+        try {
+            const { payload } = await jwtVerify(
+                token,
+                new TextEncoder().encode(process.env.JWT_SECRET || "your-secret")
+            );
+            userId = payload.id;
+        } catch (error) {
+            console.error("Error verifying token:", error);
+            toast.error("An error occurred while processing your request.", {
+                position: "bottom-center",
+            });
+            return;
+        }
+    } else {
+        // Handle guest users
+        const guestsString = localStorage.getItem("guest");
+        let guests: string[] = [];
+
+        if (guestsString) {
+            try {
+                const parsedGuests = JSON.parse(guestsString);
+                if (Array.isArray(parsedGuests)) {
+                    guests = parsedGuests;
+                } else {
+                    console.error("Parsed guests is not an array:", parsedGuests);
+                }
+            } catch (error) {
+                console.error("Error parsing guests:", error);
+            }
+        }
+
+        // Check if detailsid exists in the array
+        const index = guests.indexOf(detailsid);
+
+        if (index !== -1) {
+            // If it exists, remove the detailsid from the array
+            guests.splice(index, 1);
+            console.log(`Removed ${detailsid} from guests.`);
+            setLiked(false); // Update liked state
+        } else {
+            // If it doesn't exist, add detailsid to the array
+            guests.push(detailsid);
+            console.log(`Added ${detailsid} to guests.`);
+            setLiked(true); // Update liked state
+        }
+
+        // Store the updated array back to localStorage
+        localStorage.setItem("guest", JSON.stringify(guests));
+        return; // Exit the function after handling guest likes
+    }
+
+    try {
+        // Send like request to the backend
+        const response = await fetch(`/api/fetchUsers/userLikes`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ userId, detailsid }),
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+            toast.success(data.message, { position: "bottom-center" });
+            setLiked((prevLiked) => !prevLiked); // Toggle liked state
+        } else {
+            toast.error(data.message || "Failed to like. Please try again.", {
+                position: "bottom-center",
+            });
+        }
+    } catch (error) {
+        console.error("Error liking service:", error);
+        toast.error("An error occurred while liking.", { position: "bottom-center" });
+    }
+};
 
   return (
     <motion.div
@@ -132,9 +298,10 @@ export const CreativeCards: React.FC<UserDetail> = ({
                 >
                   <Icon
                     className="cursor-pointer text-red-400"
-                    icon="jam:heart"
+                    icon={liked ? "jam:heart-f" : "jam:heart"}
                     width="25"
                     height="25"
+                    onClick={() => handleLike(detailsid)}
                   />
                 </motion.span>
               </div>
@@ -146,17 +313,6 @@ export const CreativeCards: React.FC<UserDetail> = ({
               >
                 {age}, {address}
               </p>
-              <span className="flex gap-0.5">
-                {iconNifyNonColored.map((icon, id) => (
-                  <Icon
-                    key={id}
-                    className="cursor-pointer"
-                    icon={icon}
-                    width="25"
-                    height="25"
-                  />
-                ))}
-              </span>
             </div>
           </div>
         </div>
@@ -176,10 +332,13 @@ export const CreativeCards: React.FC<UserDetail> = ({
   );
 };
 
+
+
 const CreativeButton: React.FC<{ detailsid: string }> = ({ detailsid }) => {
   const [gettSession, setSession] = useState<string | null>(null);
   const JWT_SECRET = process.env.JWT_SECRET || "your-secret";
   const token = getSession();
+  
   useEffect(() => {
     const fetchUserDetails = async () => {
       const token = getSession();
@@ -199,11 +358,7 @@ const CreativeButton: React.FC<{ detailsid: string }> = ({ detailsid }) => {
     fetchUserDetails();
   }, []);
 
-
-
   const handleGalleryClick = async () => {
-
-    // Check if userId matches detailsid
     const response = await fetch(`/api/directoryServices`, {
       method: 'GET',
       headers: {
@@ -211,38 +366,31 @@ const CreativeButton: React.FC<{ detailsid: string }> = ({ detailsid }) => {
       },
     });
 
-
-    console.log(detailsid)
-
-
     const data = await response.json();
     if (data.exists) {
       if (gettSession) {
-        // Redirect to the gallery if the user exists
         window.location.href = `/apps-ui/g-user/collections/${detailsid}`;
       } else {
-        // Redirect to visitor's artwork if the user doesn't exist
         window.location.href = `/apps-ui/g-visitor/artwork/${detailsid}`;
       }
-    }else{
+    } else {
       toast.error("No uploaded works yet!", {
         position: "bottom-center",
       });
     }
   };
 
-
   return (
-      <motion.div
-        whileTap={{ scale: 0.95 }}
-        whileHover={{ scale: 1.05 }}
-        className="w-full h-fit flex flex-row-reverse gap-2 justify-center items-center text-primary-2"
+    <motion.div
+      whileTap={{ scale: 0.95 }}
+      whileHover={{ scale: 1.05 }}
+      className="w-full h-fit flex flex-row-reverse gap-2 justify-center items-center text-primary-2"
+    >
+      <button className="py-2 bg-primary-1 rounded-full uppercase w-56 font-bold text-base"
+        onClick={handleGalleryClick}
       >
-        <button className="py-2 bg-primary-1 rounded-full uppercase w-56 font-bold text-base"
-          onClick={handleGalleryClick}
-        >
-          view gallery
-        </button>
-      </motion.div>
+        view gallery
+      </button>
+    </motion.div>
   );
 };
