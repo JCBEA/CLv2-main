@@ -101,171 +101,207 @@ export const CreativeCards: React.FC<UserDetail> = ({
 }) => {
   const age = calculateAge(bday || "");
   const [liked, setLiked] = useState<boolean>(false);
+  const [totaluserLike, setTotaluserLike] = useState<number>(0);
 
-useEffect(() => {
+
+  
+  useEffect(() => {
+    const guestsString = localStorage.getItem("guest");
+    let guests: string[] = [];
+  
+    if (guestsString) {
+      try {
+        const parsedGuests = JSON.parse(guestsString);
+        if (Array.isArray(parsedGuests)) {
+          guests = parsedGuests;
+        } else {
+          console.error("Parsed guests is not an array:", parsedGuests);
+        }
+      } catch (error) {
+        console.error("Error parsing guests:", error);
+      }
+    }
+    // Initialize liked state based on local storage
+    setLiked(guests.includes(detailsid));
+
     const fetchLikes = async (userId: any) => {
-        const { data, error } = await supabase
-            .from('usersLikes')
-            .select('users')
-            .eq('galleryLiked', detailsid); // Adjust based on your table schema
+      const { data, error } = await supabase
+        .from("usersLikes")
+        .select("users, guest")
+        .eq("galleryLiked", detailsid);
 
-        if (error) {
-            console.error('Error fetching likes:', error);
-            return;
-        }
+      if (error) {
+        console.error("Error fetching likes:", error);
+        return;
+      }
 
-        if (data && data.length > 0) {
-            const userLikes = data[0].users; // Assuming users is an array
-            setLiked(userLikes.includes(userId));
-        }
+      if (data && data.length > 0) {
+        const allUserLikes = data.flatMap((item) => item.users);
+        const uniqueUserLikes = allUserLikes.filter(
+          (user, index, self) => self.indexOf(user) === index
+        );
+
+        const guestLikesCount = Number(data[0].guest) || 0;
+        setLiked(uniqueUserLikes.includes(userId));
+
+        const likes = guestLikesCount + uniqueUserLikes.length;
+        setTotaluserLike(likes);
+      } else {
+        setTotaluserLike(0);
+      }
     };
 
     const checkUserLikes = async () => {
-        const token = getSession(); // Adjust this based on your session management
-        let userId = null;
+      const token = getSession();
+      let userId = null;
 
-        if (token) {
-            try {
-                const { payload } = await jwtVerify(
-                    token,
-                    new TextEncoder().encode(process.env.JWT_SECRET || "your-secret")
-                );
+      if (token) {
+        try {
+          const { payload } = await jwtVerify(
+            token,
+            new TextEncoder().encode(process.env.JWT_SECRET || "your-secret")
+          );
 
-                userId = payload.id; // Adjust based on your JWT structure
+          userId = payload.id;
 
-                // Fetch likes only if userId is valid
-                if (userId) {
-                    await fetchLikes(userId);
-                }
-            } catch (error) {
-                console.error('Error verifying token:', error);
-            }
-        } else {
-            // Handle guest users
-            const guestsString = localStorage.getItem("guest");
-            let guests: string[] = []; // Initialize guests as an empty array
-
-            // Check if guestsString is not null and is a valid JSON
-            if (guestsString) {
-                try {
-                    const parsedGuests = JSON.parse(guestsString);
-                    if (Array.isArray(parsedGuests)) {
-                        guests = parsedGuests;
-                    } else {
-                        console.error("Parsed guests is not an array:", parsedGuests);
-                    }
-                } catch (error) {
-                    console.error("Error parsing guests:", error);
-                }
-            }
-
-            // Check if detailsid exists in the array
-            setLiked(guests.includes(detailsid)); // Set liked state based on localStorage
+          if (userId) {
+            await fetchLikes(userId);
+          }
+        } catch (error) {
+          console.error("Error verifying token:", error);
         }
+      } else {
+        await fetchLikes(null);
+        setLiked(guests.includes(detailsid));
+      }
     };
 
     checkUserLikes();
 
     const subscription = supabase
-        .channel('fetchlikes')
-        .on(
-            'postgres_changes',
-            {
-                event: '*',
-                schema: 'public',
-                table: 'usersLikes',
-            },
-            (payload: any) => {
-                checkUserLikes();
-            }
-        )
-        .subscribe();
+      .channel("fetchlikes")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "usersLikes",
+        },
+        (payload: any) => {
+          checkUserLikes();
+        }
+      )
+      .subscribe();
 
     return () => {
-        supabase.removeChannel(subscription);
+      supabase.removeChannel(subscription);
     };
-}, [detailsid]);
+  }, [detailsid]);
+  
 
-const handleLike = async (detailsid: string) => {
+  const handleLike = async (detailsid: string) => {
     const token = getSession();
     let userId = null;
 
     if (token) {
-        try {
-            const { payload } = await jwtVerify(
-                token,
-                new TextEncoder().encode(process.env.JWT_SECRET || "your-secret")
-            );
-            userId = payload.id;
-        } catch (error) {
-            console.error("Error verifying token:", error);
-            toast.error("An error occurred while processing your request.", {
-                position: "bottom-right",
-            });
-            return;
-        }
-    } else {
-        // Handle guest users
-        const guestsString = localStorage.getItem("guest");
-        let guests: string[] = [];
+      // Logged-in user
+      try {
+        const { payload } = await jwtVerify(
+          token,
+          new TextEncoder().encode(process.env.JWT_SECRET || "your-secret")
+        );
+        userId = payload.id;
 
-        if (guestsString) {
-            try {
-                const parsedGuests = JSON.parse(guestsString);
-                if (Array.isArray(parsedGuests)) {
-                    guests = parsedGuests;
-                } else {
-                    console.error("Parsed guests is not an array:", parsedGuests);
-                }
-            } catch (error) {
-                console.error("Error parsing guests:", error);
-            }
-        }
-
-        // Check if detailsid exists in the array
-        const index = guests.indexOf(detailsid);
-
-        if (index !== -1) {
-            // If it exists, remove the detailsid from the array
-            guests.splice(index, 1);
-            console.log(`Removed ${detailsid} from guests.`);
-            setLiked(false); // Update liked state
-        } else {
-            // If it doesn't exist, add detailsid to the array
-            guests.push(detailsid);
-            console.log(`Added ${detailsid} to guests.`);
-            setLiked(true); // Update liked state
-        }
-
-        // Store the updated array back to localStorage
-        localStorage.setItem("guest", JSON.stringify(guests));
-        return; // Exit the function after handling guest likes
-    }
-
-    try {
-        // Send like request to the backend
+        // Send like request to the backend for logged-in users
         const response = await fetch(`/api/fetchUsers/userLikes`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ userId, detailsid }),
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ userId, detailsid }),
         });
 
         const data = await response.json();
         if (response.ok) {
-            toast.success(data.message, { position: "bottom-right" });
-            setLiked((prevLiked) => !prevLiked); // Toggle liked state
+          toast.success(data.message, { position: "bottom-right" });
+          setLiked((prevLiked) => {
+            const newLiked = !prevLiked;
+            setTotaluserLike((prevTotal) => (newLiked ? prevTotal + 1 : prevTotal - 1));
+            return newLiked; // Toggle liked state
+          });
         } else {
-            toast.error(data.message || "Failed to like. Please try again.", {
-                position: "bottom-right",
-            });
+          toast.error(data.message || "Failed to like. Please try again.", {
+            position: "bottom-right",
+          });
         }
-    } catch (error) {
-        console.error("Error liking service:", error);
-        toast.error("An error occurred while liking.", { position: "bottom-right" });
+      } catch (error) {
+        console.error("Error verifying token:", error);
+        toast.error("An error occurred while processing your request.", {
+          position: "bottom-right",
+        });
+      }
+    } else {
+      // Handle guest users
+      const guestsString = localStorage.getItem("guest");
+      let guests: string[] = [];
+
+      if (guestsString) {
+        try {
+          const parsedGuests = JSON.parse(guestsString);
+          if (Array.isArray(parsedGuests)) {
+            guests = parsedGuests;
+          } else {
+            console.error("Parsed guests is not an array:", parsedGuests);
+          }
+        } catch (error) {
+          console.error("Error parsing guests:", error);
+        }
+      }
+
+      const index = guests.indexOf(detailsid);
+      
+      if (index !== -1) {
+        // Guest dislikes: Remove from array
+        guests.splice(index, 1);
+        setLiked(false); // Update liked state
+        setTotaluserLike((prevTotal) => prevTotal - 1); // Decrement total likes
+      } else {
+        // Guest likes: Add to array
+        guests.push(detailsid);
+        setLiked(true); // Update liked state
+        setTotaluserLike((prevTotal) => prevTotal + 1); // Increment total likes
+      }
+
+      // Send request to update guest count in backend
+      try {
+        const response = await fetch(`/api/fetchUsers/userLikes`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ detailsid, guestStorage: guests }),
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+          toast.success(data.message, { position: "bottom-right" });
+        } else {
+          toast.error(data.message || "Failed to update guest count. Please try again.", {
+            position: "bottom-right",
+          });
+        }
+      } catch (error) {
+        console.error("Error updating guest count:", error);
+        toast.error("An error occurred while updating guest count.", {
+          position: "bottom-right",
+        });
+      }
+
+      // Update localStorage
+      localStorage.setItem("guest", JSON.stringify(guests));
     }
-};
+  };
+
 
   return (
     <motion.div
@@ -304,6 +340,7 @@ const handleLike = async (detailsid: string) => {
                     onClick={() => handleLike(detailsid)}
                   />
                 </motion.span>
+                {totaluserLike}
               </div>
             </div>
             <div className="w-full flex flex-col sm:flex-row justify-between items-center sm:items-start gap-2 sm:gap-0">
