@@ -200,7 +200,7 @@ const handleLike = async (detailsid: string) => {
         } catch (error) {
             console.error("Error verifying token:", error);
             toast.error("An error occurred while processing your request.", {
-                position: "bottom-center",
+                position: "bottom-right",
             });
             return;
         }
@@ -254,16 +254,16 @@ const handleLike = async (detailsid: string) => {
 
         const data = await response.json();
         if (response.ok) {
-            toast.success(data.message, { position: "bottom-center" });
+            toast.success(data.message, { position: "bottom-right" });
             setLiked((prevLiked) => !prevLiked); // Toggle liked state
         } else {
             toast.error(data.message || "Failed to like. Please try again.", {
-                position: "bottom-center",
+                position: "bottom-right",
             });
         }
     } catch (error) {
         console.error("Error liking service:", error);
-        toast.error("An error occurred while liking.", { position: "bottom-center" });
+        toast.error("An error occurred while liking.", { position: "bottom-right" });
     }
 };
 
@@ -375,7 +375,7 @@ const CreativeButton: React.FC<{ detailsid: string }> = ({ detailsid }) => {
       }
     } else {
       toast.error("No uploaded works yet!", {
-        position: "bottom-center",
+        position: "bottom-right",
       });
     }
   };

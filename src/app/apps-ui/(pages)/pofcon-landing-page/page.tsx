@@ -7,10 +7,11 @@ import { Subscribe } from "@/components/reusable-component/Subscribe";
 import { Transcribed } from "@/components/reusable-component/Transcribed";
 import { PofconModal } from "@/components/reusable-component/PofconModal";
 import { useState } from "react";
-import { GallerySection } from "../landing-page/landing-page/GallerySection";
+
 import { Malikhain } from "../landing-page/landing-page/Malikhain";
 import { PofconHeroPage } from "../landing-page/landing-page/PofconHeroPage";
 import { Events } from "../landing-page/landing-page/EventsCarousel";
+import GallerySection from "../landing-page/landing-page/GallerySection";
 
 export default function PofconLandingPage() {
   const [showPofconModal, setShowPofconModal] = useState(false); // Modal state
