@@ -45,8 +45,7 @@ export const PofconHeroPage: React.FC<PofconHeroPageProps> = ({
       animate="visible"
       variants={containerVariants}
     >
-      <div className="w-full h-full absolute inset-0 bg-[url('/intro/img7.jpg')] bg-cover bg-no-repeat bg-black bg-opacity-10 z-10"></div>
-      <div className="w-full h-full absolute inset-0 bg-black bg-opacity-50 z-20"></div>
+      <div className="w-full h-full absolute inset-0 bg-[url('/intro/img7.png')] bg-cover bg-no-repeat bg-black bg-opacity-10 z-10"></div>
       <motion.div
         className="w-full md:max-w-[80%] max-w-[90%] min-h-[30dvh] mx-auto flex flex-col gap-8 justify-center pt-[20.4vh] items-center z-20 relative"
         variants={itemVariants}
