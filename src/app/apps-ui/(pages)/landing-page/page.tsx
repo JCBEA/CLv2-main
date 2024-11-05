@@ -6,11 +6,9 @@ import { Transcribed } from "@/components/reusable-component/Transcribed";
 import { useState } from "react";
 import { PofconModal } from "@/components/reusable-component/PofconModal";
 import { Events } from "./landing-page/EventsCarousel";
-
 import { HeroPage } from "./landing-page/HeroPage";
 import { Malikhain } from "./landing-page/Malikhain";
 import { GallerySection } from "./landing-page/GallerySection";
-
 
 
 

@@ -23,7 +23,7 @@ const heroImages = [
   "/intro/img4.jpg",
   "/intro/img5.jpg",
   "/intro/img6.jpg",
-  "/images/pofcon/hero.jpg",
+  "/intro/img7.png",
 ];
 
 const containerVariants = {
