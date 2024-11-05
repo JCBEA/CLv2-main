@@ -69,9 +69,10 @@ export const CalendarEvent: React.FC = () => {
   };
 
   const renderEventsForDay = (day: number) => {
-    const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
-    const formattedDate = date.toISOString().split('T')[0]; // Format: YYYY-MM-DD
+    // Construct the date string in YYYY-MM-DD format directly
+    const formattedDate = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 
+    // Filter events based on the formatted date
     const eventsForDay = data.filter((event) => event.date === formattedDate);
 
     if (eventsForDay.length === 0) {
@@ -95,7 +96,7 @@ export const CalendarEvent: React.FC = () => {
                     alt={event.title}
                   />
                   <p className={`text-xs font-semibold ${textColor}`}>
-                  {formatTime(event.start_time)} to {formatTime(event.end_time)}
+                    {formatTime(event.start_time)} to {formatTime(event.end_time)}
                   </p>
                 </div>
                 <p className={`text-sm w-full font-medium capitalize ${textColor}`}>
@@ -108,6 +109,7 @@ export const CalendarEvent: React.FC = () => {
       </div>
     );
   };
+
 
   const renderCalendarDays = () => {
     const year = currentDate.getFullYear();
