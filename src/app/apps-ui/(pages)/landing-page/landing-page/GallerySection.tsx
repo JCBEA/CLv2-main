@@ -28,7 +28,7 @@ const images = [
   "/images/landing-page/eabab.png",
 ];
 
-export default function GallerySection() {
+export function GallerySection() {
   const [[imageCount, direction], setImageCount] = useState<[number, number]>([
     0, 0,
   ]);

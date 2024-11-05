@@ -95,7 +95,7 @@ export default function SearchResults() {
                                         />
                                     </div>
                                     <div>
-                                        <h3 className="text-xl font-semibold text-primary-2 mb-2">
+                                        <h3 className="text-xl font-semibold text-stone-50 hover:text-primary-2 mb-2">
                                             No results found
                                         </h3>
                                         <p className="text-shade-6">
@@ -104,14 +104,14 @@ export default function SearchResults() {
                                     </div>
                                 </div>
                             ) : (
-                                <div className="grid gap-4">
-                                    {results.map((item) => (
+                                <div className="grid gap-4 group">
+                                    {results.map((item, index) => (
                                         <div
-                                            key={item.id}
+                                            key={index}
                                             className="p-6 bg-quaternary-1 rounded-xl hover:bg-quaternary-2 transition-colors"
                                         >
                                             <div>
-                                                <h3 className="font-semibold text-xl mb-3 text-primary-2">
+                                                <h3 className="font-semibold text-xl mb-3 text-stone-50 group-hover:text-primary-2">
                                                     {item.question}
                                                 </h3>
                                                 <p className="text-shade-7 leading-relaxed">
