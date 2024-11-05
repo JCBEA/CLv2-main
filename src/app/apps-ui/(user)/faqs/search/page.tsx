@@ -34,20 +34,20 @@ export default function SearchResults() {
   };
 
   return (
-    <div className="w-full min-h-screen bg-gradient-to-b ">
+    <div className="w-full min-h-screen bg-primary-2 ">
       <div className="w-full h-fit pt-[12dvh] pb-[10dvh]">
-        <div className="w-full md:max-w-screen-xl max-w-[90%] mx-auto min-h-[40dvh] bg-shade-1 shadow-lg px-8 py-10 rounded-3xl border border-shade-6">
+        <div className="w-full md:max-w-screen-xl max-w-[90%] mx-auto min-h-[40dvh] bg-shade-7 shadow-lg px-8 py-10 rounded-3xl border border-shade-6">
           <div className="w-full h-full flex flex-col gap-8">
             {/* Header Section */}
             <div className="flex flex-col gap-6">
               <div className="w-full flex flex-col">
                 <div className="w-full flex justify-between items-center">
-                  <h1 className="font-extrabold text-4xl text-stone-200 bg-gradient-to-r from-primary-3 to-shade-1 bg-clip-text text-transparent">
+                  <h1 className="font-extrabold text-4xl text-primary-3 bg-gradient-to-r from-primary-3 to-shade-1 bg-clip-text text-transparent">
                     Search Results
                   </h1>
                   <button
                     onClick={() => router.back()}
-                    className="flex items-center gap-2 text-primary-2 hover:text-stone-200 transition-all duration-300 w-fit group"
+                    className="flex items-center gap-2 text-primary-2 hover:text-primary-3 transition-all duration-300 w-fit group"
                   >
                     <Icon 
                       icon="eva:arrow-back-fill" 
@@ -59,13 +59,13 @@ export default function SearchResults() {
                   </button>
                 </div>
                 <p className="text-xl text-primary-2 mt-2">
-                  Found <span className="text-stone-200 font-semibold">{results.length}</span> result{results.length !== 1 ? "s" : ""}{" "}
-                  for "<span className="text-stone-200 font-semibold">{query}</span>"
+                  Found <span className="text-primary-3 font-semibold">{results.length}</span> result{results.length !== 1 ? "s" : ""}{" "}
+                  for "<span className="text-primary-3 font-semibold">{query}</span>"
                 </p>
               </div>
 
               {/* Search Input */}
-              <div className="w-full xl:max-w-md lg:max-w-xs h-fit relative">
+              <div className="w-full xl:max-w-md lg:max-w-xs max-w-[90%] h-fit relative">
                 <input
                   className="placeholder:text-shade-7 text-white text-lg font-medium rounded-full bg-primary-2 ring-2 ring-transparent focus:ring-primary-3 transition-all duration-300 outline-none w-full py-3 px-14"
                   type="text"
