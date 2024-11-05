@@ -3,8 +3,11 @@ import { supabase } from '@/services/supabaseClient';
 
 export async function POST(req: Request) {
   try {
-    const { userId, detailsid } = await req.json();
+    const { userId, detailsid, guestStorage } = await req.json();
     console.log('Incoming request:', { userId, detailsid }); // Log for debugging
+
+    // Check if guestStorage contains detailsid
+    const isGuestStorageExists = guestStorage && guestStorage.includes(detailsid);
 
     if (userId) {
       // Check if any existing likes are present for the given galleryLiked
@@ -30,12 +33,12 @@ export async function POST(req: Request) {
         if (users.includes(userId)) {
           // Remove userId from users array and update the record
           const updatedUsers = users.filter(user => user !== userId); // Filter out the userId
-        
+          
           const { error: updateError } = await supabase
             .from('usersLikes')
             .update({ users: updatedUsers }) // Update the users array without the userId
             .eq('galleryLiked', detailsid);
-        
+          
           if (updateError) {
             console.error('Error updating user likes:', updateError.message);
             return NextResponse.json(
@@ -43,7 +46,7 @@ export async function POST(req: Request) {
               { status: 500 }
             );
           }
-        
+          
           return NextResponse.json(
             { message: 'User removed their like from this gallery.' },
             { status: 200 } // OK
@@ -98,39 +101,60 @@ export async function POST(req: Request) {
         );
       }
 
-      if (guestData && guestData.length > 0) {
-        const currentCount = Number(guestData[0].guest) || 0; // Ensure this is a number
+      // Handle the guest storage case
+      if (!isGuestStorageExists) {
+        if (guestData && guestData.length > 0) {
+          const currentCount = Number(guestData[0].guest) || 0; // Ensure this is a number
 
-        const { error: updateError } = await supabase
-          .from('usersLikes')
-          .update({ guest: currentCount + 1 }) // Increment properly
-          .eq('galleryLiked', detailsid);
-        
-        if (updateError) {
-          console.error('Error updating guest count:', updateError.message);
-          return NextResponse.json(
-            { message: `Error updating guest count: ${updateError.message}` },
-            { status: 500 }
-          );
+          const { error: updateError } = await supabase
+            .from('usersLikes')
+            .update({ guest: Math.max(0, currentCount - 1) }) // Decrease like count if it exists
+            .eq('galleryLiked', detailsid);
+          
+          if (updateError) {
+            console.error('Error updating guest count:', updateError.message);
+            return NextResponse.json(
+              { message: `Error updating guest count: ${updateError.message}` },
+              { status: 500 }
+            );
+          }
         }
-        
       } else {
-        // Insert a new guest record with count set to 1 if no record exists
-        const { data, error } = await supabase
-          .from('usersLikes')
-          .insert([{ guest: 1, galleryLiked: detailsid }]);
+        // If guestStorage doesn't exist, increment guest count
+        if (guestData && guestData.length > 0) {
+          const currentCount = Number(guestData[0].guest) || 0; // Ensure this is a number
 
-        if (error) {
-          console.error('Error inserting guest record:', error.message);
-          return NextResponse.json(
-            { message: `Error inserting guest record: ${error.message}` },
-            { status: 500 }
-          );
+          const { error: updateError } = await supabase
+            .from('usersLikes')
+            .update({ guest: currentCount + 1 }) // Increment properly
+            .eq('galleryLiked', detailsid);
+          
+          if (updateError) {
+            console.error('Error updating guest count:', updateError.message);
+            return NextResponse.json(
+              { message: `Error updating guest count: ${updateError.message}` },
+              { status: 500 }
+            );
+          }
+          
+        } else {
+          // Insert a new guest record with count set to 1 if no record exists
+          const { data, error } = await supabase
+            .from('usersLikes')
+            .insert([{ guest: 1, galleryLiked: detailsid }]);
+
+          if (error) {
+            console.error('Error inserting guest record:', error.message);
+            return NextResponse.json(
+              { message: `Error inserting guest record: ${error.message}` },
+              { status: 500 }
+            );
+          }
         }
       }
 
       return NextResponse.json(
-        { message: 'Guest count incremented successfully!' },
+        { message: 'Guest count updated successfully!' },
         { status: 201 } // Created
       );
     }
@@ -154,7 +178,7 @@ export async function GET(req: Request) {
       .from('usersLikes')
       .select('*')
       .contains('users', [Number(userId)])
-      .eq("galleryLiked", detailsId ); // Ensure userId is a number if the users array holds numbers
+      .eq("galleryLiked", detailsId); // Ensure userId is a number if the users array holds numbers
 
     if (error) {
       console.error('Error fetching user likes:', error.message);
