@@ -94,13 +94,13 @@ export function GallerySection() {
   };
 
   return (
-    <div className="w-full min-h-screen bg-primary-1 flex flex-col gap-8 items-center justify-evenly p-8 pt-[10dvh]">
+    <div className="w-full min-h-dvh bg-primary-1 flex flex-col gap-16 items-center justify-evenly p-8 pt-[10dvh]">
       <h1 className="md:text-5xl text-3xl font-extrabold md:text-left text-center">
         EXPLORE OUR GALLERY
       </h1>
 
       {/* Mobile layout (single-image slider) */}
-      <div className="w-full lg:hidden flex flex-col gap-4 h-full justify-evenly items-center">
+      <div className="w-full lg:hidden flex flex-col gap-8 h-full justify-evenly items-center">
         <motion.div
           className="relative w-full md:max-w-xl h-96 overflow-hidden rounded-lg shadow-lg"
           whileHover={{ scale: 1.05 }}
@@ -157,7 +157,7 @@ export function GallerySection() {
       </div>
 
       {/* Desktop layout (three-image slider) */}
-      <div className="hidden lg:flex w-full flex-col gap-4 h-full justify-evenly items-center">
+      <div className="hidden lg:flex w-full flex-col gap-8 h-full justify-evenly items-center">
       <div className="relative w-full p-4 md:max-w-screen-xl min-h-96 overflow-hidden">
           <AnimatePresence initial={false} mode="popLayout" custom={direction}>
             {[-1, 0, 1].map((offset) => (
