@@ -23,7 +23,7 @@ const heroImages = [
   "/intro/img4.jpg",
   "/intro/img5.jpg",
   "/intro/img6.jpg",
-  "/images/pofcon/hero.jpg",
+  "/intro/img7.jpg",
 ];
 
 const containerVariants = {
@@ -245,6 +245,8 @@ export default function Loader({ setContentLoaded }: HomeProps) {
               className="imahe"
             />
           ))}
+              <div className="absolute inset-0 bg-black bg-opacity-50 z-10"></div>
+
         </div>
       </section>
 
@@ -252,6 +254,8 @@ export default function Loader({ setContentLoaded }: HomeProps) {
         ref={websiteContentRef}
         className="website-content w-full min-h-screen pb-[10dvh] relative"
       >
+                    
+
         {showContent && (
           
           <motion.div
@@ -267,8 +271,6 @@ export default function Loader({ setContentLoaded }: HomeProps) {
               paddingLeftCustom="lg:pl-14"
               buttonName="Log in"
             />
-            <div className="w-full h-[879px] absolute inset-0 bg-black bg-opacity-20 z-10"></div>
-
             <motion.div
               className="z-50 w-full h-full flex flex-col lg:justify-start lg:items-start justify-center items-center gap-4"
               variants={itemVariants}
