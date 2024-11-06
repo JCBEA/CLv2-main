@@ -81,9 +81,15 @@ const ProfileDetails: React.FC<{ userDetail: UserDetail }> = ({
       <div className="h-full w-full flex lg:flex-row flex-col lg:justify-start justify-center lg:gap-12 gap-4 items-center lg:mt-4 lg:pb-0 pb-4">
         <h1 className="text-3xl font-bold">{userDetail.first_name},</h1>
         <div className="flex flex-row justify-row items-center gap-4">
-          <Icon icon="circum:instagram" width="35" height="35" />
-          <Icon icon="uit:facebook-f" width="35" height="35" />
-          <Icon icon="fluent:mail-28-regular" width="35" height="35" />
+          <a href={userDetail.instagram} target="_blank" rel="noopener noreferrer">
+            <Icon icon="circum:instagram" width="35" height="35" />
+          </a>
+          <a href={userDetail.facebook} target="_blank" rel="noopener noreferrer">
+            <Icon icon="uit:facebook-f" width="35" height="35" />
+          </a>
+          <a href={userDetail.twitter} target="_blank" rel="noopener noreferrer">
+            <Icon icon="fluent:mail-28-regular" width="35" height="35" />
+          </a>
         </div>
       </div>
     </div>
@@ -298,18 +304,16 @@ const ProfileButton: React.FC<ProfileButtonProps> = ({ open, setOpen }) => {
     <div className="w-full h-fit flex bg-shade-8">
       <button
         onClick={() => setOpen(false)}
-        className={`w-full py-4 font-bold text-lg uppercase flex justify-center items-center gap-2 ${
-          !open ? "bg-shade-1" : "bg-shade-8"
-        } rounded-tr-lg overflow-hidden`}
+        className={`w-full py-4 font-bold text-lg uppercase flex justify-center items-center gap-2 ${!open ? "bg-shade-1" : "bg-shade-8"
+          } rounded-tr-lg overflow-hidden`}
       >
         <Icon icon="ph:calendar-dots-thin" width="35" height="35" />
         Schedule
       </button>
       <button
         onClick={() => setOpen(true)}
-        className={`w-full py-4 font-bold text-lg uppercase flex justify-center items-center gap-2 ${
-          open ? "bg-shade-1" : "bg-shade-8"
-        } rounded-tl-lg overflow-hidden`}
+        className={`w-full py-4 font-bold text-lg uppercase flex justify-center items-center gap-2 ${open ? "bg-shade-1" : "bg-shade-8"
+          } rounded-tl-lg overflow-hidden`}
       >
         <Icon icon="ph:message-circle-dots" width="35" height="35" />
         Messages
