@@ -36,7 +36,7 @@ export const PofconHeroPage: React.FC<PofconHeroPageProps> = ({
 }) => {
   return (
     <motion.div
-      className="w-full h-fit md:h-[105vh] pb-[10dvh]  relative"
+      className="w-full min-h-screen pb-[10dvh] relative"
       style={{
         backgroundPosition: "47.5% 53.5%", // Shift the image slightly to the right
         backgroundSize: "118.5%",

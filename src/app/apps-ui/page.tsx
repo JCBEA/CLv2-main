@@ -15,6 +15,7 @@ import { Logo } from "@/components/reusable-component/Logo";
 import { motion } from "framer-motion";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { PofconHeroPage } from "./(pages)/landing-page/landing-page/PofconHeroPage";
 
 const heroImages = [
   "/intro/img1.jpg",
@@ -171,7 +172,7 @@ export default function Loader({ setContentLoaded }: HomeProps) {
             className="counter"
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.5, }}
+            transition={{ duration: 0.5 }}
           >
             <div className="digit-1" ref={digit1Ref}>
               <motion.div
@@ -252,121 +253,14 @@ export default function Loader({ setContentLoaded }: HomeProps) {
         ref={websiteContentRef}
         className="website-content w-full min-h-screen pb-[10dvh] relative"
       >
-        {showContent && (
-          
-          <motion.div
-            className="w-full md:max-w-[80%] max-w-[90%] h-full min-h-[30dvh] mx-auto flex flex-col gap-8 justify-center pt-[49dvh] items-center z-20"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            onAnimationComplete={() => setContentFullyLoaded(true)}
-          >
-            <Header
-              linkName="/apps-ui/signin"
-              roundedCustom="lg:rounded-bl-3xl"
-              paddingLeftCustom="lg:pl-14"
-              buttonName="Log in"
-            />
-            <div className="w-full h-[879px] absolute inset-0 bg-black bg-opacity-20 z-10"></div>
-
-            <motion.div
-              className="z-50 w-full h-full flex flex-col lg:justify-start lg:items-start justify-center items-center gap-4"
-              variants={itemVariants}
-            >
-              <motion.h1
-                className="font-bold lg:text-6xl text-5xl text-left text-secondary-1"
-                variants={itemVariants}
-              >
-                Welcome to{" "}
-              </motion.h1>
-              <motion.div variants={itemVariants}>
-                <Logo
-                  width={"auto"}
-                  height={"auto"}
-                  color="text-secondary-1"
-                  justifyContent="justify-center"
-                  itemPosition="items-center"
-                />
-              </motion.div>
-            </motion.div>
-            <motion.div
-              className="z-50 w-full h-fit p-6 bg-shade-1 rounded-none"
-              variants={itemVariants}
-            >
-              <div className="w-full h-full flex lg:flex-row flex-col border-primary-2 border-2">
-                <motion.div
-                  className="w-full h-full flex flex-col p-32 md:justify-center justify-evenly md:items-start items-center lg:pl-16 px-2 gap-12"
-                  variants={containerVariants}
-                >
-                  <motion.div
-                    className="w-full flex flex-col justify-start lg:items-start items-center gap-6"
-                    variants={itemVariants}
-                  >
-                    <motion.h1
-                      className="md:text-4xl text-5xl lg:text-left text-center font-bold text-primary-2 lg:text-6xl tracking-widest title"
-                      variants={itemVariants}
-                    >
-                      Creative Directory
-                    </motion.h1>
-                    <motion.p
-                      className="font-medium text-2xl w-full max-w-xs lg:text-left text-center"
-                      variants={itemVariants}
-                    >
-                      Explore, connect and network with the creative minds of
-                      Legazpi City
-                    </motion.p>
-                  </motion.div>
-                  <motion.img
-                    className="w-full lg:h-full block lg:hidden"
-                    src={"../images/landing-page/laptop.png"}
-                    alt="Laptop"
-                    variants={itemVariants}
-                  />
-                  <motion.div
-                    className="lg:w-fit w-full flex flex-row md:justify-center justify-evenly items-center md:gap-6 gap-4 font-semibold"
-                    variants={containerVariants}
-                  >
-                    <motion.button
-                      className="bg-primary-2 text-secondary-1 md:w-36 w-32 py-2 rounded-full uppercase tracking-widest title"
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      variants={itemVariants}
-                    >
-                      join
-                    </motion.button>
-                    <motion.button
-                      onClick={() => setShowPofconModal(true)}
-                      className="bg-secondary-1 text-primary-2 md:w-36 w-32 py-2 rounded-full uppercase tracking-widest title"
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      variants={itemVariants}
-                    >
-                      explore
-                    </motion.button>
-                  </motion.div>
-                </motion.div>
-                <motion.div
-                  className="w-full lg:block hidden h-full"
-                  variants={itemVariants}
-                >
-                  <div className="w-full mt-1.5 h-full flex justify-center items-center">
-                    <motion.img
-                      className="w-full"
-                      src={"../images/landing-page/laptop.png"}
-                      alt="Laptop"
-                      variants={itemVariants}
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: 0.5, duration: 0.5 }}
-                    />
-                  </div>
-                </motion.div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
+        {showContent && 
+          <div className="w-full h-fit">
+            <Header />
+            <PofconHeroPage setShowPofconModal={setShowPofconModal} />
+          </div>
+        }
       </div>
-      <div className="mt-10">
+      <div className="pt-[15dvh]">
         <Events />
       </div>
       <GallerySection />
