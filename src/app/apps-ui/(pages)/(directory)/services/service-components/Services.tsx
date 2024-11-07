@@ -155,6 +155,27 @@ export const CreativeCards: React.FC<UserDetail> = ({
       const token = getSession();
       let userId = null;
 
+      const guestsString = localStorage.getItem("guest");
+  let guests: string[] = [];
+
+  if (guestsString) {
+    try {
+      const parsedGuests = JSON.parse(guestsString);
+      if (Array.isArray(parsedGuests)) {
+        guests = parsedGuests;
+      }
+    } catch (error) {
+      console.error("Error parsing guests:", error);
+    }
+  }
+  if (guests.includes(detailsid)) {
+    // Guest has liked
+    setLiked(true);
+  } else {
+    // Guest has disliked or hasn't liked yet
+    setLiked(false);
+  }
+
       if (token) {
         try {
           const { payload } = await jwtVerify(
@@ -171,6 +192,9 @@ export const CreativeCards: React.FC<UserDetail> = ({
           console.error("Error verifying token:", error);
         }
       } else {
+
+
+
         await fetchLikes(null);
         setLiked(guests.includes(detailsid));
       }
@@ -202,7 +226,7 @@ export const CreativeCards: React.FC<UserDetail> = ({
   const handleLike = async (detailsid: string) => {
     const token = getSession();
     let userId = null;
-
+  
     if (token) {
       // Logged-in user
       try {
@@ -210,29 +234,19 @@ export const CreativeCards: React.FC<UserDetail> = ({
           token,
           new TextEncoder().encode(process.env.JWT_SECRET || "your-secret")
         );
-        userId = payload.id;
-
-        // Send like request to the backend for logged-in users
-        const response = await fetch(`/api/fetchUsers/userLikes`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ userId, detailsid }),
-        });
-
-        const data = await response.json();
-        if (response.ok) {
-          toast.success(data.message, { position: "bottom-right" });
-          setLiked((prevLiked) => {
-            const newLiked = !prevLiked;
-            setTotaluserLike((prevTotal) => (newLiked ? prevTotal + 1 : prevTotal - 1));
-            return newLiked; // Toggle liked state
-          });
+        userId = payload.id as string;
+  
+        // Check if the user already liked this item
+        if (liked) {
+          // User already liked, so we dislike
+          await updateLikeStatus(userId, detailsid, "dislike");
+          setLiked(false);
+          setTotaluserLike((prevTotal) => prevTotal - 1);
         } else {
-          toast.error(data.message || "Failed to like. Please try again.", {
-            position: "bottom-right",
-          });
+          // User is liking for the first time
+          await updateLikeStatus(userId, detailsid, "like");
+          setLiked(true);
+          setTotaluserLike((prevTotal) => prevTotal + 1);
         }
       } catch (error) {
         console.error("Error verifying token:", error);
@@ -244,22 +258,20 @@ export const CreativeCards: React.FC<UserDetail> = ({
       // Handle guest users
       const guestsString = localStorage.getItem("guest");
       let guests: string[] = [];
-
+  
       if (guestsString) {
         try {
           const parsedGuests = JSON.parse(guestsString);
           if (Array.isArray(parsedGuests)) {
             guests = parsedGuests;
-          } else {
-            console.error("Parsed guests is not an array:", parsedGuests);
           }
         } catch (error) {
           console.error("Error parsing guests:", error);
         }
       }
-
+  
       const index = guests.indexOf(detailsid);
-      
+  
       if (index !== -1) {
         // Guest dislikes: Remove from array
         guests.splice(index, 1);
@@ -271,7 +283,10 @@ export const CreativeCards: React.FC<UserDetail> = ({
         setLiked(true); // Update liked state
         setTotaluserLike((prevTotal) => prevTotal + 1); // Increment total likes
       }
-
+  
+      // Update localStorage
+      localStorage.setItem("guest", JSON.stringify(guests));
+  
       // Send request to update guest count in backend
       try {
         const response = await fetch(`/api/fetchUsers/userLikes`, {
@@ -281,7 +296,7 @@ export const CreativeCards: React.FC<UserDetail> = ({
           },
           body: JSON.stringify({ detailsid, guestStorage: guests }),
         });
-
+  
         const data = await response.json();
         if (response.ok) {
           toast.success(data.message, { position: "bottom-right" });
@@ -296,11 +311,31 @@ export const CreativeCards: React.FC<UserDetail> = ({
           position: "bottom-right",
         });
       }
-
-      // Update localStorage
-      localStorage.setItem("guest", JSON.stringify(guests));
     }
   };
+  
+  // Helper function to update like/dislike in the backend for logged-in users
+  const updateLikeStatus = async (userId: string, detailsid: string, action: string) => {
+    try {
+      const response = await fetch(`/api/fetchUsers/userLikes`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userId, detailsid, action }),
+      });
+  
+      const data = await response.json();
+      if (response.ok) {
+        console.log(`${action} successful!`);
+      } else {
+        console.error(`${action} failed:`, data.message);
+      }
+    } catch (error) {
+      console.error(`Error during ${action}:`, error);
+    }
+  };
+  
 
 
   return (
