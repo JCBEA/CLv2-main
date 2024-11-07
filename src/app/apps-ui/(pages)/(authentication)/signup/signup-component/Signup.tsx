@@ -86,7 +86,7 @@ const AccountCreation = () => {
   );
 };
 
-const MultiStepForm = () => {
+export const MultiStepForm = () => {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState<UserDetail>({
     username: "",
@@ -271,7 +271,7 @@ const MultiStepForm = () => {
 export const Input: React.FC<InputProps> = ({ name, value, onChange, placeholder, icon, type = "text" }) => (
   <div className="w-full lg:max-w-sm relative">
     <input
-      className="w-full h-10 border-b-2 p-4 pl-12 border-secondary-2 outline-none ring-0"
+      className="w-full h-10 border-b-2 p-4 pl-12 [&:-webkit-autofill]:transition-[background-color_5000s_ease-in-out_0s] bg-transparent placeholder:text-primary-2 font-normal border-secondary-2 outline-none ring-0"
       type={type}
       name={name}
       value={value}
@@ -291,7 +291,7 @@ export const Input: React.FC<InputProps> = ({ name, value, onChange, placeholder
 export const TextArea: React.FC<InputProps> = ({ name, value, onChange, placeholder, icon }) => (
   <div className="w-full lg:max-w-sm relative">
     <textarea
-      className="w-full h-16 border-b-2 p-4 pl-12 border-secondary-2 outline-none ring-0 resize-none"
+      className="w-full h-16 border-b-2 p-4 pl-12 bg-transparent [&:-webkit-autofill]:transition-[background-color_5000s_ease-in-out_0s] placeholder:text-primary-2 border-secondary-2 outline-none ring-0 resize-none"
       name={name}
       value={value}
       onChange={onChange}
@@ -314,7 +314,7 @@ export const Select: React.FC<SelectProps> = ({ name, value, onChange, placehold
       name={name}
       value={value}
       onChange={onChange}
-      className="w-full p-4 pl-12 pr-10 border-b-2 border-black outline-none ring-0 appearance-none bg-transparent"
+      className="w-full p-4 pl-12 pr-10 border-b-2 border-black outline-none [&:-webkit-autofill]:transition-[background-color_5000s_ease-in-out_0s] ring-0 appearance-none bg-transparent"
       required
     >
       <option value="" disabled>{placeholder}</option>
