@@ -176,7 +176,7 @@ export function CalendarEvent() {
               <Icon icon="ph:arrow-left" className="rotate-180" width="35" height="35" />
             </button>
           </div>
-          <button className="border border-secondary-1 px-4 py-2">Filter</button>
+          
         </div>
         <div className="w-full grid grid-cols-7 auto-rows-min gap-0 bg-shade-2">
           {daysOfWeek.map((day) => (

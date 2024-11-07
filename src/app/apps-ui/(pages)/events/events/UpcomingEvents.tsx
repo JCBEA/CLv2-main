@@ -1,5 +1,7 @@
 "use client";
 
+import { PofconModal } from "@/components/reusable-component/PofconModal";
+import { RegisterModal } from "@/components/reusable-component/RegisterModal";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
@@ -73,6 +75,7 @@ export const UpcomingEvents = () => {
       console.error("Error fetching events:", error);
     }
   };
+  const [showPofconModal, setShowPofconModal] = useState(false); // Modal state
 
   useEffect(() => {
     const handleResize = () => {
@@ -88,7 +91,7 @@ export const UpcomingEvents = () => {
       <motion.div
         initial={{ opacity: 0, scale: 0.6 }}
         whileInView={{ opacity: 1, scale: 1 }}
-        viewport={{ margin: '20px', once: false }}
+        viewport={{ margin: "20px", once: false }}
         transition={{ duration: 1 }}
         className="w-full"
       >
@@ -123,7 +126,16 @@ export const UpcomingEvents = () => {
           />
         </div>
       </motion.div>
-      <EventGrid currentDate={currentDate} list={list} setList={setList} events={events} />
+      <EventGrid
+        currentDate={currentDate}
+        list={list}
+        setList={setList}
+        events={events}
+        setShowPofconModal={setShowPofconModal}
+      />
+      {showPofconModal && (
+        <RegisterModal setShowPofconModal={setShowPofconModal} />
+      )}
     </div>
   );
 };
@@ -132,8 +144,9 @@ const EventGrid: React.FC<{
   currentDate: Date;
   list: boolean;
   setList: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowPofconModal: React.Dispatch<React.SetStateAction<boolean>>;
   events: AdminEvent[];
-}> = ({ currentDate, list, setList, events }) => {
+}> = ({ currentDate, list, setList, events, setShowPofconModal }) => {
   const filteredEvents = events.filter((event) => {
     const eventDate = new Date(event.date);
     return (
@@ -152,34 +165,47 @@ const EventGrid: React.FC<{
       <div className="w-full flex justify-end items-center">
         <ListButton list={list} setList={setList} />
       </div>
-      {sortedDates.length > 0 ? sortedDates.map((date, groupIndex) => (
-        <div key={date}>
-          <h1 className="font-bold text-4xl uppercase pb-8 md:text-left text-center">
-            {(() => {
-              const dateObject = new Date(date);
-              const day = dateObject.getDate().toString().padStart(2, "0");
-              const weekday = dateObject.toLocaleDateString("en-US", { weekday: "long" });
-              return `${day} - ${weekday}`;
-            })()}
-          </h1>
-          <div className={`w-full h-fit ${
-            list
-              ? "flex flex-col gap-4"
-              : "grid xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-12"
-          }`}>
-            {groupedEvents[date].map((event) => (
-              <EventCard
-                event={event}
-                key={event.id}
-                groupIndex={groupIndex}
-                list={list}
-              />
-            ))}
+      {sortedDates.length > 0 ? (
+        sortedDates.map((date, groupIndex) => (
+          <div key={date}>
+            <h1 className="font-bold text-4xl uppercase pb-8 md:text-left text-center">
+              {(() => {
+                const dateObject = new Date(date);
+                const day = dateObject.getDate().toString().padStart(2, "0");
+                const weekday = dateObject.toLocaleDateString("en-US", {
+                  weekday: "long",
+                });
+                return `${day} - ${weekday}`;
+              })()}
+            </h1>
+            <div
+              className={`w-full h-fit ${
+                list
+                  ? "flex flex-col gap-4"
+                  : "grid xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-12"
+              }`}
+            >
+              {groupedEvents[date].map((event) => (
+                <EventCard
+                  event={event}
+                  key={event.id}
+                  groupIndex={groupIndex}
+                  list={list}
+                  setShowPofconModal={setShowPofconModal}
+                />
+              ))}
+            </div>
+            <div
+              className={`w-full h-[1px] bg-primary-1 mt-12 ${
+                list ? "hidden" : ""
+              }`}
+            ></div>
           </div>
-          <div className={`w-full h-[1px] bg-primary-1 mt-12 ${list ? "hidden" : ""}`}></div>
-        </div>
-      )) : (
-        <p className="text-center text-2xl font-semibold mt-12">No events available</p>
+        ))
+      ) : (
+        <p className="text-center text-2xl font-semibold mt-12">
+          No events available
+        </p>
       )}
     </div>
   );
@@ -189,17 +215,24 @@ const EventCard: React.FC<{
   event: AdminEvent;
   groupIndex: number;
   list: boolean;
-}> = ({ event, groupIndex, list }) => {
+  setShowPofconModal: React.Dispatch<React.SetStateAction<boolean>>;
+}> = ({ event, groupIndex, list, setShowPofconModal }) => {
   const colorClasses = getColorClasses(groupIndex);
 
   return (
     <motion.div
-      whileHover={list ? { backgroundColor: "transparent" } : { scale: 1.05, backgroundColor: "transparent" }}
+      whileHover={
+        list
+          ? { backgroundColor: "transparent" }
+          : { scale: 1.05, backgroundColor: "transparent" }
+      }
       className={`w-full ${
         list
           ? "flex flex-row gap-6 justify-start items-center"
           : "max-w-xs mx-auto flex flex-col gap-4"
-      } ${colorClasses.bgColor} border-2 ${colorClasses.border} duration-500 p-4 text-base group`}
+      } ${colorClasses.bgColor} border-2 ${
+        colorClasses.border
+      } duration-500 p-4 text-base group`}
     >
       <div className={`${list ? "h-24 w-full max-w-44" : "h-48 w-full"}`}>
         <img
@@ -208,7 +241,11 @@ const EventCard: React.FC<{
           alt={event.title}
         />
       </div>
-      <div className={`w-full flex gap-4 ${list ? "flex-col-reverse" : "flex-col"}`}>
+      <div
+        className={`w-full flex gap-4 ${
+          list ? "flex-col-reverse" : "flex-col"
+        }`}
+      >
         <div className="w-full flex justify-between items-center">
           <div className="w-fit flex flex-col leading-3">
             <p className={`font-bold duration-500 ${colorClasses.textColor}`}>
@@ -218,7 +255,9 @@ const EventCard: React.FC<{
           </div>
           <motion.div whileTap={{ scale: 0.95 }} whileHover={{ scale: 1.05 }}>
             <Icon
-              className={`rotate-180 -mt-4 cursor-pointer duration-300 ${colorClasses.textColor} ${list ? "hidden" : "block"}`}
+              className={`rotate-180 -mt-4 cursor-pointer duration-300 ${
+                colorClasses.textColor
+              } ${list ? "hidden" : "block"}`}
               icon="ph:arrow-left-bold"
               width="25"
               height="25"
@@ -226,17 +265,33 @@ const EventCard: React.FC<{
           </motion.div>
         </div>
         <div className="w-full">
-          <h1 className={`w-full text-xl font-semibold title duration-300 ${colorClasses.textColor} ${list ? "max-w-full" : "max-w-56"}`}>
+          <h1
+            className={`w-full text-xl font-semibold title duration-300 ${
+              colorClasses.textColor
+            } ${list ? "max-w-full" : "max-w-56"}`}
+          >
             {event.title}
           </h1>
         </div>
       </div>
-      <EventRegisterButton colorClasses={colorClasses} list={list} />
+      <EventRegisterButton
+        colorClasses={colorClasses}
+        list={list}
+        setShowPofconModal={setShowPofconModal}
+      />
     </motion.div>
   );
 };
 
-const EventRegisterButton = ({ colorClasses, list }: { colorClasses: any; list: boolean }) => {
+const EventRegisterButton = ({
+  colorClasses,
+  list,
+  setShowPofconModal,
+}: {
+  colorClasses: any;
+  list: boolean;
+  setShowPofconModal: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
   return (
     <motion.button
       className={`px-6 py-1.5 bg-primary-1 text-secondary-2 font-medium transition-colors duration-500 ease-in-out 
@@ -246,6 +301,7 @@ const EventRegisterButton = ({ colorClasses, list }: { colorClasses: any; list: 
       `}
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
+      onClick={() => setShowPofconModal(true)}
     >
       Register for free
     </motion.button>
