@@ -36,27 +36,28 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
     >
       <div className="w-full h-full flex justify-center items-center">
         <div
-          className="w-full h-full lg:max-h-[70%] max-h-[40%] lg:max-w-[55%] max-w-[90%] mx-auto bg-secondary-1 p-3 rounded-2xl relative overflow-hidden"
+          className="w-full h-full max-h-[70%] xl:max-w-[55%]  md:max-w-[60%] max-w-[90%] mx-auto bg-secondary-1 py-4 rounded-2xl relative overflow-hidden"
           onClick={(e) => e.stopPropagation()} // Prevent close on inner click
         >
-          <div className="w-full h-full flex flex-row-reverse overflow-hidden rounded-lg relative px-4 lg:py-0 py-12">
-            <div className="lg:h-4/5 h-fit w-full flex xl:justify-start justify-center xl:items-end items-center">
+          <div className="w-full h-full flex xl:flex-row-reverse flex-col overflow-hidden rounded-lg relative px-4 lg:py-0 ">
+            <div className="h-full w-full -ml-4 xl:flex hidden">
               <div className="h-full w-full max-w-[24rem] ">
                 <Logo color="text-primary-2" width="auto" height="auto" />
               </div>
             </div>
-            <div className="h-full w-full text-primary-2 z-50">
-              <div className="w-full min-h-full lg:-ml-8 flex flex-col gap-4 justify-center items-center sm:p-10 p-4">
-                <div className="w-full h-full flex justify-end items-end">
+            <div className="h-full w-full overflow-y-auto scroll-none text-primary-2 z-50 ">
+              <div className=" min-h-full lg:-ml-8 flex flex-col gap-4 justify-center items-center sm:p-10 p-4">
+                <div className="w-full mx-auto h-full flex justify-end items-end">
                   <MultiStepForm />
                 </div>
               </div>
             </div>
-            {/* design lang to */}
-            <div className="h-fit w-fit absolute lg:-bottom-[19rem] -top-[23rem] lg:right-[-15rem] left-[-20rem]">
+            
+          </div>
+          {/* design lang to */}
+          <div className="h-fit w-fit absolute lg:-bottom-[19rem] -top-[23rem] lg:right-[-15rem] left-[-20rem]">
               <div className="bg-primary-2/20 xl:w-[40rem] w-[35rem]  h-[35rem] xl:h-[40rem]  rounded-full z-20"></div>
             </div>
-          </div>
           {/* design lang to */}
           <div className="h-fit w-fit absolute lg:-bottom-[23rem] -bottom-[30rem] right-[-20rem]">
             <div className="bg-primary-2/70 w-[40rem] h-[40rem] rounded-full z-20"></div>
