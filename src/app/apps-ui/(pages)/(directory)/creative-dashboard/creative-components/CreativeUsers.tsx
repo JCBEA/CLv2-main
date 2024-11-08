@@ -145,6 +145,27 @@
           const token = getSession();
           let userId = null;
     
+          const guestsString = localStorage.getItem("guest");
+      let guests: string[] = [];
+    
+      if (guestsString) {
+        try {
+          const parsedGuests = JSON.parse(guestsString);
+          if (Array.isArray(parsedGuests)) {
+            guests = parsedGuests;
+          }
+        } catch (error) {
+          console.error("Error parsing guests:", error);
+        }
+      }
+      if (guests.includes(detailsid)) {
+        // Guest has liked
+        setLiked(true);
+      } else {
+        // Guest has disliked or hasn't liked yet
+        setLiked(false);
+      }
+    
           if (token) {
             try {
               const { payload } = await jwtVerify(
@@ -161,6 +182,9 @@
               console.error("Error verifying token:", error);
             }
           } else {
+    
+    
+    
             await fetchLikes(null);
             setLiked(guests.includes(detailsid));
           }
