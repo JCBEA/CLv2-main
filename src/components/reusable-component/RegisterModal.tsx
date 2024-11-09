@@ -41,9 +41,13 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
         >
           <div className="w-full h-full flex xl:flex-row-reverse flex-col overflow-hidden rounded-lg relative px-4 lg:py-0 ">
             <div className="h-full w-full -ml-4 xl:flex hidden">
-              <div className="h-full w-full max-w-[24rem] ">
+              <motion.div
+              initial={{ opacity: 0, y: "10%" }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: "easeInOut" }}
+              className="h-full w-full max-w-[24rem] ">
                 <Logo color="text-primary-2" width="auto" height="auto" />
-              </div>
+              </motion.div>
             </div>
             <div className="h-full w-full overflow-y-auto scroll-none text-primary-2 z-50 ">
               <div className=" min-h-full lg:-ml-8 flex flex-col gap-4 justify-center items-center sm:p-10 p-4">
