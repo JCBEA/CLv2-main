@@ -61,10 +61,6 @@ export default function CollectionsCarousel() {
     setCurrentIndex((prevIndex) => (prevIndex - 1 + collections.length) % collections.length);
   };
 
-  if (loading) { // Check loading state
-    return <div className="text-center">Loading collections...</div>;
-  }
-
   if (collections.length === 0) {
     return (
       <div className="text-center">

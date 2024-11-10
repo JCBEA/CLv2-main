@@ -37,8 +37,6 @@ export const CreativeUsers = () => {
     fetchUsers();
   }, []);
 
-  if (loading) return <p>Loading creatives...</p>;
-  if (error) return <p>{error}</p>;
 
   return (
     <div className="w-full h-fit pb-[15dvh]">
