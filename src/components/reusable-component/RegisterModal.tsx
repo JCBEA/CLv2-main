@@ -8,13 +8,18 @@ interface InputFieldProps {
   placeholder: string;
   type?: string;
   name: string;
+  value: string;  // Add this line to handle the `value` prop
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;  // Add the onChange handler
 }
+
 
 const InputField: React.FC<InputFieldProps> = ({
   icon,
   placeholder,
   type = "text",
   name,
+  value, // Accept value here
+  onChange, // Accept onChange handler here
 }) => (
   <div className="relative w-full group">
     <input
@@ -26,6 +31,8 @@ const InputField: React.FC<InputFieldProps> = ({
       placeholder={placeholder}
       autoComplete="off"
       required
+      value={value} // Bind value to input
+      onChange={onChange} // Handle onChange
     />
     <Icon
       icon={icon}
@@ -38,48 +45,65 @@ const InputField: React.FC<InputFieldProps> = ({
 );
 
 // New Gender Selection Component
-const GenderSelect = () => {
-  const [selectedGender, setSelectedGender] = useState("");
-  
-  return (
-    <div className="relative w-full group">
-      <select
-        className="w-full h-12 bg-transparent border-b-2 border-secondary-2/30 px-12 
-                   text-primary-2 outline-none transition-all duration-300
-                   focus:border-secondary-2 appearance-none cursor-pointer"
-        value={selectedGender}
-        onChange={(e) => setSelectedGender(e.target.value)}
-        required
-      >
-        <option value="" disabled>Select Gender</option>
-        <option value="male">Male</option>
-        <option value="female">Female</option>
-        <option value="prefer-not-to-say">Prefer not to say</option>
-      </select>
-      <Icon
-        icon="mdi:gender-male-female"
-        className="absolute left-0 top-1/2 -translate-y-1/2 text-primary-2/50 w-6 h-6
-                   group-focus-within:text-secondary-2 transition-colors duration-300"
-        width="25"
-        height="25"
-      />
-      <Icon
-        icon="mdi:chevron-down"
-        className="absolute right-4 top-1/2 -translate-y-1/2 text-primary-2/50 w-4 h-4
-                   pointer-events-none transition-colors duration-300"
-        width="16"
-        height="16"
-      />
-    </div>
-  );
-};
+const GenderSelect = ({ selectedGender, setSelectedGender }: any) => (
+  <div className="relative w-full group">
+    <select
+      className="w-full h-12 bg-transparent border-b-2 border-secondary-2/30 px-12 
+                 text-primary-2 outline-none transition-all duration-300
+                 focus:border-secondary-2 appearance-none cursor-pointer"
+      value={selectedGender}
+      onChange={(e) => setSelectedGender(e.target.value)}
+      required
+    >
+      <option value="" disabled>Select Gender</option>
+      <option value="male">Male</option>
+      <option value="female">Female</option>
+      <option value="prefer-not-to-say">Prefer not to say</option>
+    </select>
+    <Icon
+      icon="mdi:gender-male-female"
+      className="absolute left-0 top-1/2 -translate-y-1/2 text-primary-2/50 w-6 h-6
+                 group-focus-within:text-secondary-2 transition-colors duration-300"
+      width="25"
+      height="25"
+    />
+    <Icon
+      icon="mdi:chevron-down"
+      className="absolute right-4 top-1/2 -translate-y-1/2 text-primary-2/50 w-4 h-4
+                 pointer-events-none transition-colors duration-300"
+      width="16"
+      height="16"
+    />
+  </div>
+);
 
 export const RegisterModal = ({
   setShowPofconModal,
+  eventId,
+  eventTitle,
+  eventLocation,
+  eventStartTime,
+  eventEndTime,
 }: {
   setShowPofconModal: React.Dispatch<React.SetStateAction<boolean>>;
+  eventId: number | null;
+  eventTitle: string;
+  eventLocation: string;
+  eventStartTime: string;
+  eventEndTime: string;
 }) => {
   const [isExiting, setIsExiting] = useState(false);
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    address: "",
+    email: "",
+    contact: "",
+  });
+  
+  const [gender, setGender] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleClose = () => {
     setIsExiting(true);
@@ -90,6 +114,58 @@ export const RegisterModal = ({
       setShowPofconModal(false);
     }
   };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+  
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setErrorMessage("");
+  
+    const { firstName, lastName, address, email, contact } = formData;
+  
+    if (!firstName || !lastName || !address || !email || !contact || !gender) {
+      setErrorMessage("Please fill in all fields.");
+      setLoading(false);
+      return;
+    }
+  
+    console.log("Form Data:", formData, "Gender:", gender); // Ensure formData is logged correctly
+  
+    try {
+      const response = await fetch("/api/admin-events", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          EventID: eventId,
+          eventData: { ...formData, gender },
+        }),
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+        alert("Registration successful!");
+        setShowPofconModal(false);
+      } else {
+        setErrorMessage(data.error || "An error occurred.");
+      }
+    } catch (error) {
+      setErrorMessage("Failed to register. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  
 
   return (
     <motion.div
@@ -123,31 +199,40 @@ export const RegisterModal = ({
               </p>
             </div>
 
-            <form className="py-10 flex flex-col gap-4" onSubmit={(e) => e.preventDefault()}>
+            <form className="py-10 flex flex-col gap-4" onSubmit={handleSubmit}>
+              {/* Display Event Information */}
+              <div className="mb-4">
+                <h3 className="text-lg font-semibold text-primary-2">{eventTitle}</h3>
+                <p className="text-primary-2/70">{eventLocation}</p>
+                <p className="text-primary-2/70">
+                  {eventStartTime} - {eventEndTime}
+                </p>
+              </div>
+
+              {/* Other Input Fields */}
               <div className="grid grid-cols-2 gap-4">
                 <InputField
                   icon="icon-park-solid:edit-name"
                   placeholder="First Name"
                   name="firstName"
+                  value={formData.firstName}
+                  onChange={handleInputChange}
                 />
-                <div className="relative w-full">
-                  <input
-                    className="w-full h-12 bg-transparent border-b-2 border-secondary-2/30 px-4 
-                             text-primary-2 placeholder:text-primary-2/50 outline-none transition-all duration-300
-                             focus:border-secondary-2 [&:-webkit-autofill]:transition-[background-color_5000s_ease-in-out_0s]"
-                    type="text"
-                    name="lastName"
-                    placeholder="Last Name"
-                    autoComplete="off"
-                    required
-                  />
-                </div>
+                <InputField
+                  icon="icon-park-solid:edit-name"
+                  placeholder="Last Name"
+                  name="lastName"
+                  value={formData.lastName}
+                  onChange={handleInputChange}
+                />
               </div>
 
               <InputField
                 icon="mdi:address-marker"
                 placeholder="Mailing Address"
                 name="address"
+                value={formData.address}
+                onChange={handleInputChange}
               />
 
               <InputField
@@ -155,6 +240,8 @@ export const RegisterModal = ({
                 placeholder="Email Address"
                 type="email"
                 name="email"
+                value={formData.email}
+                onChange={handleInputChange}
               />
 
               <div className="grid grid-cols-2 gap-4">
@@ -162,9 +249,13 @@ export const RegisterModal = ({
                   icon="bxs:contact"
                   placeholder="Contact Number"
                   name="contact"
+                  value={formData.contact}
+                  onChange={handleInputChange}
                 />
-                <GenderSelect />
+               <GenderSelect selectedGender={gender} setSelectedGender={setGender} />
               </div>
+
+              {errorMessage && <p className="text-red-500">{errorMessage}</p>}
 
               <motion.button
                 type="submit"
@@ -173,40 +264,18 @@ export const RegisterModal = ({
                          hover:bg-primary-2/90 focus:ring-2 focus:ring-primary-2/50 focus:ring-offset-2"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
+                disabled={loading}
               >
-                Register Now
+                {loading ? "Registering..." : "Register Now"}
               </motion.button>
             </form>
           </div>
 
-          {/* Right side - Logo and decorative content */}
-          <div className="hidden h-full md:flex flex-col -mt-10 items-center justify-center relative">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="w-full h-fit max-w-xs"
-            >
-              <Logo color="text-primary-2" width="auto" height="auto" />
-              <div className="text-center space-y-4">
-                <h3 className="text-xl font-semibold text-primary-2">
-                  Join us at POFCON
-                </h3>
-                <p className="text-primary-2/70">
-                  Connect with fellow professionals and expand your network
-                </p>
-              </div>
-            </motion.div>
+          {/* Right side - Logo */}
+          <div className="relative flex justify-center items-center">
+            <Logo />
           </div>
         </div>
-
-        {/* Close button */}
-        <button
-          onClick={handleClose}
-          className="absolute top-4 right-4 text-primary-2/70 hover:text-primary-2 transition-colors"
-        >
-          <Icon icon="mdi:close" width="24" height="24" />
-        </button>
       </motion.div>
     </motion.div>
   );

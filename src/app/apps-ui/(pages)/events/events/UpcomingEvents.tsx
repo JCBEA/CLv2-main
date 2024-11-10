@@ -75,7 +75,9 @@ export const UpcomingEvents = () => {
       console.error("Error fetching events:", error);
     }
   };
+
   const [showPofconModal, setShowPofconModal] = useState(false); // Modal state
+  const [selectedEvent, setSelectedEvent] = useState<AdminEvent | null>(null); // State to store the selected event
 
   useEffect(() => {
     const handleResize = () => {
@@ -132,9 +134,17 @@ export const UpcomingEvents = () => {
         setList={setList}
         events={events}
         setShowPofconModal={setShowPofconModal}
+        setSelectedEvent={setSelectedEvent} // Pass the setter for selected event
       />
-      {showPofconModal && (
-        <RegisterModal setShowPofconModal={setShowPofconModal} />
+      {showPofconModal && selectedEvent !== null && (
+        <RegisterModal
+          setShowPofconModal={setShowPofconModal}
+          eventId={selectedEvent.id}
+          eventTitle={selectedEvent.title}
+          eventLocation={selectedEvent.location}
+          eventStartTime={selectedEvent.start_time}
+          eventEndTime={selectedEvent.end_time}
+        />
       )}
     </div>
   );
@@ -146,7 +156,8 @@ const EventGrid: React.FC<{
   setList: React.Dispatch<React.SetStateAction<boolean>>;
   setShowPofconModal: React.Dispatch<React.SetStateAction<boolean>>;
   events: AdminEvent[];
-}> = ({ currentDate, list, setList, events, setShowPofconModal }) => {
+  setSelectedEvent: React.Dispatch<React.SetStateAction<AdminEvent | null>>; // Setter for selected event
+}> = ({ currentDate, list, setList, events, setShowPofconModal, setSelectedEvent }) => {
   const filteredEvents = events.filter((event) => {
     const eventDate = new Date(event.date);
     return (
@@ -179,11 +190,10 @@ const EventGrid: React.FC<{
               })()}
             </h1>
             <div
-              className={`w-full h-fit ${
-                list
+              className={`w-full h-fit ${list
                   ? "flex flex-col gap-4"
                   : "grid xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-12"
-              }`}
+                }`}
             >
               {groupedEvents[date].map((event) => (
                 <EventCard
@@ -192,13 +202,13 @@ const EventGrid: React.FC<{
                   groupIndex={groupIndex}
                   list={list}
                   setShowPofconModal={setShowPofconModal}
+                  setSelectedEvent={setSelectedEvent} // Pass setter for event
                 />
               ))}
             </div>
             <div
-              className={`w-full h-[1px] bg-primary-1 mt-12 ${
-                list ? "hidden" : ""
-              }`}
+              className={`w-full h-[1px] bg-primary-1 mt-12 ${list ? "hidden" : ""
+                }`}
             ></div>
           </div>
         ))
@@ -216,7 +226,8 @@ const EventCard: React.FC<{
   groupIndex: number;
   list: boolean;
   setShowPofconModal: React.Dispatch<React.SetStateAction<boolean>>;
-}> = ({ event, groupIndex, list, setShowPofconModal }) => {
+  setSelectedEvent: React.Dispatch<React.SetStateAction<AdminEvent | null>>; // Setter for event
+}> = ({ event, groupIndex, list, setShowPofconModal, setSelectedEvent }) => {
   const colorClasses = getColorClasses(groupIndex);
 
   return (
@@ -226,85 +237,45 @@ const EventCard: React.FC<{
           ? { backgroundColor: "transparent" }
           : { scale: 1.05, backgroundColor: "transparent" }
       }
-      className={`w-full ${
-        list
-          ? "flex flex-row gap-6 justify-start items-center"
-          : "max-w-xs mx-auto flex flex-col gap-4"
-      } ${colorClasses.bgColor} border-2 ${
-        colorClasses.border
-      } duration-500 p-4 text-base group`}
+      transition={{ duration: 0.3 }}
+      className={`w-full flex md:flex-row flex-col gap-4 border-2 ${colorClasses.border} ${list ? "p-4" : "p-8"} rounded-xl`}
     >
-      <div className={`${list ? "h-24 w-full max-w-44" : "h-48 w-full"}`}>
+      <div className="w-[250px] h-[150px] overflow-hidden relative rounded-lg">
         <img
-          className={`object-cover ${list ? "w-44 h-24" : "h-48 w-full"}`}
-          src={event.image_path || "../images/events/cover.png"}
+          src={event.image_path}
           alt={event.title}
+          className="w-full h-full object-cover rounded-lg"
         />
       </div>
-      <div
-        className={`w-full flex gap-4 ${
-          list ? "flex-col-reverse" : "flex-col"
-        }`}
-      >
-        <div className="w-full flex justify-between items-center">
-          <div className="w-fit flex flex-col leading-3">
-            <p className={`font-bold duration-500 ${colorClasses.textColor}`}>
-              {event.start_time} - {event.end_time}
-            </p>
-            <p className="text-sm capitalize font-medium">{event.location}</p>
-          </div>
-          <motion.div whileTap={{ scale: 0.95 }} whileHover={{ scale: 1.05 }}>
-            <Icon
-              className={`rotate-180 -mt-4 cursor-pointer duration-300 ${
-                colorClasses.textColor
-              } ${list ? "hidden" : "block"}`}
-              icon="ph:arrow-left-bold"
-              width="25"
-              height="25"
-            />
-          </motion.div>
-        </div>
-        <div className="w-full">
-          <h1
-            className={`w-full text-xl font-semibold title duration-300 ${
-              colorClasses.textColor
-            } ${list ? "max-w-full" : "max-w-56"}`}
+      <div className="w-full flex flex-col justify-between">
+        <h2
+          className={`font-semibold ${list ? "text-2xl" : "text-lg"} text-primary-1`}
+        >
+          {event.title}
+        </h2>
+        <p
+          className={`font-semibold ${list ? "text-base" : "text-sm"} text-primary-2`}
+        >
+          {event.location}
+        </p>
+        <p
+          className={`font-semibold ${list ? "text-base" : "text-sm"} text-primary-2`}
+        >
+          {event.start_time} - {event.end_time}
+        </p>
+        <div className="w-full flex justify-end mt-4">
+          <button
+            className="font-semibold px-6 py-2 rounded-lg text-sm bg-primary-2 text-white"
+            onClick={() => {
+              setSelectedEvent(event); // Set the selected event id
+              setShowPofconModal(true);
+            }}
           >
-            {event.title}
-          </h1>
+            Register
+          </button>
         </div>
       </div>
-      <EventRegisterButton
-        colorClasses={colorClasses}
-        list={list}
-        setShowPofconModal={setShowPofconModal}
-      />
     </motion.div>
-  );
-};
-
-const EventRegisterButton = ({
-  colorClasses,
-  list,
-  setShowPofconModal,
-}: {
-  colorClasses: any;
-  list: boolean;
-  setShowPofconModal: React.Dispatch<React.SetStateAction<boolean>>;
-}) => {
-  return (
-    <motion.button
-      className={`px-6 py-1.5 bg-primary-1 text-secondary-2 font-medium transition-colors duration-500 ease-in-out 
-        ${colorClasses.bgHover} 
-        ${colorClasses.textHover}
-        ${list ? "w-fit px-6 whitespace-nowrap" : "w-full"}
-      `}
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
-      onClick={() => setShowPofconModal(true)}
-    >
-      Register for free
-    </motion.button>
   );
 };
 
