@@ -216,7 +216,7 @@ export const RegisterModal = ({
           <div className="space-y-0">
             <div className="space-y-2">
               <h2 className="text-2xl font-bold text-primary-2">
-                Register for POFCON
+                Register for {eventTitle}
               </h2>
               <p className="text-primary-2/70">
                 Fill out the form below to secure your spot
@@ -302,7 +302,7 @@ export const RegisterModal = ({
               <Logo color="text-primary-2 h-fit" width="auto" height="auto" />
               <div className="text-center space-y-4">
                 <h3 className="text-xl font-semibold text-primary-2">
-                  Join us at POFCON
+                  Join us at {eventTitle}
                 </h3>
                 <p className="text-primary-2/70">
                   Connect with fellow professionals and expand your network
