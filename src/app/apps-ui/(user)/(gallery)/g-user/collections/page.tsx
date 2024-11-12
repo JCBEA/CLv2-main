@@ -10,6 +10,7 @@ interface CollectionProps {
   year: string;
 }
 
+// Explicitly typing the component as a functional component
 const CollectionDisplay: React.FC<CollectionProps> = ({ created_at, title, description, images, artist, year }) => {
   useAuthRedirect(); // auth guard
 
