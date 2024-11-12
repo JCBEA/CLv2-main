@@ -16,7 +16,7 @@ const heroImages = [
   "/intro/img7.png",
 ];
 
-interface HomeProps {
+export interface HomeProps {
   setContentLoaded?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
