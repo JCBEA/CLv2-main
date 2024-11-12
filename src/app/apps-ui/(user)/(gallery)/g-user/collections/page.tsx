@@ -1,10 +1,10 @@
-"use client"
-import useAuthRedirect from '@/services/hoc/auth';
-import React from 'react';
+"use client";
+import useAuthRedirect from "@/services/hoc/auth";
+import React from "react";
 
 interface CollectionProps {
   collection: {
-    created_at:string;
+    created_at: string;
     title: string;
     description: string;
     images: string[];
@@ -14,10 +14,15 @@ interface CollectionProps {
 }
 
 const CollectionDisplay: React.FC<CollectionProps> = ({ collection }) => {
-  useAuthRedirect();    //authguard
-  if(collection){
+  useAuthRedirect(); // auth guard
+
+  // Ensure collection is available
+  if (!collection) {
+    return <p>No collection found</p>; // You can customize this message
+  }
+
   const { title, description, images, artist, year } = collection;
-  
+
   return (
     <div>
       <h1>{title}</h1>
@@ -32,7 +37,6 @@ const CollectionDisplay: React.FC<CollectionProps> = ({ collection }) => {
       </div>
     </div>
   );
-}
 };
 
 export default CollectionDisplay;
