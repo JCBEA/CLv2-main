@@ -9,10 +9,9 @@ interface InputFieldProps {
   placeholder: string;
   type?: string;
   name: string;
-  value: string;  // Add this line to handle the `value` prop
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;  // Add the onChange handler
+  value: string; // Add this line to handle the `value` prop
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void; // Add the onChange handler
 }
-
 
 const InputField: React.FC<InputFieldProps> = ({
   icon,
@@ -56,7 +55,9 @@ const GenderSelect = ({ selectedGender, setSelectedGender }: any) => (
       onChange={(e) => setSelectedGender(e.target.value)}
       required
     >
-      <option value="" disabled>Select Gender</option>
+      <option value="" disabled>
+        Select Gender
+      </option>
       <option value="male">Male</option>
       <option value="female">Female</option>
       <option value="prefer-not-to-say">Prefer not to say</option>
@@ -101,7 +102,7 @@ export const RegisterModal = ({
     email: "",
     contact: "",
   });
-  
+
   const [gender, setGender] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -123,22 +124,22 @@ export const RegisterModal = ({
       [name]: value,
     }));
   };
-  
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setErrorMessage("");
-  
+
     const { firstName, lastName, address, email, contact } = formData;
-  
+
     if (!firstName || !lastName || !address || !email || !contact || !gender) {
       setErrorMessage("Please fill in all fields.");
       setLoading(false);
       return;
     }
-  
+
     console.log("Form Data:", formData, "Gender:", gender); // Ensure formData is logged correctly
-  
+
     try {
       const response = await fetch("/api/admin-events", {
         method: "POST",
@@ -150,9 +151,9 @@ export const RegisterModal = ({
           eventData: { ...formData, gender },
         }),
       });
-  
+
       const data = await response.json();
-  
+
       if (response.ok) {
         toast.success("Successfully Registered!", { position: "bottom-right" });
         setShowPofconModal(false);
@@ -165,8 +166,6 @@ export const RegisterModal = ({
       setLoading(false);
     }
   };
-  
-  
 
   return (
     <motion.div
@@ -201,15 +200,6 @@ export const RegisterModal = ({
             </div>
 
             <form className="py-10 flex flex-col gap-4" onSubmit={handleSubmit}>
-              {/* Display Event Information */}
-              <div className="mb-4">
-                <h3 className="text-lg font-semibold text-primary-2">{eventTitle}</h3>
-                <p className="text-primary-2/70">{eventLocation}</p>
-                <p className="text-primary-2/70">
-                  {eventStartTime} - {eventEndTime}
-                </p>
-              </div>
-
               {/* Other Input Fields */}
               <div className="grid grid-cols-2 gap-4">
                 <InputField
@@ -253,7 +243,10 @@ export const RegisterModal = ({
                   value={formData.contact}
                   onChange={handleInputChange}
                 />
-               <GenderSelect selectedGender={gender} setSelectedGender={setGender} />
+                <GenderSelect
+                  selectedGender={gender}
+                  setSelectedGender={setGender}
+                />
               </div>
 
               {errorMessage && <p className="text-red-500">{errorMessage}</p>}
@@ -272,9 +265,38 @@ export const RegisterModal = ({
             </form>
           </div>
 
-          {/* Right side - Logo */}
-          <div className="relative flex justify-center items-center">
-            <Logo />
+          {/* Right side - Logo and decorative content */}
+          <div className="hidden h-full md:flex flex-col -mt-10 items-center justify-center relative">
+            {/* Display Event Information */}
+            <div className="top-10 absolute flex flex-col justify-center items-center">
+              <h3 className="text-lg font-semibold text-primary-2">
+                {eventTitle}
+              </h3>
+              <p className="text-primary-2/70 text-sm">{eventLocation}</p>
+              <p className="text-primary-2/70 text-sm">
+                {eventStartTime} - {eventEndTime}
+              </p>
+            </div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="w-full max-w-xs "
+            >
+              <Logo
+                color="text-primary-2 h-fit"
+                width="auto"
+                height="auto"
+              />
+              <div className="text-center space-y-4">
+                <h3 className="text-xl font-semibold text-primary-2">
+                  Join us at POFCON
+                </h3>
+                <p className="text-primary-2/70">
+                  Connect with fellow professionals and expand your network
+                </p>
+              </div>
+            </motion.div>
           </div>
         </div>
       </motion.div>
