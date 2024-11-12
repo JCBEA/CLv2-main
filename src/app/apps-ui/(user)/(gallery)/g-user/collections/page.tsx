@@ -1,6 +1,6 @@
-"use client";
-import useAuthRedirect from "@/services/hoc/auth";
-import React from "react";
+"use client"
+import useAuthRedirect from '@/services/hoc/auth';
+import React from 'react';
 
 interface CollectionProps {
   collection: {
@@ -14,11 +14,11 @@ interface CollectionProps {
 }
 
 const CollectionDisplay: React.FC<CollectionProps> = ({ collection }) => {
-  useAuthRedirect(); // auth guard
-
-  // Ensure collection is available
+  useAuthRedirect();    // auth guard
+  
+  // Return early if no collection is provided
   if (!collection) {
-    return <p>No collection found</p>; // You can customize this message
+    return <div>Loading...</div>; // Or handle this case however you'd like
   }
 
   const { title, description, images, artist, year } = collection;
