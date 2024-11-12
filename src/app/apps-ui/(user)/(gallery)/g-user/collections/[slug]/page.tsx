@@ -15,30 +15,31 @@ async function getCollection(slug: string) {
     console.error('Error fetching collection:', error);
     return null;
   }
-  
 
   if (data && data.length > 0) {
     const collection = data[0];
-
-    // Map the images correctly according to the CollectionProps interface
     const images = data.map(item => ({
-      created_at:item.created_at,
-      generatedId:item.generatedId,
-      image_path: item.path, // Assuming 'path' is the correct field for the image URL
-      title: item.title,     // Adjust these fields according to your actual data structure
+      created_at: item.created_at,
+      generatedId: item.generatedId,
+      image_path: item.path,
+      title: item.title,
       desc: item.desc,
       artist: item.artist,
       year: item.year,
-      childid:item.childid
+      childid: item.childid
     }));
 
     return {
-      collection: { images }, // Return the collection object as expected in CollectionProps
+      collection: { images },
     };
   }
 
   return null;
 }
+
+
+
+
 
 export default async function ViewCollectionPage({ params }: { params: { slug: string } }) {
   const collectionData = await getCollection(params.slug);

@@ -19,17 +19,18 @@ const JWT_SECRET = process.env.JWT_SECRET || "your-secret";
 interface CollectionProps {
   collection: {
     images: {
-      created_at: Date;
+      created_at: Date;   // Correct type
       generatedId: string;
-      image_path: string;
+      image_path: string;  // Correct type
       title: string;
       desc: string;
       artist: string;
-      year: number;
+      year: number;        // Correct type
       childid: string;
     }[];
   };
 }
+
 
 export const CollectionDisplay: React.FC<CollectionProps> = ({ collection }) => {
   const router = useRouter();
