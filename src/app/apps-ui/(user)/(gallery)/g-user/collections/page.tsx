@@ -9,7 +9,7 @@ interface CollectionProps {
     images: string[];
     artist: string;
     year: string;
-  };
+  } | null;
 }
 
 export default function CollectionDisplay({ collection }: CollectionProps) {
@@ -17,7 +17,7 @@ export default function CollectionDisplay({ collection }: CollectionProps) {
 
   // Return early if no collection
   if (!collection) {
-    return <div>Loading...</div>; // Or handle this case however you'd like
+    return <div>Loading...</div>;
   }
 
   const { title, description, images, artist, year } = collection;
@@ -37,6 +37,7 @@ export default function CollectionDisplay({ collection }: CollectionProps) {
     </div>
   );
 }
+
 
 // Ensure this component is exported as the default export.
 
