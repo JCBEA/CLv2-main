@@ -1,6 +1,6 @@
 "use client"
-import useAuthRedirect from '@/services/hoc/auth';
 import React from 'react';
+import {useAuthRedirect} from '@/services/hoc/auth';
 
 interface CollectionProps {
   collection: {
@@ -14,9 +14,9 @@ interface CollectionProps {
 }
 
 const CollectionDisplay: React.FC<CollectionProps> = ({ collection }) => {
-  useAuthRedirect();    // auth guard
-  
-  // Return early if no collection is provided
+  useAuthRedirect(); // auth guard
+
+  // Return early if no collection
   if (!collection) {
     return <div>Loading...</div>; // Or handle this case however you'd like
   }
@@ -37,6 +37,7 @@ const CollectionDisplay: React.FC<CollectionProps> = ({ collection }) => {
       </div>
     </div>
   );
-};
+}
 
+// This is the page export. If this is the main page of the route, it should be the default export.
 export default CollectionDisplay;

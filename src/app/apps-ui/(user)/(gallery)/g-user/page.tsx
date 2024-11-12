@@ -3,7 +3,7 @@
 import { Infinite } from "@/components/reusable-component/Infinite";
 import { Subscribe } from "@/components/reusable-component/Subscribe";
 
-import useAuthRedirect from "@/services/hoc/auth";
+import {useAuthRedirect} from "@/services/hoc/auth";
 import { CollectionsCarousel } from "./g-user-components/CollectionGallery";
 import { FeaturedCollections } from "./g-user-components/FeaturedGallery";
 

@@ -8,7 +8,7 @@ import { jwtVerify } from "jose";
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret';
 
-const useAuthRedirect = () => {
+export const useAuthRedirect = () => {
     const router = useRouter();
 
     useEffect(() => {
@@ -37,4 +37,3 @@ const useAuthRedirect = () => {
     }, [router]); 
 };
 
-export default useAuthRedirect;
