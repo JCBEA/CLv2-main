@@ -15,7 +15,7 @@ interface CollectionItem {
   slug: string;
 }
 
-export default function FeaturedCollections() {
+export const FeaturedCollections = () => {
   const [featuredItems, setFeaturedItems] = useState<CollectionItem[]>([]); // Array of CollectionItem
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null); // Allow both string and null types

@@ -5,7 +5,6 @@ import { RegisterModal } from "@/components/reusable-component/RegisterModal";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
-import { ToastContainer } from "react-toastify";
 
 interface ButtonProp {
   list: boolean;
@@ -147,7 +146,6 @@ export const UpcomingEvents = () => {
           eventEndTime={selectedEvent.end_time}
         />
       )}
-      <ToastContainer/>
     </div>
   );
 };
@@ -248,55 +246,94 @@ const EventCard: React.FC<{
           ? { backgroundColor: "transparent" }
           : { scale: 1.05, backgroundColor: "transparent" }
       }
-      transition={{ duration: 0.3 }}
-      className={`w-full flex md:flex-row flex-col gap-4 border-2 ${
+      className={`w-full ${
+        list
+          ? "flex flex-row gap-6 justify-start items-center"
+          : "max-w-xs mx-auto flex flex-col gap-4"
+      } ${colorClasses.bgColor} border-2 ${
         colorClasses.border
-      } ${list ? "p-4" : "p-8"} rounded-xl`}
+      } duration-500 p-4 text-base group`}
     >
-      <div className="w-[250px] h-[150px] overflow-hidden relative rounded-lg">
+      <div className={`${list ? "h-24 w-full max-w-44" : "h-48 w-full"}`}>
         <img
-          src={event.image_path}
+          className={`object-cover ${list ? "w-44 h-24" : "h-48 w-full"}`}
+          src={event.image_path || "../images/events/cover.png"}
           alt={event.title}
-          className="w-full h-full object-cover rounded-lg"
         />
       </div>
-      <div className="w-full flex flex-col justify-between">
-        <h2
-          className={`font-semibold ${
-            list ? "text-2xl" : "text-lg"
-          } text-primary-1`}
-        >
-          {event.title}
-        </h2>
-        <p
-          className={`font-semibold ${
-            list ? "text-base" : "text-sm"
-          } text-primary-2`}
-        >
-          {event.location}
-        </p>
-        <p
-          className={`font-semibold ${
-            list ? "text-base" : "text-sm"
-          } text-primary-2`}
-        >
-          {event.start_time} - {event.end_time}
-        </p>
-        <div className="w-full flex justify-end mt-4">
-          <button
-            className="font-semibold px-6 py-2 rounded-lg text-sm bg-primary-2 text-white"
-            onClick={() => {
-              setSelectedEvent(event); // Set the selected event id
-              setShowPofconModal(true);
-            }}
+      <div
+        className={`w-full flex gap-4 ${
+          list ? "flex-col-reverse" : "flex-col"
+        }`}
+      >
+        <div className="w-full flex justify-between items-center">
+          <div className="w-fit flex flex-col leading-3">
+            <p className={`font-bold duration-500 ${colorClasses.textColor}`}>
+              {event.start_time} - {event.end_time}
+            </p>
+            <p className="text-sm capitalize font-medium">{event.location}</p>
+          </div>
+          <motion.div whileTap={{ scale: 0.95 }} whileHover={{ scale: 1.05 }}>
+            <Icon
+              className={`rotate-180 -mt-4 cursor-pointer duration-300 ${
+                colorClasses.textColor
+              } ${list ? "hidden" : "block"}`}
+              icon="ph:arrow-left-bold"
+              width="25"
+              height="25"
+            />
+          </motion.div>
+        </div>
+        <div className="w-full">
+          <h1
+            className={`w-full text-xl font-semibold title duration-300 ${
+              colorClasses.textColor
+            } ${list ? "max-w-full" : "max-w-56"}`}
           >
-            Register
-          </button>
+            {event.title}
+          </h1>
         </div>
       </div>
+      <EventRegisterButton
+        colorClasses={colorClasses}
+        list={list}
+        setShowPofconModal={setShowPofconModal}
+        setSelectedEvent={() => setSelectedEvent(event)} // Pass the event to setSelectedEvent
+      />
     </motion.div>
   );
 };
+
+const EventRegisterButton = ({
+  colorClasses,
+  list,
+  setShowPofconModal,
+  setSelectedEvent,
+}: {
+  colorClasses: any;
+  list: boolean;
+  setShowPofconModal: React.Dispatch<React.SetStateAction<boolean>>;
+  setSelectedEvent: () => void;
+}) => {
+  return (
+    <motion.button
+      className={`px-6 py-1.5 bg-primary-1 text-secondary-2 font-medium transition-colors duration-500 ease-in-out 
+        ${colorClasses.bgHover} 
+        ${colorClasses.textHover}
+        ${list ? "w-fit px-6 whitespace-nowrap" : "w-full"}
+      `}
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      onClick={() => {
+        setSelectedEvent(); // Set the selected event
+        setShowPofconModal(true);
+      }}
+    >
+      Register for free
+    </motion.button>
+  );
+};
+
 
 const ListButton: React.FC<ButtonProp> = ({ list, setList }) => {
   return (
