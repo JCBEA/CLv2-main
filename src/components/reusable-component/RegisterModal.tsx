@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import { Logo } from "./Logo";
 import { Icon } from "@iconify/react/dist/iconify.js";
+import { toast } from "react-toastify";
 
 interface InputFieldProps {
   icon: any;
@@ -153,7 +154,7 @@ export const RegisterModal = ({
       const data = await response.json();
   
       if (response.ok) {
-        alert("Registration successful!");
+        toast.success("Successfully Registered!", { position: "bottom-right" });
         setShowPofconModal(false);
       } else {
         setErrorMessage(data.error || "An error occurred.");

@@ -1,18 +1,24 @@
 "use client";
 
+import { RegisterModal } from "@/components/reusable-component/RegisterModal";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { ToastContainer } from "react-toastify";
 
+interface ModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
 interface EventProps {
   id: string;
   eventTitle: string;
   start_time: string;
   end_time: string;
   location: string;
-  date:string;
+  date: string;
   desc: string;
-  title:string;
+  title: string;
 }
 
 export const Events = () => {
@@ -21,18 +27,25 @@ export const Events = () => {
   const [events, setEvents] = useState<EventProps[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<EventProps | null>(null);
+
+  const handleRegisterClick = (event: EventProps) => {
+    setSelectedEvent(event);
+    setShowModal(true);
+  };
 
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await fetch('/api/admin-events'); // Adjust the endpoint as needed
+        const response = await fetch("/api/admin-events"); // Adjust the endpoint as needed
         if (!response.ok) {
-          throw new Error('Failed to fetch events');
+          throw new Error("Failed to fetch events");
         }
         const data = await response.json();
         setEvents(data);
-      } catch (err:any) {
-        setError(err.message || 'An error occurred while fetching events');
+      } catch (err: any) {
+        setError(err.message || "An error occurred while fetching events");
       } finally {
         setLoading(false);
       }
@@ -102,7 +115,7 @@ export const Events = () => {
                     : "w-1/3"
                 } p-4 flex-shrink-0 box-border`}
               >
-                <Cards {...event} />
+                <Cards {...event} onRegisterClick={() => handleRegisterClick(event)}/>
               </div>
             ))}
           </motion.div>
@@ -128,17 +141,30 @@ export const Events = () => {
           />
         </button>
       </div>
+      {/* Register Modal */}
+      {showModal && selectedEvent && (
+        <RegisterModal
+          setShowPofconModal={setShowModal}
+          eventId={parseInt(selectedEvent.id)}
+          eventTitle={selectedEvent.title}
+          eventLocation={selectedEvent.location}
+          eventStartTime={selectedEvent.start_time}
+          eventEndTime={selectedEvent.end_time}
+        />
+      )}
+      <ToastContainer/>
     </div>
   );
 };
 
-const Cards: React.FC<EventProps> = ({
+const Cards: React.FC<EventProps & { onRegisterClick: () => void }> = ({
   title,
   eventTitle,
   start_time,
   end_time,
   location,
   desc,
+  onRegisterClick
 }) => {
   return (
     <div className="w-full h-fit flex flex-col justify-center items-center gap-6 p-8 bg-shade-2 text-secondary-2 rounded-xl text-lg">
@@ -150,18 +176,21 @@ const Cards: React.FC<EventProps> = ({
           </p>
           <small>{location}</small>
         </div>
-        <p className={`font-medium title w-full md:text-left text-center ${desc.length > 25 ? "line-clamp-1" : ""}`}>
+        <p className={`font-medium title w-full md:text-left text-center ${
+          desc.length > 25 ? "line-clamp-1" : ""
+        }`}>
           {desc}
         </p>
       </div>
-      <EventButton />
+      <EventButton onClick={onRegisterClick} />
     </div>
   );
 };
 
-const EventButton = () => {
+const EventButton: React.FC<{ onClick: () => void }> = ({ onClick }) => {
   return (
     <motion.button
+      onClick={onClick}
       className="w-fit px-4 py-1.5 bg-primary-1 text-secondary-2 whitespace-nowrap"
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}

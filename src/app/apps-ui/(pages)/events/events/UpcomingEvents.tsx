@@ -5,6 +5,7 @@ import { RegisterModal } from "@/components/reusable-component/RegisterModal";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
+import { ToastContainer } from "react-toastify";
 
 interface ButtonProp {
   list: boolean;
@@ -146,6 +147,7 @@ export const UpcomingEvents = () => {
           eventEndTime={selectedEvent.end_time}
         />
       )}
+      <ToastContainer/>
     </div>
   );
 };
@@ -157,7 +159,14 @@ const EventGrid: React.FC<{
   setShowPofconModal: React.Dispatch<React.SetStateAction<boolean>>;
   events: AdminEvent[];
   setSelectedEvent: React.Dispatch<React.SetStateAction<AdminEvent | null>>; // Setter for selected event
-}> = ({ currentDate, list, setList, events, setShowPofconModal, setSelectedEvent }) => {
+}> = ({
+  currentDate,
+  list,
+  setList,
+  events,
+  setShowPofconModal,
+  setSelectedEvent,
+}) => {
   const filteredEvents = events.filter((event) => {
     const eventDate = new Date(event.date);
     return (
@@ -190,10 +199,11 @@ const EventGrid: React.FC<{
               })()}
             </h1>
             <div
-              className={`w-full h-fit ${list
+              className={`w-full h-fit ${
+                list
                   ? "flex flex-col gap-4"
                   : "grid xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-12"
-                }`}
+              }`}
             >
               {groupedEvents[date].map((event) => (
                 <EventCard
@@ -207,8 +217,9 @@ const EventGrid: React.FC<{
               ))}
             </div>
             <div
-              className={`w-full h-[1px] bg-primary-1 mt-12 ${list ? "hidden" : ""
-                }`}
+              className={`w-full h-[1px] bg-primary-1 mt-12 ${
+                list ? "hidden" : ""
+              }`}
             ></div>
           </div>
         ))
@@ -238,7 +249,9 @@ const EventCard: React.FC<{
           : { scale: 1.05, backgroundColor: "transparent" }
       }
       transition={{ duration: 0.3 }}
-      className={`w-full flex md:flex-row flex-col gap-4 border-2 ${colorClasses.border} ${list ? "p-4" : "p-8"} rounded-xl`}
+      className={`w-full flex md:flex-row flex-col gap-4 border-2 ${
+        colorClasses.border
+      } ${list ? "p-4" : "p-8"} rounded-xl`}
     >
       <div className="w-[250px] h-[150px] overflow-hidden relative rounded-lg">
         <img
@@ -249,17 +262,23 @@ const EventCard: React.FC<{
       </div>
       <div className="w-full flex flex-col justify-between">
         <h2
-          className={`font-semibold ${list ? "text-2xl" : "text-lg"} text-primary-1`}
+          className={`font-semibold ${
+            list ? "text-2xl" : "text-lg"
+          } text-primary-1`}
         >
           {event.title}
         </h2>
         <p
-          className={`font-semibold ${list ? "text-base" : "text-sm"} text-primary-2`}
+          className={`font-semibold ${
+            list ? "text-base" : "text-sm"
+          } text-primary-2`}
         >
           {event.location}
         </p>
         <p
-          className={`font-semibold ${list ? "text-base" : "text-sm"} text-primary-2`}
+          className={`font-semibold ${
+            list ? "text-base" : "text-sm"
+          } text-primary-2`}
         >
           {event.start_time} - {event.end_time}
         </p>
