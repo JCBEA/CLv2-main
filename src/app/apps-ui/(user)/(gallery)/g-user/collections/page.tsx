@@ -2,25 +2,23 @@ import React from 'react';
 import { useAuthRedirect } from '@/services/hoc/auth';
 
 interface CollectionProps {
-  collection: {
     created_at: string;
     title: string;
     description: string;
     images: string[];
     artist: string;
     year: string;
-  } | null;
 }
 
-export default function CollectionDisplay({ collection }: CollectionProps) {
+export default function CollectionDisplay(props: CollectionProps) {
   useAuthRedirect(); // auth guard
 
-  // Return early if no collection
-  if (!collection) {
+  // Return early if no collection data
+  if (!props) {
     return <div>Loading...</div>;
   }
 
-  const { title, description, images, artist, year } = collection;
+  const { title, description, images, artist, year } = props;
 
   return (
     <div>
@@ -37,7 +35,3 @@ export default function CollectionDisplay({ collection }: CollectionProps) {
     </div>
   );
 }
-
-
-// Ensure this component is exported as the default export.
-
