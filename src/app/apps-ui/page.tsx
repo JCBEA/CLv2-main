@@ -16,11 +16,13 @@ const heroImages = [
   "/intro/img7.png",
 ];
 
+// Define HomeProps separately
 export interface HomeProps {
   setContentLoaded?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export default function Loader({ setContentLoaded }: HomeProps) {
+// Use the interface in the component
+const Loader: React.FC<HomeProps> = ({ setContentLoaded }) => {
   const router = useRouter();
   const [contentFullyLoaded, setContentFullyLoaded] = useState(false);
 
@@ -153,4 +155,6 @@ export default function Loader({ setContentLoaded }: HomeProps) {
       </section>
     </main>
   );
-}
+};
+
+export default Loader;
