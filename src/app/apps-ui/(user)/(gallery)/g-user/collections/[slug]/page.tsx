@@ -1,23 +1,9 @@
 import { notFound } from 'next/navigation';
 import { supabase } from '@/services/supabaseClient'; // Adjust the import path as needed
-import CollectionDisplay from './CollectionDisplay'; // Adjust the import path to your component
-import { Icon } from '@iconify/react/dist/iconify.js';
+import {CollectionDisplay} from './CollectionDisplay'; // Adjust the import path to your component
+
 
 // Define the CollectionProps interface
-interface CollectionProps {
-  collection: {
-    images: {
-      created_at:Date;
-      generatedId:string;
-      image_path: string;
-      title: string;
-      desc: string;
-      artist: string;
-      year: string;
-      childid:string
-    }[];
-  };
-}
 
 async function getCollection(slug: string) {
   const { data, error } = await supabase

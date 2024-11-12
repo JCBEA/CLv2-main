@@ -31,7 +31,7 @@ interface CollectionProps {
   };
 }
 
-const CollectionDisplay: React.FC<CollectionProps> = ({ collection }) => {
+export const CollectionDisplay: React.FC<CollectionProps> = ({ collection }) => {
   const router = useRouter();
   const [images, setImages] = useState(collection.images);
   const [getID, setID] = useState<string | null>(null);
@@ -347,4 +347,3 @@ const CollectionDisplay: React.FC<CollectionProps> = ({ collection }) => {
   );
 };
 
-export default CollectionDisplay;
