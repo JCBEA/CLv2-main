@@ -8,7 +8,7 @@ import { deleteCollectionItem } from "@/services/Collections/deleteCollection";
 import { getSession } from "@/services/authservice";
 import { jwtVerify } from "jose";
 import { useRouter } from "next/navigation";
-import useAuthRedirect from "@/services/hoc/auth";
+import {useAuthRedirect} from "@/services/hoc/auth";
 import DeleteCollection from "./(collectionModal)/DeleteCollection";
 import { toast, ToastContainer } from "react-toastify";
 import { EditCollection } from "./(collectionModal)/EditCollection";
