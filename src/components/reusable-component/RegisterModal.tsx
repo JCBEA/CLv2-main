@@ -10,6 +10,7 @@ interface InputFieldProps {
   type?: string;
   name: string;
   value: string; // Add this line to handle the `value` prop
+  error?: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void; // Add the onChange handler
 }
 
@@ -18,37 +19,60 @@ const InputField: React.FC<InputFieldProps> = ({
   placeholder,
   type = "text",
   name,
-  value, // Accept value here
-  onChange, // Accept onChange handler here
-}) => (
-  <div className="relative w-full group">
-    <input
-      className="w-full h-12 bg-transparent border-b-2 border-secondary-2/30 px-12 
+  value,
+  onChange,
+  error,
+}) => {
+  const isContactField = name === "contact";
+
+  return (
+    <div className="relative w-full group">
+      <div className="flex items-center">
+      {isContactField && <span className={`mr-1 text-gray-700 absolute ${isContactField ? "px-8" : ""}`}>+63</span>}
+        <input
+          className={`w-full h-12 bg-transparent border-b-2 border-secondary-2/30 ${isContactField ? "pl-20" : "px-8"}
                  text-primary-2 placeholder:text-primary-2/50 outline-none transition-all duration-300
-                 focus:border-secondary-2 [&:-webkit-autofill]:transition-[background-color_5000s_ease-in-out_0s]"
-      type={type}
-      name={name}
-      placeholder={placeholder}
-      autoComplete="off"
-      required
-      value={value} // Bind value to input
-      onChange={onChange} // Handle onChange
-    />
-    <Icon
-      icon={icon}
-      className="absolute left-0 top-1/2 -translate-y-1/2 text-primary-2/50 w-6 h-6
+                 focus:border-secondary-2 [&:-webkit-autofill]:transition-[background-color_5000s_ease-in-out_0s]`}
+          type={type}
+          name={name}
+          placeholder={placeholder}
+          autoComplete="off"
+          required
+          value={value}
+          onChange={(e) => {
+            // Conditional validation for contact number
+            if (isContactField) {
+              const inputValue = e.target.value;
+              if (!/^9\d{9}$/.test(inputValue)) {
+                e.target.setCustomValidity(
+                  "Contact number must start with 9 and be exactly 10 digits long."
+                );
+              } else {
+                e.target.setCustomValidity("");
+              }
+            }
+            onChange(e); // Call parent's onChange handler
+          }}
+        />
+        <Icon
+          icon={icon}
+          className="absolute left-0 top-1/2 -translate-y-1/2 text-primary-2/50 w-6 h-6
                  group-focus-within:text-secondary-2 transition-colors duration-300"
-      width="25"
-      height="25"
-    />
-  </div>
-);
+          width="25"
+          height="25"
+        />
+      </div>
+      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+    </div>
+  );
+};
+
 
 // New Gender Selection Component
 const GenderSelect = ({ selectedGender, setSelectedGender }: any) => (
   <div className="relative w-full group">
     <select
-      className="w-full h-12 bg-transparent border-b-2 border-secondary-2/30 px-12 
+      className="w-full h-12 bg-transparent border-b-2 border-secondary-2/30 px-8 
                  text-primary-2 outline-none transition-all duration-300
                  focus:border-secondary-2 appearance-none cursor-pointer"
       value={selectedGender}
@@ -189,7 +213,7 @@ export const RegisterModal = ({
 
         <div className="relative grid md:grid-cols-2 gap-8 md:p-10 p-6">
           {/* Left side - Form */}
-          <div className="space-y-6">
+          <div className="space-y-0">
             <div className="space-y-2">
               <h2 className="text-2xl font-bold text-primary-2">
                 Register for POFCON
@@ -238,10 +262,12 @@ export const RegisterModal = ({
               <div className="grid grid-cols-2 gap-4">
                 <InputField
                   icon="bxs:contact"
-                  placeholder="Contact Number"
+                  placeholder="Number"
+                  type="number"
                   name="contact"
                   value={formData.contact}
                   onChange={handleInputChange}
+                  error={errorMessage}
                 />
                 <GenderSelect
                   selectedGender={gender}
@@ -267,27 +293,13 @@ export const RegisterModal = ({
 
           {/* Right side - Logo and decorative content */}
           <div className="hidden h-full md:flex flex-col -mt-10 items-center justify-center relative">
-            {/* Display Event Information */}
-            <div className="top-10 absolute flex flex-col justify-center items-center">
-              <h3 className="text-lg font-semibold text-primary-2">
-                {eventTitle}
-              </h3>
-              <p className="text-primary-2/70 text-sm">{eventLocation}</p>
-              <p className="text-primary-2/70 text-sm">
-                {eventStartTime} - {eventEndTime}
-              </p>
-            </div>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
               className="w-full max-w-xs "
             >
-              <Logo
-                color="text-primary-2 h-fit"
-                width="auto"
-                height="auto"
-              />
+              <Logo color="text-primary-2 h-fit" width="auto" height="auto" />
               <div className="text-center space-y-4">
                 <h3 className="text-xl font-semibold text-primary-2">
                   Join us at POFCON
