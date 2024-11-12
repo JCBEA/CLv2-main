@@ -10,7 +10,7 @@ interface CollectionProps {
   year: string;
 }
 
-export default function CollectionDisplay({ created_at, title, description, images, artist, year }: CollectionProps) {
+const CollectionDisplay: React.FC<CollectionProps> = ({ created_at, title, description, images, artist, year }) => {
   useAuthRedirect(); // auth guard
 
   // Return early if no collection data
@@ -32,4 +32,6 @@ export default function CollectionDisplay({ created_at, title, description, imag
       </div>
     </div>
   );
-}
+};
+
+export default CollectionDisplay;
