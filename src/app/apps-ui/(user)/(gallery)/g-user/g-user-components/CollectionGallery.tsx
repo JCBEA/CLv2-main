@@ -17,7 +17,7 @@ interface Collection {
   slug: string;
 }
 
-export default function CollectionsCarousel() {
+export const CollectionsCarousel = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [collections, setCollections] = useState<Collection[]>([]);
   const [loading, setLoading] = useState(true); // Add loading state
