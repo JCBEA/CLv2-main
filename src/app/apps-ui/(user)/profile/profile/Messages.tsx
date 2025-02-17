@@ -210,11 +210,6 @@ export const Messages = () => {
         },
         body: JSON.stringify(messageData),
       });
-      console.log(
-        "Message Data: " + messageData.message,
-        messageData.forId,
-        messageData.first_name
-      );
 
       if (!response.ok) {
         throw new Error("Failed to send message");
@@ -297,7 +292,6 @@ export const Messages = () => {
     try {
       localStorage.setItem("messageId", messageId);
       const getMessageToken = getMessageId();
-      console.log("Token ID" + getMessageToken);
       const someoneMessage = messages.filter((msg) => msg.id === messageId);
       const yourMessage = messages.filter(
         (msg) => msg.id === userId || msg.for == messageId
@@ -389,7 +383,6 @@ export const Messages = () => {
                       onClick={() => {
                         if (userId) {
                           handleUserClick(userId, msg.id, msg.first_name);
-                          console.log("msg CLICK: " + messageId);
                         }
                       }}
                     >

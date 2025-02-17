@@ -26,7 +26,6 @@ const ArtworkDetailPage: React.FC = () => {
       try {
         const data = await fetchArtworks();
         setArtworksData(data);
-        console.log("Fetched Artworks Data:", data); // Log the fetched data
       } catch (err) {
         console.error('Error fetching artworks:', err);
         setError('Failed to fetch artworks');

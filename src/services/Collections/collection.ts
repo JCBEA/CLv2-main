@@ -57,7 +57,6 @@ export function useImageCollectionSubscription() {
               }
     
               const data = await response.json();
-              console.log("Fetched collections:", data); // Check the data structure
               setCollection(data || []); // Default to an empty array
     
             } catch (err) {

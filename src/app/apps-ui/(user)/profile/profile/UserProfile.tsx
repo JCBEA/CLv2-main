@@ -147,8 +147,6 @@ const UserDetailDisplay = ({ userDetail }: { userDetail: UserDetail }) => {
         new TextEncoder().encode(JWT_SECRET)
       );
 
-      // Log the payload for debugging
-      console.log("Retrieved token payload:", payload.id);
       const userId = payload.id as string;
       const response = await fetch("/api/creatives", {
         method: "PUT",
@@ -168,8 +166,6 @@ const UserDetailDisplay = ({ userDetail }: { userDetail: UserDetail }) => {
         throw new Error(errorData.message);
       }
 
-      // Handle success
-      console.log("User details updated successfully");
       setIsEditing(false); // Exit edit mode
     } catch (error) {
       console.error("Error updating user details:", error);

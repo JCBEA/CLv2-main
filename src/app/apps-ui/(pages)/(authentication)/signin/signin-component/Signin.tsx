@@ -69,7 +69,6 @@ export const Form = () => {
 
     try {
         const user = await loginUser(username, password);
-        console.log("Logged in user:", user);
         toast.success("Successfully Login!", { position: "bottom-right" });
         if (user) {
             // Store the token in local storage or cookies

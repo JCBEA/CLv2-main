@@ -74,8 +74,6 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
         new TextEncoder().encode(JWT_SECRET)
       );
 
-      // Log the payload for debugging
-      console.log("Retrieved token payload:", payload.id);
 
       const userId = payload.id as string;
       const response = await fetch("/api/creatives", {
@@ -99,7 +97,6 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
       // Assuming your API responds with the updated user details
       const updatedUserDetail: UserDetail = await response.json(); // Fetch the updated user details
       setFormData(updatedUserDetail); // Update formData with the new data
-      console.log("User details updated successfully");
       setIsEditing(false); // Exit edit mode
     } catch (error) {
       console.error("Error updating user details:", error);

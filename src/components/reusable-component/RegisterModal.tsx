@@ -162,8 +162,6 @@ export const RegisterModal = ({
       return;
     }
 
-    console.log("Form Data:", formData, "Gender:", gender); // Ensure formData is logged correctly
-
     try {
       const response = await fetch("/api/admin-events", {
         method: "POST",

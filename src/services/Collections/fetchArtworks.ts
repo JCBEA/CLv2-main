@@ -31,8 +31,6 @@ export const fetchArtworks = async (): Promise<Artwork[]> => {
                 return child.sluger === artwork.slug;
             });
 
-            console.log('Related Works for', artwork.slug, relatedWorks);
-
             return {
                 slug: artwork.slug,
                 image_path: artwork.image_path,

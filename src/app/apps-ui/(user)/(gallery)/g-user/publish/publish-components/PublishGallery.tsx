@@ -105,8 +105,6 @@ export default function PublishGallery() {
         throw new Error(`Failed to send message: ${errorBody}`);
       }
 
-      const result = await response.json();
-      console.log(result); // Handle success (optional)
       setFormData({
         title: "",
         desc: "",

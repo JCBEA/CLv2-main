@@ -99,7 +99,7 @@ const Loader: React.FC<HomeProps> = ({ setContentLoaded }) => {
           duration: 1,
           ease: "power3.out",
         },
-        "-=0.5"
+        "-=0.5"   
       )
       .eventCallback("onComplete", () => {
         if (setContentLoaded) {

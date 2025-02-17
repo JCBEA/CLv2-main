@@ -32,9 +32,6 @@ export const ServiceCreatives = () => {
   
         const data = await response.json();
   
-        // Check the data structure in the console
-        console.log("Fetched data:", data);
-  
         // Transform the data to include newCount
         const transformedData = data.map((item: any) => ({
           first_name: item.first_name,
